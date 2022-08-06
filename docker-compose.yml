@@ -19,7 +19,7 @@ services:
     env_file:
       - .env
     volumes:
-      - .:/app
+      - .:/user/src/app
     ports:
       - "${DOCKER_APP_PORT}:8000"
     environment:
