@@ -33,3 +33,7 @@ Teniendo la aplicación en ejecución, se aplican las migraciones de cada app in
 ```
 $ docker-compose exec web python manage.py migrate
 ```
+## Detencion ##
+```
+sudo docker-compose stop
+```
