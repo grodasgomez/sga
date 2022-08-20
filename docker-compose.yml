@@ -22,6 +22,7 @@ services:
       - .:/user/src/app
     ports:
       - "${DOCKER_APP_PORT}:8000"
+    user: "${DOCKER_USER}"
     environment:
       - POSTGRES_NAME=${POSTGRES_NAME}
       - POSTGRES_USER=${POSTGRES_USER}

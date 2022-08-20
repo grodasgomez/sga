@@ -1,0 +1,67 @@
+<div
+  id="sidebar"
+  class="d-flex flex-column flex-shrink-0 p-3 bg-light"
+  style="width: 280px"
+>
+  <a
+    href="/"
+    class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none"
+  >
+    <svg class="bi pe-none" width="40" height="32">
+      <use xlink:href="#bootstrap"></use>
+    </svg>
+    <span class="fs-4">SGA</span>
+  </a>
+  <hr />
+  <ul class="nav nav-pills flex-column mb-auto">
+    <li class="nav-item">
+      <a href="#" class="nav-link active" aria-current="page">
+        <i class="fa-solid fa-house"></i>
+        Home
+      </a>
+    </li>
+    <li>
+      <a href="#" class="nav-link link-dark">
+        <i class="fa-solid fa-diagram-project"></i>
+        Proyectos
+      </a>
+    </li>
+    <li>
+      <a href="#" class="nav-link link-dark">
+        <i class="fa-solid fa-table"></i>
+        Tablero
+      </a>
+    </li>
+    <li>
+      <a href="#" class="nav-link link-dark">
+        <i class="fa-solid fa-circle-user"></i>
+        Usuarios
+      </a>
+    </li>
+  </ul>
+  <hr />
+  <div class="dropdown">
+    <a
+      href="#"
+      class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+    >
+      <img
+        src="{{user.socialaccount_set.all.0.get_avatar_url}}"
+        alt=""
+        width="32"
+        height="32"
+        class="rounded-circle"
+      />
+      <strong>{{user.first_name}}</strong>
+    </a>
+    <ul class="dropdown-menu text-small shadow">
+      <li><a class="dropdown-item" href="/profile">Profile</a></li>
+      <li><hr class="dropdown-divider" /></li>
+      <li>
+        <a class="dropdown-item" href="/accounts/logout">Sign out</a>
+      </li>
+    </ul>
+  </div>
+</div>
