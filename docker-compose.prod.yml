@@ -1,0 +1,45 @@
+version: "3.9"
+   
+services:
+  db:
+    env_file:
+      - .prod.env
+    container_name: is2-db-prod
+    image: postgres:14
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - ${DOCKER_DB_PORT}:5432
+  web:
+    container_name: is2-app-prod
+
+    build: 
+      context: .
+      target: production
+
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+    env_file:
+      - .prod.env
+    expose:
+      - 8000
+    environment:
+      - POSTGRES_NAME=${POSTGRES_NAME}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+  nginx:
+    container_name: is2-nginx-prod
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+    build: ./nginx
+    ports:
+      - 80:80
+    depends_on:
+      - web
+volumes:
+  static_volume:
+    

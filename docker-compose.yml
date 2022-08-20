@@ -14,7 +14,9 @@ services:
       - ${DOCKER_DB_PORT}:5432
   web:
     container_name: is2-app
-    build: .
+    build: 
+      context: .
+      target: base
     command: python manage.py runserver 0.0.0.0:8000
     env_file:
       - .env
