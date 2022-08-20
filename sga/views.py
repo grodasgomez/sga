@@ -1,9 +1,9 @@
 
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
 def profile(request):
+    print(request.user)
     return render(request, 'sga/profile.html')
 
 @login_required()
