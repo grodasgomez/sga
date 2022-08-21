@@ -1,6 +1,6 @@
 # SGA: Sistema de Gestión Agile #
 ##  Descripción ##
-Proyecto de 
+Proyecto de Ingenieria de Software II
 
 ## Construcción ##
 * ***Lenguaje*** : Python 3.10
