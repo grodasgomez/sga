@@ -1,6 +1,6 @@
 # SGA: Sistema de Gestión Agile #
 ##  Descripción ##
-Proyecto de 
+Proyecto de Ingenieria de Software II
 
 ## Construcción ##
 * ***Lenguaje*** : Python 3.10
@@ -40,9 +40,16 @@ $ docker-compose exec web python manage.py migrate
 ```
 ## Detencion ##
 ```
-sudo docker-compose stop
+$ docker-compose stop
 ```
-
+## Ver documentacion ##
+```
+$ docker-compose exec web python django_pydoc.py -p 1234 -n 0.0.0.0
+```
+## Realizar pruebas unitarias ##
+```
+$ docker-compose exec web python manage.py test
+```
 ## Puesta a producción ##
 Para levantar el ambiente de producción se utiliza el archivo `docker-compose.prod.yml` que contiene las definiciones de los servicios para el ambiente de producción incluido ngnix y gunicorn
 
