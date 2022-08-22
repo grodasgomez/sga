@@ -40,7 +40,11 @@ $ docker-compose exec web python manage.py migrate
 ```
 ## Detencion ##
 ```
-sudo docker-compose stop
+$ docker-compose stop
+```
+## Ver documentacion ##
+```
+$ docker-compose exec web python django_pydoc.py -p 1234 -n 0.0.0.0
 ```
 
 ## Puesta a producción ##
