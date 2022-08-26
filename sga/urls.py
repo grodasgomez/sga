@@ -25,4 +25,6 @@ urlpatterns = [
     path('', views.index, name='index'),
 
     path('project', views.project, name='project'),
+    #TODO listar usuarios luego debe estar en otro lado
+    path('users', views.list_users, name='users'),
 ]

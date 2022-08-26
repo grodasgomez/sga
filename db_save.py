@@ -8,7 +8,7 @@ from users import models
 # rol2.name = "Developer"
 # rol2.save()
 
-project1 = models.project()
-project1.user_id = 2
-project1.role_id = 34
-project1.save()
+# project1 = models.project()
+# project1.user_id = 1
+# project1.role_id = 1
+# project1.save()

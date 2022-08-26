@@ -1,0 +1,15 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+<b></b>
+<head>Roles:</head>
+	{% for x in user_list_with_roles %}
+		<b></b>
+		<head>{{ x.user.first_name }}</head>
+		<head>{{ x.user.last_name }}</head>
+		<head>Roles:</head>
+        {% for rol in x.roles %}
+            <b></b>
+            <head>{{ rol.name }}</head>
+        {% endfor %}
+	{% endfor %}
+{% endblock %}
