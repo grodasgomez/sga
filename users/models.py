@@ -10,7 +10,7 @@ class CustomUser(AbstractBaseUser):
     email = models.EmailField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
-    role = models.CharField(max_length=50, default='user')
+    role_system = models.CharField(max_length=50, default='user')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
@@ -20,3 +20,19 @@ class CustomUser(AbstractBaseUser):
 
     class Meta:
         db_table = 'sga_user'
+
+class project(models.Model):
+    user_id = models.IntegerField()
+    role_id = models.IntegerField()
+
+class Role(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=100)
+    permissions = []
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(null=True)
+
+class permission(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=100)
