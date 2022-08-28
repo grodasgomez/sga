@@ -100,7 +100,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': os.environ.get("GOOGLE_CLIENT_ID"),
             'secret': os.environ.get("GOOGLE_CLIENT_SECRET"),
         }
-    }
+    },
 }
 
 # SOCIALACCOUNT_ADAPTER = 'sga.socialaccount_adapter.CustomUsersAccountAdapter'
@@ -111,6 +111,8 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_LOGOUT_ON_GET=True
+SOCIALACCOUNT_LOGIN_ON_GET=True
 
 WSGI_APPLICATION = 'sga.wsgi.application'
 
