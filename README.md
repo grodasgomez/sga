@@ -59,14 +59,14 @@ Para levantar el ambiente de producción se utiliza el archivo `docker-compose.p
   
 - Estando en el directorio del proyecto, construir las imagenes de producción:
 ```
-$ docker-compose -f docker-compose.prod.yml build
+$ docker-compose -f docker-compose.prod.yml --env-file=.prod.env build
 ```
 - Levantar la base de datos, el wsgi y el nginx en segundo plano:
 ```
-$ docker-compose -f docker-compose.prod.yml up -d
+$ docker-compose -f docker-compose.prod.yml --env-file=.prod.env up -d
 ```
 - Aplicar las migraciones a la base de datos de producción:
 ```
-$ docker-compose -f docker-compose.prod.yml exec web python manage.py migrate
+$ docker-compose -f docker-compose.prod.yml --env-file=.prod.env exec web python manage.py migrate
 ```
 - Visualizar la aplicación abriendo en el navegador `http://localhost`
