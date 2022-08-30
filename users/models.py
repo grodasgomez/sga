@@ -25,14 +25,18 @@ class project(models.Model):
     user_id = models.IntegerField()
     role_id = models.IntegerField()
 
-class Role(models.Model):
+class permission(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=100)    
+
+class role(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=100)
-    permissions = []
+    #permissions = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
+    permissions = models.ManyToManyField(permission)
+#manytoone foreignkey
 
-class permission(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.CharField(max_length=100)
+    

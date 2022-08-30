@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include
 from . import views
+from users import views as views_users
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,4 +28,5 @@ urlpatterns = [
     path('project', views.project, name='project'),
     #TODO listar usuarios luego debe estar en otro lado
     path('users', views.list_users, name='users'),
+    path('agg_roles', views_users.agg_roles, name='agg_roles'),
 ]
