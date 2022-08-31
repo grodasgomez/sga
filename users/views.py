@@ -1,11 +1,35 @@
 from multiprocessing import context
+from random import choices
 from django.shortcuts import render
+from django.http import HttpResponse
 import users.models
+from .forms import FormRoles
 
 # Create your views here.
 def agg_roles(request):
-    #select * from sga_permission
-    permissions = users.models.permission.objects.all()
-    context = { "list_permissions" : permissions}
-    #print ([x.name for x in permissions])
-    return render(request, 'sga/agg_roles.html', context)
+    isRoleSave=0 #variable para saber si se guardo o no algo recientemente
+    #si ocurrio un envio de informacion POST
+
+    if request.method=="POST": 
+        formRolPost=FormRoles(request.POST) #creamos un form con los datos cargados
+
+        if formRolPost.is_valid(): #vemos si es valido
+            formRolNew=formRolPost.cleaned_data #tomamos los datos
+            oldRole=users.models.role.objects.all().filter(name=formRolNew['name_role']) #vemos si hay un rol en la bd con ese nombre
+            if (len(oldRole)==0):
+                newRole=users.models.role(name=formRolNew['name_role'],description=formRolNew['description_role']) #creamos un rol
+                newRole.save() #guardamos el rol en bd
+
+                for perm in formRolNew['permissions']: #veremos cada permiso
+                    #tomamos de la bd cada permiso con el id correspondiente
+                    permission_to_role=users.models.permission.objects.get(id=perm)
+                    #agregamos el permiso al rol nuevo
+                    newRole.permissions.add(permission_to_role)
+
+                isRoleSave=1 #se guardo un rol
+            else:
+                isRoleSave=2 #el rol ya existe
+    #form vacio para el template
+    formRol = FormRoles()
+    #enviamos el form vacio y el numero que indica si se cargo un rol o no
+    return render(request, 'agg_roles.html', {'formRol': formRol,'isRoleSave':isRoleSave}) 

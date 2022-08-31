@@ -30,13 +30,11 @@ class permission(models.Model):
     description = models.CharField(max_length=100)    
 
 class role(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=100)
-    #permissions = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
     permissions = models.ManyToManyField(permission)
-#manytoone foreignkey
 
     
