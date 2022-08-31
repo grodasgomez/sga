@@ -1,0 +1,16 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+<b></b>
+	<h1>Crear Roles:</h1>
+	
+	<form action="agg_roles" method="post">
+		{% csrf_token %}
+		{{ formRol.as_div }}
+		<input type="submit" value="Guardar">
+	</form>
+	{% if isRoleSave == 1 %}
+		<p>El rol fue creado</p>
+	{% elif isRoleSave == 2 %}
+		<p>El rol ya existe</p>
+	{% endif %}
+{% endblock %}
