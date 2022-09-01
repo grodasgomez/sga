@@ -21,20 +21,20 @@ class CustomUser(AbstractBaseUser):
     class Meta:
         db_table = 'sga_user'
 
-class project(models.Model):
-    user_id = models.IntegerField()
-    role_id = models.IntegerField()
 
-class permission(models.Model):
+class Permission(models.Model):
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=100)    
+    description = models.CharField(max_length=100) 
 
-class role(models.Model):
+    def __str__(self):
+        return self.name 
+
+class Role(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
-    permissions = models.ManyToManyField(permission)
+    permissions = models.ManyToManyField(Permission)
 
     
