@@ -42,4 +42,7 @@ services:
       - web
 volumes:
   static_volume:
+networks:
+  default:
+    name: sga-net-prod
     
