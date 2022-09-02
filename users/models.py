@@ -32,6 +32,7 @@ class Permission(models.Model):
 class Role(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=100)
+    project = models.ForeignKey('projects.Project', null=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)

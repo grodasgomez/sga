@@ -1,0 +1,20 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+<b></b>
+	<h1>Crear Proyecto</h1>
+	
+	<form action="{% url 'create' %}" method="post" class="was-validated">
+		{% csrf_token %}
+		{% for field in form %}
+      {% include "utils/form_field.html" with field=field %}
+      {% if field.errors %}
+        <div class="invalid-feedback">
+          {% for error in field.errors %}
+            {{ error }}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endfor %}
+		<input type="submit" value="Guardar">
+	</form>
+{% endblock %}
