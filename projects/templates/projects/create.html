@@ -3,17 +3,14 @@
 <b></b>
 	<h1>Crear Proyecto</h1>
 	
-	<form action="{% url 'create' %}" method="post" class="was-validated">
+	<form action="{% url 'create' %}" method="post" class="form row g-3">
 		{% csrf_token %}
 		{% for field in form %}
       {% include "utils/form_field.html" with field=field %}
-      {% if field.errors %}
-        <div class="invalid-feedback">
-          {% for error in field.errors %}
-            {{ error }}
-          {% endfor %}
-        </div>
-      {% endif %}
+    {% endfor %}
+
+    {% for error in form.non_field_errors %}
+      <div class="alert alert-danger">{{ error }}</div>
     {% endfor %}
 		<input type="submit" value="Guardar">
 	</form>

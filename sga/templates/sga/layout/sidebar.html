@@ -15,13 +15,13 @@
   <hr />
   <ul class="nav nav-pills flex-column mb-auto">
     <li class="nav-item">
-      <a href="#" class="nav-link active" aria-current="page">
+      <a href="#" class="nav-link link-dark" aria-current="page">
         <i class="fa-solid fa-house"></i>
         Home
       </a>
     </li>
     <li>
-      <a href="/projects" class="nav-link link-dark">
+      <a href="/projects" class="nav-link {% if 'project' in request.path%}active {%endif%} ">
         <i class="fa-solid fa-diagram-project"></i>
         Proyectos
       </a>
