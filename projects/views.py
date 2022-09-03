@@ -6,6 +6,7 @@ from django.views import View
 from projects.forms import FormCreateProject
 
 from projects.models import Project, ProjectStatus
+from projects.usecase import ProjectUseCase
 
 
 # Create your views here.
@@ -27,7 +28,11 @@ class ProjectCreateView(LoginRequiredMixin, View):
 
     def post(self, request):
         form = self.form_class(request.POST)
+
         if form.is_valid():
+            cleaned_data = form.cleaned_data
+            ProjectUseCase.create_project(**cleaned_data)
             messages.success(request, 'Proyecto creado correctamente')
+            
             return HttpResponseRedirect('/projects')
         return render(request, 'projects/create.html', {'form': form})

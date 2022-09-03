@@ -18,6 +18,9 @@ class CustomUser(AbstractBaseUser):
     USERNAME_FIELD = 'email'
     objects = CustomUserManager()
 
+    def __str__(self):
+        return self.email
+
     class Meta:
         db_table = 'sga_user'
 

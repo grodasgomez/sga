@@ -18,19 +18,19 @@ class Project(models.Model):
     end_date = models.DateField()
     status = models.CharField(default=True, choices=ProjectStatus.choices, max_length=15)
     roles = models.ManyToOneRel(Role, on_delete=models.CASCADE, to='projects.Project', field_name='project')
-
+    project_members = models.ManyToManyField(CustomUser, through='ProjectMember')
     def __str__(self):
         return self.name
 
 class ProjectMember(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    role = models.ManyToManyField(Role)
+    roles = models.ManyToManyField(Role)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.email} - {self.project.name}"
 
 

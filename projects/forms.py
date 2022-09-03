@@ -1,18 +1,20 @@
 from django import forms
-from datetime import datetime
-
-from projects.utils import get_html_date
+from sga import widgets
+from users.models import CustomUser
 
 
 class FormCreateProject(forms.Form):
 
-    name = forms.CharField(max_length=100, label='Nombre')
-    description = forms.CharField(max_length=100, label='Descripción')
-    prefix = forms.CharField(max_length=5, label='Prefijo')
+    name = forms.CharField(max_length=100, label='Nombre', widget=widgets.TextInput())
+    description = forms.CharField(max_length=100, label='Descripción', widget=widgets.TextInput())
+    prefix = forms.CharField(max_length=5, label='Prefijo', widget=widgets.TextInput())
     start_date = forms.DateField(
-        label='Fecha Inicio', widget=forms.DateInput(attrs={'type': 'date'}))
+        label='Fecha Inicio', widget=widgets.DateInput())
     end_date = forms.DateField(
-        label='Fecha Fin', widget=forms.DateInput(attrs={'type': 'date'}))
+        label='Fecha Fin', widget=widgets.DateInput())
+    scrum_master = forms.ModelChoiceField(
+        queryset=CustomUser.objects.all(), label='Scrum Master', empty_label='Seleccione un usuario',
+        widget=widgets.SelectInput())
 
     def clean(self):
         cleaned_data = super().clean()
