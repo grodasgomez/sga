@@ -20,7 +20,9 @@ class CustomUser(AbstractBaseUser):
 
     def __str__(self):
         return self.email
-
+        
+    def is_admin(self):
+        return self.role_system == 'admin'
     class Meta:
         db_table = 'sga_user'
 
@@ -40,5 +42,8 @@ class Role(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
     permissions = models.ManyToManyField(Permission)
+
+    def __str__(self):
+        return self.name
 
     

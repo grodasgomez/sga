@@ -25,11 +25,14 @@
         <td>{{ project.end_date|date:"d/m/Y" }}</td>
         <td>{{ project.get_status_display }}</td>
         <td>
-          <a class="btn btn-labeled btn-warning">
+          <a class="btn">
             <span class="btn-label"><i class="fa fa-pencil"></i></span>
           </a>
-          <a class="btn btn-labeled btn-danger">
+          <a class="btn">
             <span class="btn-label"><i class="fa fa-trash"></i></span>
+          </a>
+          <a href="{% url 'create-member' id=project.id %}" class="btn">
+            <span class="btn-label"><i class="fa fa-user-plus"></i></span>
           </a>
         </td>
       </tr>
