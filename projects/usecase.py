@@ -5,13 +5,11 @@ from users.usecase import RoleUseCase
 class ProjectUseCase:
 
     @staticmethod
-    def create_project(name, description, prefix, start_date, end_date, scrum_master):
+    def create_project(name, description, prefix, scrum_master):
         project = Project.objects.create(
             name=name,
             description=description,
             prefix=prefix,
-            start_date=start_date,
-            end_date=end_date,
             status=ProjectStatus.CREATED
         )
         project_member = ProjectMember.objects.create(
