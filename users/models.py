@@ -27,23 +27,6 @@ class CustomUser(AbstractBaseUser):
         db_table = 'sga_user'
 
 
-class Permission(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.CharField(max_length=100) 
 
-    def __str__(self):
-        return self.name 
-
-class Role(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    description = models.CharField(max_length=100)
-    project = models.ForeignKey('projects.Project', null=True, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True)
-    permissions = models.ManyToManyField(Permission)
-
-    def __str__(self):
-        return self.name
 
     

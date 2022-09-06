@@ -2,8 +2,8 @@ from django import forms
 from projects.usecase import ProjectUseCase
 from sga import widgets
 from users.models import CustomUser
-from users.usecase import RoleUseCase
-
+from projects.usecase import RoleUseCase
+from projects.models import Permission
 
 class FormCreateProject(forms.Form):
 
@@ -30,6 +30,13 @@ class FormCreateProjectMember(forms.Form):
         self.fields['roles'] = forms.ModelMultipleChoiceField(
             queryset=RoleUseCase.get_roles_by_project(project_id),
             label='Roles', widget=widgets.SelectMultipleInput())
+
+class FormRoles(forms.Form):
+
+    name_role = forms.CharField(max_length=100)  # nombre del rol
+    description_role = forms.CharField(max_length=100)  # descripcion del rol
+    permissions = forms.ModelMultipleChoiceField(
+        queryset=Permission.objects.all(), widget=forms.CheckboxSelectMultiple())
 
     # def clean(self):
     #     cleaned_data = super().clean()

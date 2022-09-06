@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.views import View
 from django.views import generic
-from projects.forms import FormCreateProject, FormCreateProjectMember
+from projects.forms import FormCreateProject, FormCreateProjectMember, FormRoles
 
 from projects.models import Project
 from projects.usecase import ProjectUseCase
@@ -91,4 +91,4 @@ def agg_roles(request):
     formRol = FormRoles()
     # formRol.fields['permissions'].choices=CHOICES #agregamos los permisos al form
     #enviamos el form vacio y el numero que indica si se cargo un rol o no
-    return render(request, 'agg_roles.html', {'formRol': formRol,'isRoleSave':isRoleSave}) 
+    return render(request, 'projects/agg_roles.html', {'formRol': formRol,'isRoleSave':isRoleSave}) 

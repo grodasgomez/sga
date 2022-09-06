@@ -8,4 +8,5 @@ urlpatterns = [
     path('<int:pk>/', views.ProjectView.as_view(), name='project-detail'),
     path('create', views.ProjectCreateView.as_view(), name='create'),
     path('<int:id>/members/create', views.ProjectMemberCreateView.as_view(), name='create-member'),
+    path('agg_roles', views.agg_roles, name='agg_roles'),
 ]
