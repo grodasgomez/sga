@@ -1,4 +1,4 @@
-{% extends 'sga/layout/base_generic.html'%} 
+{% extends 'sga/layout/base_generic.html'%}
 {% block content %}
 
   <h1>Project {{object.name}}</h1>
@@ -15,6 +15,10 @@
       <li>{{member}}</li>
     {% endfor %}
   </ul>
+  {% if object.status == "CREATED" %}
+    <form action="started" method="post">
+      {% csrf_token %}
+      <input type="submit" value="Iniciar Proyecto">
+  {% endif %}
 
-  
 {% endblock %}
