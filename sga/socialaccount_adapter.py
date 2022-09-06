@@ -1,28 +1,17 @@
-# from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-# from allauth.exceptions import ImmediateHttpResponse
-# from django.shortcuts import render
-# from sga.models import Invitation
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from users.models import CustomUser
 
 
-# class CustomUsersAccountAdapter(DefaultSocialAccountAdapter):
-
-#     def is_open_for_signup(self, request, socialaccount):
-#         """
-#         Checks whether or not the site is open for signups.
-
-#         Next to simply returning True/False you can also intervene the
-#         regular flow by raising an ImmediateHttpResponse
-
-#         (Comment reproduced from the overridden method.)
-#         """
-#         email = socialaccount.email_addresses[0].email
-#         print(f"Checking if {email} has an invitation")
-#         hasInvitation = Invitation.objects.filter(email=email).exists()
-#         if not hasInvitation:
-#             context = {
-#                 'email': email,
-#             }
-#             raise ImmediateHttpResponse(
-#                 response=render(request, 'sga/signup_closed.html', context)
-#             )
-#         return True
+class CustomUsersAccountAdapter(DefaultSocialAccountAdapter):
+    """
+    Clase encargada de la lógica de manejo de usuarios mediante cuentas sociales.
+    """
+    def new_user(self, request, sociallogin):
+        """
+        Instancia un nuevo usuario con los datos de la cuenta social.
+        Si es el primer usuario que se registra, se le asigna el rol de administrador.
+        """
+        user = super().new_user(request, sociallogin)
+        if CustomUser.objects.all().count() == 0:
+            user.role_system = 'admin'
+        return user

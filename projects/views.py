@@ -6,7 +6,7 @@ from django.views import View
 from django.views import generic
 from projects.forms import FormCreateProject, FormCreateProjectMember
 
-from projects.models import Project, ProjectStatus
+from projects.models import Project
 from projects.usecase import ProjectUseCase
 
 

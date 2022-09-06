@@ -104,7 +104,7 @@ SOCIALACCOUNT_PROVIDERS = {
     },
 }
 
-# SOCIALACCOUNT_ADAPTER = 'sga.socialaccount_adapter.CustomUsersAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'sga.socialaccount_adapter.CustomUsersAccountAdapter'
 
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
