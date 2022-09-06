@@ -20,19 +20,23 @@ class CustomUser(AbstractBaseUser):
 
     def __str__(self):
         return self.email
-        
+
     def is_admin(self):
         return self.role_system == 'admin'
+
+    def is_user(self):
+        return self.is_admin or self.role_system == 'user'
+
     class Meta:
         db_table = 'sga_user'
 
 
 class Permission(models.Model):
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=100) 
+    description = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name 
+        return self.name
 
 class Role(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -45,5 +49,3 @@ class Role(models.Model):
 
     def __str__(self):
         return self.name
-
-    
