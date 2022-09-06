@@ -14,7 +14,7 @@ class FormCreateProject(forms.Form):
     prefix = forms.CharField(
         max_length=5, label='Prefijo', widget=widgets.TextInput())
     scrum_master = forms.ModelChoiceField(
-        queryset=CustomUser.objects.all(), label='Scrum Master', empty_label='Seleccione un usuario',
+        queryset=CustomUser.objects.filter(role_system='user'), label='Scrum Master', empty_label='Seleccione un usuario',
         widget=widgets.SelectInput())
 
 

@@ -1,6 +1,7 @@
 from projects.models import Project, ProjectMember, ProjectStatus
 from users.models import CustomUser
 from users.usecase import RoleUseCase
+from django.db.models import Q
 
 class ProjectUseCase:
 
@@ -22,7 +23,10 @@ class ProjectUseCase:
 
     @staticmethod
     def get_non_members(project_id):
-        return CustomUser.objects.exclude(projectmember__project_id=project_id)
+        """
+        Obtener los usuarios que no son parte del proyecto, no son admin y son usuarios verificados
+        """
+        return CustomUser.objects.exclude(projectmember__project_id=project_id).exclude(role_system='admin').exclude(role_system=None)
 
     @staticmethod
     def get_members(project_id):
