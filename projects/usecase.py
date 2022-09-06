@@ -1,6 +1,7 @@
-from projects.models import Project, ProjectMember, ProjectStatus
+from projects.models import Project, ProjectMember, ProjectStatus, UserStoryType
 from users.models import CustomUser
 from users.usecase import RoleUseCase
+
 
 class ProjectUseCase:
 
@@ -38,3 +39,12 @@ class ProjectUseCase:
         for role in roles:
             project_member.roles.add(role)
         return project_member
+
+    @staticmethod
+    def create_user_story_type(name, columns, project_id):
+        project = Project.objects.get(id=project_id)
+        return UserStoryType.objects.create(
+            name=name,
+            project=project,
+            columns=columns
+        )

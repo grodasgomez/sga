@@ -1,5 +1,6 @@
 from django import forms
 from projects.usecase import ProjectUseCase
+from projects.utils import build_field_error
 from sga import widgets
 from users.models import CustomUser
 from users.usecase import RoleUseCase
@@ -31,11 +32,42 @@ class FormCreateProjectMember(forms.Form):
             queryset=RoleUseCase.get_roles_by_project(project_id),
             label='Roles', widget=widgets.SelectMultipleInput())
 
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     start_date = cleaned_data.get('start_date')
-    #     end_date = cleaned_data.get('end_date')
-    #     if start_date and end_date and start_date > end_date:
-    #         raise forms.ValidationError(
-    #             'La fecha de inicio del proyecto debe ser menor a la fecha de finalización')
-    #     return cleaned_data
+
+class FormCreateUserStoryType(forms.Form):
+
+    def __init__(self, project_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project_id = project_id
+
+    name = forms.CharField(max_length=100, label='Nombre',
+                           widget=widgets.TextInput())
+    columns = forms.CharField(label='Columnas',
+                              widget=widgets.TextInput(attrs={'placeholder': 'Ej: To Do, In Progress, Done'}))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        columns = cleaned_data.get('columns')
+
+        # Creo un array de los nombres de las columnas
+        array_column = columns.split(',')
+
+        array_column = [x.strip() for x in array_column]
+
+        # Verifico que haya minimo dos columnas
+        if len(array_column) < 2:
+            raise forms.ValidationError(build_field_error(
+                'columns', 'Debe ingresar al menos dos columnas'))
+
+        # Verifico que no haya columnas repetidas
+        if len(array_column) != len(set(array_column)):
+            raise forms.ValidationError(build_field_error(
+                'columns', 'No puede haber columnas repetidas'))
+
+        # Verifico que no haya columnas vacias
+        for column in array_column:
+            if column == '':
+                raise forms.ValidationError(build_field_error(
+                    'columns', 'No puede haber columnas vacias'))
+
+        cleaned_data['columns'] = array_column
+        return cleaned_data

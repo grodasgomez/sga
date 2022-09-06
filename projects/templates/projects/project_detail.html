@@ -1,8 +1,11 @@
 {% extends 'sga/layout/base_generic.html'%} 
 {% block content %}
-
+  {% include 'utils/messages.html' %}
   <h1>Project {{object.name}}</h1>
 
+  <a href="{% url 'create-user-story-type' id=object.id %}" class="btn btn-labeled btn-info">
+    <span class="btn-label"><i class="fa fa-plus"></i></span>Crear tipo de historia de usuario
+  </a>
   <h2>Detalles</h2>
   <p><strong>Nombre:</strong> {{object.name}}</p>
   <p><strong>Descripción:</strong> {{object.description}}</p>
@@ -15,6 +18,7 @@
       <li>{{member}}</li>
     {% endfor %}
   </ul>
+
 
   
 {% endblock %}

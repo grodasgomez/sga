@@ -34,3 +34,11 @@ class ProjectMember(models.Model):
         return f"{self.user.email} - {self.project.name}"
 
 
+class UserStoryType(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    columns = models.JSONField()
+
+    def __str__(self):
+        return self.name
+

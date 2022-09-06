@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.views import View
 from django.views import generic
-from projects.forms import FormCreateProject, FormCreateProjectMember
+from projects.forms import FormCreateProject, FormCreateProjectMember, FormCreateUserStoryType
 
 from projects.models import Project
 from projects.usecase import ProjectUseCase
@@ -63,3 +63,20 @@ class ProjectMemberCreateView(LoginRequiredMixin, View):
             
             return HttpResponseRedirect('/projects')
         return render(request, 'project_member/create.html', {'form': form})
+
+
+#User Story
+class UserStoryTypeCreateView(LoginRequiredMixin, generic.View):
+    def get(self, request, id):
+        form = FormCreateUserStoryType(id)
+        return render(request, 'user_story_type/create.html', {'form': form})
+
+    def post(self, request, id):
+        form = FormCreateUserStoryType(id, request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            ProjectUseCase.create_user_story_type(project_id=id, **cleaned_data)
+            messages.success(request, f"Tipo de historia de usuario creado correctamente")
+            
+            return HttpResponseRedirect(f"/projects/{id}")
+        return render(request, 'user_story_type/create.html', {'form': form})
