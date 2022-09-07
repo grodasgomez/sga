@@ -4,12 +4,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.views import View
 from django.views import generic
-from projects.forms import FormCreateProject, FormCreateProjectMember, FormRoles
-from projects.models import Role
+
+from projects.forms import FormCreateProject, FormCreateProjectMember, FormCreateRole
+
 from projects.models import Project
+from projects.models import Role
 from projects.usecase import ProjectUseCase
 from projects.usecase import RoleUseCase
 from django.db.models import Q
+
+#todo
+from projects.models import Permission
 
 
 # Create your views here.
@@ -42,7 +47,7 @@ class ProjectCreateView(LoginRequiredMixin, View):
 
         if form.is_valid():
             cleaned_data = form.cleaned_data
-            ProjectUseCase.create_project(**cleaned_data)
+            isRoleSave = ProjectUseCase.create_project(**cleaned_data)
             messages.success(request, 'Proyecto creado correctamente')
             
             return HttpResponseRedirect('/projects')
@@ -66,31 +71,35 @@ class ProjectMemberCreateView(LoginRequiredMixin, View):
             return HttpResponseRedirect('/projects')
         return render(request, 'project_member/create.html', {'form': form})
 
-def agg_roles(request,id):
+
+class ProjectRoleCreaterView(LoginRequiredMixin, View):
+    form_class = FormCreateRole
     isRoleSave=0 #variable para saber si se guardo o no algo recientemente
     #si ocurrio un envio de informacion POST
 
-    if request.method=="POST":
-        formRolPost=FormRoles(request.POST) #creamos un form con los datos cargados
-        if formRolPost.is_valid(): #vemos si es valido
-            formRolNew=formRolPost.cleaned_data #tomamos los datos
-            oldRole=Role.objects.all().filter(name=formRolNew['name_role']) #vemos si hay un rol en la bd con ese nombre
-            if (len(oldRole)==0):
-                newRole= Role(name=formRolNew['name_role'],description=formRolNew['description_role'],project=Project.objects.get(id=id)) #creamos un rol
-                newRole.save() #guardamos el rol en bd
+    def get(self, request, id):
+        form = self.form_class()
+        return render(request, 'roles/create.html', {'form': form,'project_id':id})
 
-                for perm in formRolNew['permissions']: #veremos cada permiso
-                    #tomamos de la bd cada permiso con el id correspondiente
-                    #agregamos el permiso al rol nuevo
-                    newRole.permissions.add(perm)
-                isRoleSave=1 #se guardo un rol
-            else:
-                isRoleSave=2 #el rol ya existe
-    #form vacio para el template
-    #tomamos todos los permisos de la base de datos
-    formRol = FormRoles()
-    #enviamos el form vacio y el numero que indica si se cargo un rol o no
-    return render(request, 'roles/create.html', {'formRol': formRol,'isRoleSave':isRoleSave, 'project_id':id}) 
+    def post(self, request, id):
+        form=self.form_class(request.POST) #creamos un form con los datos cargados
+
+        if form.is_valid(): #vemos si es valido
+            cleaned_data=form.cleaned_data #tomamos los datos
+            isRoleSave = RoleUseCase.create_role(id=id, **cleaned_data)
+            #todo
+            if isRoleSave:
+                print(isRoleSave)
+                messages.success(request, 'Rol creado correctamente')
+
+                return HttpResponseRedirect('/projects/'+str(id)+'/roles')
+
+        #form vacio para el template
+        #tomamos todos los permisos de la base de datos
+        formRol = self.form_class()
+        #enviamos el form vacio y el numero que indica si se cargo un rol o no
+
+        return render(request, 'roles/create.html', {'form': form,'isRoleSave':isRoleSave, 'project_id':id}) 
 
 class ProjectRoleView (LoginRequiredMixin, View): #Para ver  los roles
     def get(self, request, id):

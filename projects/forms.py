@@ -31,7 +31,7 @@ class FormCreateProjectMember(forms.Form):
             queryset=RoleUseCase.get_roles_by_project(project_id),
             label='Roles', widget=widgets.SelectMultipleInput())
 
-class FormRoles(forms.Form):
+class FormCreateRole(forms.Form):
 
     name_role = forms.CharField(max_length=100)  # nombre del rol
     description_role = forms.CharField(max_length=100)  # descripcion del rol

@@ -42,6 +42,20 @@ class ProjectUseCase:
 
 class RoleUseCase:
 
+    @staticmethod
+    def create_role(id, name_role, description_role, permissions):
+        oldRole=Role.objects.all().filter(name=name_role) #vemos si hay un rol en la bd con ese nombre
+        if oldRole:
+            newRole= Role(name=name_role,description=description_role,project=Project.objects.get(id=id)) #creamos un rol
+            newRole.save() #guardamos el rol en bd
+
+            for perm in permissions: #veremos cada permiso
+                #tomamos de la bd cada permiso con el id correspondiente
+                #agregamos el permiso al rol nuevo
+                newRole.permissions.add(perm)
+            return True #se guardo un rol
+        return False #el rol ya existe
+
     @classmethod
     def get_scrum_role(self):
         return self.get_role_by_name('Scrum Master')

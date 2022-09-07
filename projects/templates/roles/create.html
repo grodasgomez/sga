@@ -5,12 +5,12 @@
 	
 	<form action="{% url 'create-role' id=project_id %}" method="post">
 		{% csrf_token %}
-		{{ formRol.as_div }}
+		{{ form.as_div }}
 		<input type="submit" value="Guardar">
 	</form>
-	{% if isRoleSave == 1 %}
+	{% if isRoleSave %}
 		<p>El rol fue creado</p>
-	{% elif isRoleSave == 2 %}
+	{% else %}
 		<p>El rol ya existe</p>
 	{% endif %}
 {% endblock %}
