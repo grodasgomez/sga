@@ -16,12 +16,14 @@ class FormCreateProject(forms.Form):
     prefix = forms.CharField(
         max_length=5, label='Prefijo', widget=widgets.TextInput())
     scrum_master = forms.ModelChoiceField(
-        queryset=CustomUser.objects.all(), label='Scrum Master', empty_label='Seleccione un usuario',
+        queryset=CustomUser.objects.filter(role_system='user'), label='Scrum Master', empty_label='Seleccione un usuario',
         widget=widgets.SelectInput())
 
 
 class FormCreateProjectMember(forms.Form):
-
+    """
+    Formulario para crear un miembro de un proyecto
+    """
     def __init__(self, project_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['user'] = forms.ModelChoiceField(
@@ -35,7 +37,9 @@ class FormCreateProjectMember(forms.Form):
 
 
 class FormUserStoryType(forms.Form):
-
+    """
+    Formulario base para el modelo UserStoryType
+    """
     name = forms.CharField(max_length=100, label='Nombre',
                            widget=widgets.TextInput())
     columns = forms.CharField(label='Columnas',
@@ -66,7 +70,9 @@ class FormUserStoryType(forms.Form):
 
 
 class FormCreateUserStoryType(FormUserStoryType):
-
+    """
+    Formulario para crear un tipo de historia de usuario en un proyecto
+    """
     def __init__(self, project_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.project_id = project_id
@@ -87,7 +93,9 @@ class FormCreateUserStoryType(FormUserStoryType):
 
 
 class FormEditUserStoryType(FormUserStoryType):
-
+    """
+    Formulario para editar un tipo de historia de usuario en un proyecto
+    """
     def __init__(self, id, project_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.id = id

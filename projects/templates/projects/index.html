@@ -1,42 +1,52 @@
-{% extends 'sga/layout/base_generic.html'%} 
+{% extends 'sga/layout/base_generic.html'%}
 {% block content %}
 
-  <a href="{% url 'create' %}" class="btn btn-labeled btn-info">
+  {% if admin %}
+    <a href="{% url 'create' %}" class="btn btn-labeled btn-info">
     <span class="btn-label"><i class="fa fa-plus"></i></span>Crear proyecto
-  </a>
+    </a>
+  {% endif %}
   {% include 'utils/messages.html'%}
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">Nombre</th>
-        <th scope="col">Prefijo</th>
-        <th scope="col">Fecha inicio</th>
-        <th scope="col">Fecha fin</th>
-        <th scope="col">Estado</th>
-        <th scope="col">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for project in projects %}
-      <tr>
-        <td>{{ project.name }}</td>
-        <td>{{ project.prefix }}</td>
-        <td>{{ project.start_date|date:"d/m/Y" }}</td>
-        <td>{{ project.end_date|date:"d/m/Y" }}</td>
-        <td>{{ project.get_status_display }}</td>
-        <td>
-          <a href="{% url 'project-detail' pk=project.id %}"class="btn">
-            <span class="btn-label"><i class="fa fa-eye"></i></span>
-          </a>
-          <a class="btn">
-            <span class="btn-label"><i class="fa fa-pencil"></i></span>
-          </a>
-          <a href="{% url 'create-member' id=project.id %}" class="btn">
-            <span class="btn-label"><i class="fa fa-user-plus"></i></span>
-          </a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  {% if projects %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Nombre</th>
+          <th scope="col">Prefijo</th>
+          <th scope="col">Fecha inicio</th>
+          <th scope="col">Fecha fin</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for project in projects %}
+        <tr>
+          <td>
+            <a href="{% url 'project-detail' id=project.id %}" class="btn">
+              <span class="btn-label">{{ project.name }}</span>
+            </a>
+          </td>
+          <td>{{ project.prefix }}</td>
+          <td>{{ project.start_date|date:"d/m/Y" }}</td>
+          <td>{{ project.end_date|date:"d/m/Y" }}</td>
+          <td>{{ project.get_status_display }}</td>
+          <td>
+            <a class="btn">
+              <span class="btn-label"><i class="fa fa-pencil"></i></span>
+            </a>
+            <a class="btn">
+              <span class="btn-label"><i class="fa fa-trash"></i></span>
+            </a>
+            <a href="{% url 'create-member' id=project.id %}" class="btn">
+              <span class="btn-label"><i class="fa fa-user-plus"></i></span>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    No tiene proyectos
+  {% endif %}
 {% endblock %}

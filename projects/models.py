@@ -6,7 +6,6 @@ from users.models import CustomUser, Role
 # Create your models here.
 class ProjectStatus(models.TextChoices):
     CREATED = 'CREATED', 'Creado'
-    PENDING = 'PENDING', 'Pendiente'
     IN_PROGRESS = 'IN_PROGRESS', 'En progreso'
     CANCELLED = 'CANCELLED', 'Cancelado'
     FINISHED = 'FINISHED', 'Finalizado'
