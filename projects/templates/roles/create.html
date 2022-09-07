@@ -1,0 +1,12 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+{% include 'utils/messages.html'%}
+<b></b>
+	<h1>Crear Roles:</h1>
+
+	<form action="{% url 'create-role' id=project_id %}" method="post">
+		{% csrf_token %}
+		{{ form.as_div }}
+		<input type="submit" value="Guardar">
+	</form>
+{% endblock %}

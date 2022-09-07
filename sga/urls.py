@@ -28,5 +28,4 @@ urlpatterns = [
     path('projects/', include('projects.urls')),
     #TODO listar usuarios luego debe estar en otro lado
     path('users', views.list_users, name='users'),
-    path('agg_roles', views_users.agg_roles, name='agg_roles'),
 ]

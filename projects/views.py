@@ -6,9 +6,12 @@ from django.contrib import messages
 from django.views import View
 from django.db.models.query import QuerySet
 
-from projects.forms import FormCreateProject, FormCreateProjectMember, FormCreateUserStoryType, FormEditUserStoryType
+from projects.forms import FormCreateProject, FormCreateProjectMember, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole
 from projects.models import Project, UserStoryType, ProjectStatus
-from projects.usecase import ProjectUseCase
+from projects.usecase import ProjectUseCase, RoleUseCase
+
+#todo
+from projects.models import Permission
 from users.models import CustomUser
 
 # Create your views here.
@@ -102,6 +105,39 @@ class ProjectMemberCreateView(LoginRequiredMixin, View):
             messages.success(request, f"Miembro agregado correctamente")
             return HttpResponseRedirect('/projects')
         return render(request, 'project_member/create.html', {'form': form})
+
+
+class ProjectRoleCreaterView(LoginRequiredMixin, View):
+    form_class = FormCreateRole
+    isRoleSave=0 #variable para saber si se guardo o no algo recientemente
+    #si ocurrio un envio de informacion POST
+
+    def get(self, request, id):
+        form = self.form_class()
+        return render(request, 'roles/create.html', {'form': form,'project_id':id})
+
+    def post(self, request, id):
+        form=self.form_class(request.POST) #creamos un form con los datos cargados
+
+        if form.is_valid(): #vemos si es valido
+            cleaned_data=form.cleaned_data #tomamos los datos
+            if RoleUseCase.create_role(id=id, **cleaned_data):
+                messages.success(request, 'Rol creado correctamente')
+                return HttpResponseRedirect('/projects/'+str(id)+'/roles')
+            else:
+                messages.warning(request, 'El rol ya existe')
+        #si el form no es valido retorna a la misma pagina
+        return render(request, 'roles/create.html', {'form': form, 'project_id':id})
+
+class ProjectRoleView (LoginRequiredMixin, View): #Para ver  los roles
+    def get(self, request, id):
+        data = RoleUseCase.get_roles_by_project(id) #tomamos todos los roles del proyecto con esa id
+        #data =  Role.objects.all().filter(Q(project=id) | Q(project=None)) #esta linea hace lo mismo
+        context = { #ponemos en contextx
+            'roles': data,
+            'project_id': id #id del proyecto para usar en el template
+        }
+        return render(request, 'roles/index.html', context) #le pasamos a la vista
 
 
 #User Story

@@ -1,15 +1,15 @@
-from users import models
+from projects import models
 
-permis1 = models.permission()
+permis1 = models.Permission()
 permis1.name = "ABM Roles" 
 permis1.description = "ABM de Roles"
 permis1.save()
 
-rol1 = models.role()
+rol1 = models.Role()
 rol1.name = "Scrum Master"
 rol1.save()
 
-rol2 = models.role()
+rol2 = models.Role()
 rol2.name = "Developer"
 rol2.save()
 
