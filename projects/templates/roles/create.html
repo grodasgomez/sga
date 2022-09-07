@@ -3,7 +3,7 @@
 <b></b>
 	<h1>Crear Roles:</h1>
 	
-	<form action="agg_roles" method="post">
+	<form action="{% url 'create-role' id=project_id %}" method="post">
 		{% csrf_token %}
 		{{ formRol.as_div }}
 		<input type="submit" value="Guardar">

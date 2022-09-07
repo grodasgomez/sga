@@ -1,5 +1,7 @@
 from projects.models import Project, ProjectMember, ProjectStatus
 from users.models import CustomUser
+from projects.models import Role
+from django.db.models import Q
 
 class ProjectUseCase:
 
@@ -42,7 +44,7 @@ class RoleUseCase:
 
     @classmethod
     def get_scrum_role(self):
-        return self.get_role_by_name('scrum master')
+        return self.get_role_by_name('Scrum Master')
 
     @classmethod
     def get_role_by_name(self, name):

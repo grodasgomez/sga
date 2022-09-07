@@ -5,9 +5,11 @@ from django.contrib import messages
 from django.views import View
 from django.views import generic
 from projects.forms import FormCreateProject, FormCreateProjectMember, FormRoles
-
+from projects.models import Role
 from projects.models import Project
 from projects.usecase import ProjectUseCase
+from projects.usecase import RoleUseCase
+from django.db.models import Q
 
 
 # Create your views here.
@@ -64,7 +66,7 @@ class ProjectMemberCreateView(LoginRequiredMixin, View):
             return HttpResponseRedirect('/projects')
         return render(request, 'project_member/create.html', {'form': form})
 
-def agg_roles(request):
+def agg_roles(request,id):
     isRoleSave=0 #variable para saber si se guardo o no algo recientemente
     #si ocurrio un envio de informacion POST
 
@@ -74,21 +76,28 @@ def agg_roles(request):
             formRolNew=formRolPost.cleaned_data #tomamos los datos
             oldRole=Role.objects.all().filter(name=formRolNew['name_role']) #vemos si hay un rol en la bd con ese nombre
             if (len(oldRole)==0):
-                newRole= Role(name=formRolNew['name_role'],description=formRolNew['description_role']) #creamos un rol
+                newRole= Role(name=formRolNew['name_role'],description=formRolNew['description_role'],project=Project.objects.get(id=id)) #creamos un rol
                 newRole.save() #guardamos el rol en bd
 
                 for perm in formRolNew['permissions']: #veremos cada permiso
                     #tomamos de la bd cada permiso con el id correspondiente
-                    # permission_to_role=Permission.objects.get(id=perm)
                     #agregamos el permiso al rol nuevo
                     newRole.permissions.add(perm)
-
                 isRoleSave=1 #se guardo un rol
             else:
                 isRoleSave=2 #el rol ya existe
     #form vacio para el template
     #tomamos todos los permisos de la base de datos
     formRol = FormRoles()
-    # formRol.fields['permissions'].choices=CHOICES #agregamos los permisos al form
     #enviamos el form vacio y el numero que indica si se cargo un rol o no
-    return render(request, 'projects/agg_roles.html', {'formRol': formRol,'isRoleSave':isRoleSave}) 
+    return render(request, 'roles/create.html', {'formRol': formRol,'isRoleSave':isRoleSave, 'project_id':id}) 
+
+class ProjectRoleView (LoginRequiredMixin, View): #Para ver  los roles
+    def get(self, request, id):
+        data = RoleUseCase.get_roles_by_project(id) #tomamos todos los roles del proyecto con esa id
+        #data =  Role.objects.all().filter(Q(project=id) | Q(project=None)) #esta linea hace lo mismo 
+        context = { #ponemos en contextx
+            'roles': data,
+            'project_id': id #id del proyecto para usar en el template
+        }
+        return render(request, 'roles/index.html', context) #le pasamos a la vista

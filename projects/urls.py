@@ -8,5 +8,6 @@ urlpatterns = [
     path('<int:pk>/', views.ProjectView.as_view(), name='project-detail'),
     path('create', views.ProjectCreateView.as_view(), name='create'),
     path('<int:id>/members/create', views.ProjectMemberCreateView.as_view(), name='create-member'),
-    path('agg_roles', views.agg_roles, name='agg_roles'),
+    path('<int:id>/roles/create', views.agg_roles, name='create-role'), #esto debe arreglar ale
+    path('<int:id>/roles', views.ProjectRoleView.as_view(), name='index-roles'), #el index de roles dedl proyecto, el id es del proyecto
 ]
