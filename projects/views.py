@@ -28,7 +28,7 @@ class ProjectListView(LoginRequiredMixin, View):
 
 class ProjectView(LoginRequiredMixin, generic.DetailView):
     model = Project
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['members'] = self.object.project_members.all()
@@ -49,7 +49,7 @@ class ProjectCreateView(LoginRequiredMixin, View):
             cleaned_data = form.cleaned_data
             isRoleSave = ProjectUseCase.create_project(**cleaned_data)
             messages.success(request, 'Proyecto creado correctamente')
-            
+
             return HttpResponseRedirect('/projects')
         return render(request, 'projects/create.html', {'form': form})
 
@@ -67,7 +67,7 @@ class ProjectMemberCreateView(LoginRequiredMixin, View):
             cleaned_data = form.cleaned_data
             ProjectUseCase.add_member(project_id=id, **cleaned_data)
             messages.success(request, f"Miembro agregado correctamente")
-            
+
             return HttpResponseRedirect('/projects')
         return render(request, 'project_member/create.html', {'form': form})
 
@@ -99,12 +99,12 @@ class ProjectRoleCreaterView(LoginRequiredMixin, View):
         formRol = self.form_class()
         #enviamos el form vacio y el numero que indica si se cargo un rol o no
 
-        return render(request, 'roles/create.html', {'form': form,'isRoleSave':isRoleSave, 'project_id':id}) 
+        return render(request, 'roles/create.html', {'form': form,'isRoleSave':isRoleSave, 'project_id':id})
 
 class ProjectRoleView (LoginRequiredMixin, View): #Para ver  los roles
     def get(self, request, id):
         data = RoleUseCase.get_roles_by_project(id) #tomamos todos los roles del proyecto con esa id
-        #data =  Role.objects.all().filter(Q(project=id) | Q(project=None)) #esta linea hace lo mismo 
+        #data =  Role.objects.all().filter(Q(project=id) | Q(project=None)) #esta linea hace lo mismo
         context = { #ponemos en contextx
             'roles': data,
             'project_id': id #id del proyecto para usar en el template
