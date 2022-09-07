@@ -107,10 +107,8 @@ class ProjectMemberCreateView(LoginRequiredMixin, View):
         return render(request, 'project_member/create.html', {'form': form})
 
 
-class ProjectRoleCreaterView(LoginRequiredMixin, View):
+class ProjectRoleCreateView(LoginRequiredMixin, View):
     form_class = FormCreateRole
-    isRoleSave=0 #variable para saber si se guardo o no algo recientemente
-    #si ocurrio un envio de informacion POST
 
     def get(self, request, id):
         form = self.form_class()
