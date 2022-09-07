@@ -1,6 +1,4 @@
-from django.contrib import admin
 from django.urls import path
-from django.urls import include
 from . import views
 
 urlpatterns = [
@@ -10,5 +8,7 @@ urlpatterns = [
     path('<int:id>/members/create', views.ProjectMemberCreateView.as_view(), name='create-member'),
 
     #User story type
-    path('<int:id>/user-story-type/create', views.UserStoryTypeCreateView.as_view(), name='create-user-story-type'),
+    path('<int:project_id>/user-story-type/', views.UserStoryTypeListView.as_view(), name='user-story-type-list'),
+    path('<int:project_id>/user-story-type/create', views.UserStoryTypeCreateView.as_view(), name='user-story-type-create'),
+    path('<int:project_id>/user-story-type/<int:id>/edit', views.UserStoryTypeEditView.as_view(), name='user-story-type-edit'),
 ]

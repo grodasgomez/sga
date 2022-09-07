@@ -1,4 +1,5 @@
 from django import forms
+from projects.models import UserStoryType
 from projects.usecase import ProjectUseCase
 from projects.utils import build_field_error
 from sga import widgets
@@ -33,21 +34,14 @@ class FormCreateProjectMember(forms.Form):
             label='Roles', widget=widgets.SelectMultipleInput())
 
 
-class FormCreateUserStoryType(forms.Form):
-
-    def __init__(self, project_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.project_id = project_id
+class FormUserStoryType(forms.Form):
 
     name = forms.CharField(max_length=100, label='Nombre',
                            widget=widgets.TextInput())
     columns = forms.CharField(label='Columnas',
                               widget=widgets.TextInput(attrs={'placeholder': 'Ej: To Do, In Progress, Done'}))
 
-    def clean(self):
-        cleaned_data = super().clean()
-        columns = cleaned_data.get('columns')
-
+    def custom_clean_columns(self, columns):
         # Creo un array de los nombres de las columnas
         array_column = columns.split(',')
 
@@ -68,6 +62,46 @@ class FormCreateUserStoryType(forms.Form):
             if column == '':
                 raise forms.ValidationError(build_field_error(
                     'columns', 'No puede haber columnas vacias'))
+        return array_column
 
-        cleaned_data['columns'] = array_column
+
+class FormCreateUserStoryType(FormUserStoryType):
+
+    def __init__(self, project_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project_id = project_id
+
+    def clean(self):
+        cleaned_data = super().clean()
+        columns = cleaned_data.get('columns')
+        name = cleaned_data.get('name')
+
+        already_exists = UserStoryType.objects.filter(
+            name=name, project_id=self.project_id).exists()
+        if already_exists:
+            raise forms.ValidationError(build_field_error(
+                'name', 'Ya existe un tipo de historia con ese nombre'))
+        print(columns)
+        cleaned_data['columns'] = self.custom_clean_columns(columns)
+        return cleaned_data
+
+
+class FormEditUserStoryType(FormUserStoryType):
+
+    def __init__(self, id, project_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.id = id
+        self.project_id = project_id
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+        already_exists = UserStoryType.objects.filter(
+            name=name, project_id=self.project_id).exclude(id=self.id).exists()
+        if already_exists:
+            raise forms.ValidationError(build_field_error(
+                'name', 'Ya existe un tipo de historia con ese nombre'))
+
+        columns = cleaned_data.get('columns')
+        cleaned_data['columns'] = self.custom_clean_columns(columns)
         return cleaned_data

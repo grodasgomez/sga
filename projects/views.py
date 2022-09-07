@@ -1,12 +1,13 @@
+import json
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.views import View
 from django.views import generic
-from projects.forms import FormCreateProject, FormCreateProjectMember, FormCreateUserStoryType
+from projects.forms import FormCreateProject, FormCreateProjectMember, FormCreateUserStoryType, FormEditUserStoryType
 
-from projects.models import Project
+from projects.models import Project, UserStoryType
 from projects.usecase import ProjectUseCase
 
 
@@ -67,16 +68,55 @@ class ProjectMemberCreateView(LoginRequiredMixin, View):
 
 #User Story
 class UserStoryTypeCreateView(LoginRequiredMixin, generic.View):
-    def get(self, request, id):
-        form = FormCreateUserStoryType(id)
+    def get(self, request, project_id):
+        form = FormCreateUserStoryType(project_id)
         return render(request, 'user_story_type/create.html', {'form': form})
 
-    def post(self, request, id):
-        form = FormCreateUserStoryType(id, request.POST)
+    def post(self, request, project_id):
+        form = FormCreateUserStoryType(project_id, request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
-            ProjectUseCase.create_user_story_type(project_id=id, **cleaned_data)
+            ProjectUseCase.create_user_story_type(project_id=project_id, **cleaned_data)
             messages.success(request, f"Tipo de historia de usuario creado correctamente")
             
-            return HttpResponseRedirect(f"/projects/{id}")
+            return HttpResponseRedirect(f"/projects/{project_id}/user-story-type")
         return render(request, 'user_story_type/create.html', {'form': form})
+
+class UserStoryTypeEditView(LoginRequiredMixin, generic.View):
+    def get(self, request, project_id, id):
+        data = ProjectUseCase.get_user_story_type(id).__dict__
+        data['columns'] = ",".join(data.get('columns'))
+        print(project_id, id)
+        form = FormEditUserStoryType(id, project_id, initial=data)
+        return render(request, 'user_story_type/edit.html', {'form': form})
+
+    def post(self, request, project_id, id):
+        form = FormEditUserStoryType(id, project_id,request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            ProjectUseCase.edit_user_story_type(id, **cleaned_data)
+            messages.success(request, f"Tipo de historia de usuario editado correctamente")
+            
+            return HttpResponseRedirect(f"/projects/{project_id}/user-story-type")
+        return render(request, 'user_story_type/edit.html', {'form': form})
+
+class UserStoryTypeListView(LoginRequiredMixin, generic.ListView):
+    """
+    Vista que lista tipos de historias de usuario de un projecto
+    """
+    model = UserStoryType
+    template_name = 'user_story_type/index.html'
+
+    def get_queryset(self):
+        return self.model.objects.filter(project_id=self.kwargs.get('project_id'))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Agregamos el id del proyecto en el contexto para ser usado en el template
+        context['project_id'] = self.kwargs.get('project_id')
+
+        #Convertimos las columnas de lista de str a un str separado por comas
+        for item in context['object_list']:
+            item.columns = ",".join(item.columns)
+        return context

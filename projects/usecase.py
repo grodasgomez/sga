@@ -48,3 +48,16 @@ class ProjectUseCase:
             project=project,
             columns=columns
         )
+
+    @staticmethod
+    def edit_user_story_type(id, name, columns):
+        data = {}
+        if name:
+            data['name'] = name
+        if columns:
+            data['columns'] = columns
+        return UserStoryType.objects.filter(id=id).update(**data)
+
+    @staticmethod
+    def get_user_story_type(id):
+        return UserStoryType.objects.get(id=id)
