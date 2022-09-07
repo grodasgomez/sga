@@ -23,7 +23,7 @@
         {% for project in projects %}
         <tr>
           <td>
-            <a href="{% url 'project-detail' pk=project.id %}" class="btn">
+            <a href="{% url 'project-detail' id=project.id %}" class="btn">
               <span class="btn-label">{{ project.name }}</span>
             </a>
           </td>

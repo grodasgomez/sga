@@ -1,12 +1,12 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect, HttpRequest
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.views import View
-from django.views import generic
-from projects.forms import FormCreateProject, FormCreateProjectMember
+from django.db.models.query import QuerySet
 
-from projects.models import Project, ProjectMember
+from projects.forms import FormCreateProject, FormCreateProjectMember
+from projects.models import Project, ProjectMember, ProjectStatus
 from projects.usecase import ProjectUseCase
 from users.models import CustomUser
 
@@ -36,17 +36,28 @@ class ProjectListView(LoginRequiredMixin, View):
                     context['projects'].append(p)
         return render(request, 'projects/index.html', context)
 
-#TODO: how to add checks and post method in generic???
-class ProjectView(LoginRequiredMixin, generic.DetailView):
-    model = Project
+class ProjectView(LoginRequiredMixin, View):
+    def get(self, request, id):
+        user: CustomUser = request.user
+        if not user.is_user():
+            return HttpResponseRedirect('/')
+        data: Project = Project.objects.get(id=id)
+        members: QuerySet = data.project_members.all()
+        if user not in members:
+            messages.warning(request, "No eres miembro")
+            return HttpResponseRedirect('/projects')
+        context= {
+            "object" : data,
+            "members" : members
+        }
+        return render(request, 'projects/project_detail.html', context)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['members'] = self.object.project_members.all()
-        return context
-
-    def post(self):
-        pass
+    def post(self, request, id):
+        data: Project = Project.objects.get(id=id)
+        data.status = ProjectStatus.IN_PROGRESS
+        data.save()
+        messages.success(request, 'Proyecto iniciado correctamente')
+        return redirect(request.META['HTTP_REFERER'])
 
 
 class ProjectCreateView(LoginRequiredMixin, View):
@@ -79,11 +90,6 @@ class ProjectMemberCreateView(LoginRequiredMixin, View):
     form_class = FormCreateProjectMember
 
     def get(self, request, id):
-        user: CustomUser = request.user
-        members = ProjectMember.objects.filter(project=id)
-        for member in members:
-            print(member.roles)
-        #TODO: ProjectMember.roles empty
         form = self.form_class(project_id=id)
         return render(request, 'project_member/create.html', {'form': form})
 

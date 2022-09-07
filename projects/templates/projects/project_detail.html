@@ -16,9 +16,8 @@
     {% endfor %}
   </ul>
   {% if object.status == "CREATED" %}
-    <form action="started" method="post">
+    <form method="post">
       {% csrf_token %}
       <input type="submit" value="Iniciar Proyecto">
   {% endif %}
-
 {% endblock %}
