@@ -86,20 +86,13 @@ class ProjectRoleCreaterView(LoginRequiredMixin, View):
 
         if form.is_valid(): #vemos si es valido
             cleaned_data=form.cleaned_data #tomamos los datos
-            isRoleSave = RoleUseCase.create_role(id=id, **cleaned_data)
-            #todo
-            if isRoleSave:
-                print(isRoleSave)
+            if RoleUseCase.create_role(id=id, **cleaned_data):
                 messages.success(request, 'Rol creado correctamente')
-
                 return HttpResponseRedirect('/projects/'+str(id)+'/roles')
-
-        #form vacio para el template
-        #tomamos todos los permisos de la base de datos
-        formRol = self.form_class()
-        #enviamos el form vacio y el numero que indica si se cargo un rol o no
-
-        return render(request, 'roles/create.html', {'form': form,'isRoleSave':isRoleSave, 'project_id':id})
+            else:
+                messages.warning(request, 'El rol ya existe')
+        #si el form no es valido retorna a la misma pagina
+        return render(request, 'roles/create.html', {'form': form, 'project_id':id})
 
 class ProjectRoleView (LoginRequiredMixin, View): #Para ver  los roles
     def get(self, request, id):
