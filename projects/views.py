@@ -112,30 +112,30 @@ class ProjectRoleCreaterView(LoginRequiredMixin, View):
     isRoleSave=0 #variable para saber si se guardo o no algo recientemente
     #si ocurrio un envio de informacion POST
 
-    def get(self, request, id):
+    def get(self, request, project_id):
         form = self.form_class()
-        return render(request, 'roles/create.html', {'form': form,'project_id':id})
+        return render(request, 'roles/create.html', {'form': form,'project_id':project_id})
 
-    def post(self, request, id):
+    def post(self, request, project_id):
         form=self.form_class(request.POST) #creamos un form con los datos cargados
 
         if form.is_valid(): #vemos si es valido
             cleaned_data=form.cleaned_data #tomamos los datos
-            if RoleUseCase.create_role(id=id, **cleaned_data):
+            if RoleUseCase.create_role(id=project_id, **cleaned_data):
                 messages.success(request, 'Rol creado correctamente')
-                return HttpResponseRedirect('/projects/'+str(id)+'/roles')
+                return HttpResponseRedirect('/projects/'+str(project_id)+'/roles')
             else:
                 messages.warning(request, 'El rol ya existe')
         #si el form no es valido retorna a la misma pagina
-        return render(request, 'roles/create.html', {'form': form, 'project_id':id})
+        return render(request, 'roles/create.html', {'form': form, 'project_id':project_id})
 
 class ProjectRoleView (LoginRequiredMixin, View): #Para ver  los roles
-    def get(self, request, id):
-        data = RoleUseCase.get_roles_by_project(id) #tomamos todos los roles del proyecto con esa id
+    def get(self, request, project_id):
+        data = RoleUseCase.get_roles_by_project(project_id) #tomamos todos los roles del proyecto con esa id
         #data =  Role.objects.all().filter(Q(project=id) | Q(project=None)) #esta linea hace lo mismo
         context = { #ponemos en contextx
             'roles': data,
-            'project_id': id #id del proyecto para usar en el template
+            'project_id': project_id #id del proyecto para usar en el template
         }
         return render(request, 'roles/index.html', context) #le pasamos a la vista
 

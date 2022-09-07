@@ -11,6 +11,6 @@ urlpatterns = [
     path('<int:project_id>/user-story-type/', views.UserStoryTypeListView.as_view(), name='user-story-type-list'),
     path('<int:project_id>/user-story-type/create', views.UserStoryTypeCreateView.as_view(), name='user-story-type-create'),
     path('<int:project_id>/user-story-type/<int:id>/edit', views.UserStoryTypeEditView.as_view(), name='user-story-type-edit'),
-    path('<int:id>/roles/create', views.ProjectRoleCreaterView.as_view(), name='create-role'), #esto debe arreglar ale
-    path('<int:id>/roles', views.ProjectRoleView.as_view(), name='index-roles'), #el index de roles dedl proyecto, el id es del proyecto
+    path('<int:project_id>/roles/create', views.ProjectRoleCreaterView.as_view(), name='create-role'), #esto debe arreglar ale
+    path('<int:project_id>/roles', views.ProjectRoleView.as_view(), name='index-roles'), #el index de roles dedl proyecto, el id es del proyecto
 ]

@@ -4,7 +4,7 @@
 <b></b>
 	<h1>Crear Roles:</h1>
 
-	<form action="{% url 'create-role' id=project_id %}" method="post">
+	<form action="{% url 'create-role' project_id=project_id %}" method="post">
 		{% csrf_token %}
 		{{ form.as_div }}
 		<input type="submit" value="Guardar">

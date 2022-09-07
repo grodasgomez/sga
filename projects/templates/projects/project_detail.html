@@ -6,6 +6,9 @@
   <a href="{% url 'user-story-type-list' project_id=object.id %}" class="btn btn-labeled btn-info">
     <span class="btn-label"><i class="fa-solid fa-book"></i></span>Ver tipos de historia de usuario
   </a>
+  <a href="{% url 'index-roles' project_id=object.id %}" class="btn btn-labeled btn-info">
+    <span class="btn-label"><i class="fa-solid fa-book"></i></span>Ver Roles
+  </a>
   <h2>Detalles</h2>
   <p><strong>Nombre:</strong> {{object.name}}</p>
   <p><strong>Descripción:</strong> {{object.description}}</p>
