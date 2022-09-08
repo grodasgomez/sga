@@ -17,7 +17,11 @@
 		<td>{{ user.last_name }}</td>
 		<td>{{ user.first_name }}</td>
 		<td>{{ user.email }}</td>
-		<td>{{ user.role_system }}</td>
+		{% if user.role_system %}
+			<td>{{ user.role_system }}</td>
+		{% else %}
+			<td>Sin Rol</td>
+		{% endif %}
 		<td>
 			<form method="post">
 				{% csrf_token %}
