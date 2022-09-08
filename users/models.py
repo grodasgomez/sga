@@ -29,3 +29,4 @@ class CustomUser(AbstractBaseUser):
 
     class Meta:
         db_table = 'sga_user'
+        ordering = ['last_name']
