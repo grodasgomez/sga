@@ -1,0 +1,33 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+{% include 'utils/messages.html'%}
+<table class="table">
+	<thead>
+	<tr>
+		<th scope="col">Apellido</th>
+		<th scope="col">Nombre</th>
+		<th scope="col">Correo</th>
+		<th scope="col">Rol del Sistema</th>
+		<th scope="col">Acciones</th>
+	</tr>
+	</thead>
+	<tbody>
+	{% for user in users %}
+	<tr>
+		<td>{{ user.last_name }}</td>
+		<td>{{ user.first_name }}</td>
+		<td>{{ user.email }}</td>
+		<td>{{ user.role_system }}</td>
+		<td>
+			<form method="post">
+				{% csrf_token %}
+				<input name="user_id" type="hidden" value={{user.id}}>
+				<input type="submit" name="user" value="user">
+				<input type="submit" name="admin" value="admin">
+			</form>
+		</td>
+	</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
