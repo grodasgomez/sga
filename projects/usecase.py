@@ -97,6 +97,13 @@ class RoleUseCase:
         return Role.objects.filter(Q(project_id=project_id) | Q(project_id=None))
 
     @staticmethod
+    def get_roles_by_project_no_default(project_id):
+        """
+        Retorna los roles de un proyecto
+        """
+        return Role.objects.filter(project_id=project_id)
+
+    @staticmethod
     def get_role_by_id(role_id):
         return Role.objects.get(id=role_id)
     

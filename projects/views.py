@@ -129,7 +129,7 @@ class ProjectRoleCreaterView(LoginRequiredMixin, View):
 
 class ProjectRoleView (LoginRequiredMixin, View): #Para ver  los roles
     def get(self, request, project_id):
-        data = RoleUseCase.get_roles_by_project(project_id) #tomamos todos los roles del proyecto con esa id
+        data = RoleUseCase.get_roles_by_project_no_default(project_id) #tomamos todos los roles del proyecto con esa id
         #data =  Role.objects.all().filter(Q(project=id) | Q(project=None)) #esta linea hace lo mismo
         context = { #ponemos en contextx
             'roles': data,
