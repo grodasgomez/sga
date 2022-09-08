@@ -18,7 +18,7 @@ class UsersView(LoginRequiredMixin, View):
         if not user.is_admin():
             messages.warning(request, "No eres admin")
             return HttpResponseRedirect('/')
-        custom_users = CustomUser.objects.all()
+        custom_users = CustomUser.objects.all().exclude(id=user.id)
         users = [user for user in custom_users]
         context = { "users" :  users }
 
