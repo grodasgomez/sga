@@ -12,7 +12,7 @@ class Permission(models.Model):
         return self.name 
 
 class Role(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
     description = models.CharField(max_length=100)
     project = models.ForeignKey('projects.Project', null=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)

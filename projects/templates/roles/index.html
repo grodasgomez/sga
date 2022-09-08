@@ -19,7 +19,7 @@
         <td>{{ role.description }}</td>
         <td>
           <!-- Aun no funciona borrar y editar roles -->
-          <a class="btn">
+          <a href="{% url 'edit-role' project_id=project_id role_id=role.id %}" class="btn">
             <span class="btn-label"><i class="fa fa-pencil"></i></span>
           </a>
           <a class="btn">
