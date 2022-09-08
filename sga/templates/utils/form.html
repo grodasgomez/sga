@@ -1,0 +1,12 @@
+  {% csrf_token %}
+  {% for field in form %}
+    {% include "utils/form_field.html" with field=field %}
+  {% endfor %}
+
+  {% for error in form.non_field_errors %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endfor %}
+  {%block buttons%}
+
+  <input type="submit" class="btn btn-primary" value="Guardar">
+  {%endblock%}
