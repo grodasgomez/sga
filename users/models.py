@@ -25,7 +25,8 @@ class CustomUser(AbstractBaseUser):
         return self.role_system == 'admin'
 
     def is_user(self):
-        return self.is_admin or self.role_system == 'user'
+        return self.is_admin() or self.role_system == 'user'
 
     class Meta:
         db_table = 'sga_user'
+        ordering = ['last_name']
