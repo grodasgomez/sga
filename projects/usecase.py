@@ -7,7 +7,10 @@ from django.db.models import Q
 class ProjectUseCase:
 
     @staticmethod
-    def create_project(name, description, prefix, scrum_master):
+    def create_project(name, description, prefix, scrum_master)-> Project:
+        """
+        Crea un proyecto con un scrum master y un tipo de historia por defecto
+        """
         project = Project.objects.create(
             name=name,
             description=description,
@@ -20,7 +23,21 @@ class ProjectUseCase:
         )
         scrum_master_role = RoleUseCase.get_scrum_role()
         project_member.roles.add(scrum_master_role)
+
+        #Creamos el tipo de historia de usuario por defecto para el proyecto
+        ProjectUseCase.create_default_user_story_type(project_id=project.id)
         return project
+
+    @staticmethod
+    def create_default_user_story_type(project_id):
+        """
+        Crea un tipo de historia de usuario por defecto para el proyecto dado
+        """
+        return ProjectUseCase.create_user_story_type(
+            name='Historia de Usuario',
+            project_id=project_id,
+            columns=['Por hacer', 'En progreso', 'Hecho']
+        )
 
     @staticmethod
     def get_non_members(project_id):

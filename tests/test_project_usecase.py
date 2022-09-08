@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django import setup
 import os
-from projects.models import Project, ProjectMember, Role
+from projects.models import Project, ProjectMember, Role, UserStoryType
 
 from projects.usecase import ProjectUseCase
 from users.models import CustomUser
@@ -44,8 +44,11 @@ class ProjectUseCaseTest(TestCase):
             'prefix': 'P1',
         }
         project = ProjectUseCase.create_project(scrum_master=self.scrum_master,**data)
+        user_story_types = UserStoryType.objects.filter(project=project)
+
         self.assertDictContainsSubset(data, project.__dict__, "El proyecto creado no es igual al que se creo")
         self.assertIn(self.scrum_master, project.project_members.all(), "El Scrum Master debe estar en la lista de miembros")
+        self.assertEqual(len(user_story_types), 1, "No se crearon los tipos de historia de usuario por defecto")
 
     def test_get_non_members(self):
         data = {
