@@ -1,15 +1,12 @@
-from multiprocessing import context
-from random import choices
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-#importo project de projecto models
-from projects.models import Project
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.views import View
+from users.forms import ProfileForm
 from users.usecase import UserUseCase
 from users.models import CustomUser
+from django.views.generic import FormView
 
 # Create your views here.
 class UsersView(LoginRequiredMixin, View):
@@ -36,3 +33,39 @@ class UsersView(LoginRequiredMixin, View):
             if "admin" in request.POST:
                 UserUseCase.update_system_role(user_id, "admin")
         return redirect(request.META['HTTP_REFERER'])
+
+class ProfileView(LoginRequiredMixin, FormView):
+    """
+    Vista para mostrar el perfil del usuario, asi como tambien para editar el perfil
+    """
+    # Nombre del template a renderizar
+    template_name = 'profile.html'
+
+    #Clase del formulario a utilizar
+    form_class = ProfileForm
+
+    # Indicamos el path al cual se redirecciona si el formulario es valido
+    success_url = '/profile'
+
+    def get_form_kwargs(self):
+        """
+        Metodo para pasar el usuario logueado al formulario para indicar
+        que el formulario es para editar, no para crear
+        """
+        #Obtenemos los parametros nombrados por defecto
+        kwargs = super().get_form_kwargs()
+
+        #Indicamos al form que es una edición, pasandole la instancia del usuario que se desea editar
+        kwargs.update({'instance': self.request.user})
+
+        return kwargs
+
+    def form_valid(self, form):
+        """
+        Metodo que se ejecuta si el formulario es valido
+        """
+        user: CustomUser = self.request.user
+        data = form.cleaned_data
+        CustomUser.objects.filter(id=user.id).update(**data)
+        messages.success(self.request, "Perfil actualizado")
+        return super().form_valid(form)

@@ -5,12 +5,12 @@ from .manager import CustomUserManager
 
 
 class CustomUser(AbstractBaseUser):
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=100, verbose_name='Nombres')
+    last_name = models.CharField(max_length=100, verbose_name='Apellidos')
     email = models.EmailField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
-    role_system = models.CharField(max_length=50, null=True)
+    role_system = models.CharField(max_length=50, null=True, verbose_name='Rol del sistema')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
