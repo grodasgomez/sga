@@ -202,8 +202,6 @@ class ProjectRoleEditView(LoginRequiredMixin, View):
         role = RoleUseCase.get_role_by_id(role_id)
         data = role.__dict__
         permissions= role.permissions.all()
-        # newlist = [item.__dict__ for item in permissions]
-        # print(newlist)
         data['permissions']=permissions
         form = FormCreateRole(project_id,role_id,initial=data)
         context= {

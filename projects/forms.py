@@ -51,16 +51,24 @@ class FormCreateRole(forms.Form):
         cleaned_data = super().clean()
         name = cleaned_data.get('name')
 
-        if(self.id):
+        if(self.id): #editar roles, ya tienen un id
             already_exists = Role.objects.filter(
             name=name, project_id=self.project_id).exclude(id=self.id).exists()
-        else:    
+        else:    #crear roles, pues no tienen un id
             already_exists = Role.objects.filter(
             name=name, project_id=self.project_id).exists()
         
         if already_exists:
             raise forms.ValidationError(build_field_error(
                 'name', 'Ya existe un rol con ese nombre'))
+
+        #no pude ser un rol sin proyecto, porque son Default
+        default_role = Role.objects.filter(
+        name=name, project_id=None).exists()
+
+        if default_role:
+            raise forms.ValidationError(build_field_error(
+                'name', 'Ya existe un rol por defecto con ese nombre'))
 
         return cleaned_data
 
