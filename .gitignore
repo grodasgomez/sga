@@ -9,3 +9,4 @@ media
 /data
 *.env
 desktop.ini
+data.json

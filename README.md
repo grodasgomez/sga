@@ -7,13 +7,12 @@ Proyecto de Ingenieria de Software II
 * ***Framework*** : Django 4.1
 
 ## Requisitos ##
-* [Docker Compose](https://docs.docker.com/compose/install/) 
+* [Docker Compose](https://docs.docker.com/compose/install/)
 * [Docker](https://www.docker.com/)
 
 
 ## Instalación ##
 - Clonar el repositorio de [GitHub](link)
-
 
 - Duplicar el archivo `.env.example`, renombrarlo a `.env` y editar las variables de entorno a conveniencia.
 
@@ -30,7 +29,7 @@ $ docker-compose up -d
 ```
 
 Para visualizar el log del servidor web:
-```    
+```
 $ docker-compose logs -f web
 ```
 ## Migraciones ##
@@ -56,7 +55,7 @@ Para levantar el ambiente de producción se utiliza el archivo `docker-compose.p
 - Duplicar el archivo `.env.example`, renombrarlo a `.prod.env` y editar las variables de entorno a conveniencia.
 
 - Solicitar al equipo las variables de entorno de producción de `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` para la autenticación con Google.
-  
+
 - Estando en el directorio del proyecto, construir las imagenes de producción:
 ```
 $ docker-compose -f docker-compose.prod.yml --env-file=.prod.env build
@@ -70,3 +69,15 @@ $ docker-compose -f docker-compose.prod.yml --env-file=.prod.env up -d
 $ docker-compose -f docker-compose.prod.yml --env-file=.prod.env exec web python manage.py migrate
 ```
 - Visualizar la aplicación abriendo en el navegador `http://localhost`
+
+## Base de datos ##
+- Duplicar el archivo `data.json.example`, renombrarlo a `data.json` y editar el archivo a conveniencia.
+
+- Cargar datos en la base de datos
+```
+$ docker-compose exec web python manage.py loaddata data.json
+```
+- Limpiar la base de datos
+```
+$ docker-compose exec web python manage.py flush --noinput
+```

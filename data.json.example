@@ -1,0 +1,188 @@
+[
+	{
+		"model": "users.customuser",
+		"pk": 1,
+		"fields": {
+			"last_login": null,
+			"first_name": "Usuario",
+			"last_name": "0",
+			"email": "0@gmail.com",
+			"password": "",
+			"is_active": true,
+			"role_system": null,
+			"created_at": "2022-09-08T18:17:45.973Z",
+			"updated_at": "2022-09-08T18:17:45.973Z",
+			"deleted_at": null
+		}
+	},
+	{
+		"model": "users.customuser",
+		"pk": 2,
+		"fields": {
+			"last_login": null,
+			"first_name": "Usuario",
+			"last_name": "1",
+			"email": "1@gmail.com",
+			"password": "",
+			"is_active": true,
+			"role_system": null,
+			"created_at": "2022-09-08T18:17:45.975Z",
+			"updated_at": "2022-09-08T18:17:45.975Z",
+			"deleted_at": null
+		}
+	},
+	{
+		"model": "users.customuser",
+		"pk": 3,
+		"fields": {
+			"last_login": null,
+			"first_name": "Usuario",
+			"last_name": "2",
+			"email": "2@gmail.com",
+			"password": "",
+			"is_active": true,
+			"role_system": null,
+			"created_at": "2022-09-08T18:17:45.976Z",
+			"updated_at": "2022-09-08T18:17:45.976Z",
+			"deleted_at": null
+		}
+	},
+	{
+		"model": "users.customuser",
+		"pk": 4,
+		"fields": {
+			"last_login": null,
+			"first_name": "Usuario",
+			"last_name": "3",
+			"email": "3@gmail.com",
+			"password": "",
+			"is_active": true,
+			"role_system": null,
+			"created_at": "2022-09-08T18:17:45.978Z",
+			"updated_at": "2022-09-08T18:17:45.978Z",
+			"deleted_at": null
+		}
+	},
+	{
+		"model": "users.customuser",
+		"pk": 5,
+		"fields": {
+			"last_login": null,
+			"first_name": "Usuario",
+			"last_name": "4",
+			"email": "4@gmail.com",
+			"password": "",
+			"is_active": true,
+			"role_system": null,
+			"created_at": "2022-09-08T18:17:45.980Z",
+			"updated_at": "2022-09-08T18:17:45.980Z",
+			"deleted_at": null
+		}
+	},
+	{
+		"model": "users.customuser",
+		"pk": 6,
+		"fields": {
+			"last_login": null,
+			"first_name": "Usuario",
+			"last_name": "5",
+			"email": "5@gmail.com",
+			"password": "",
+			"is_active": true,
+			"role_system": null,
+			"created_at": "2022-09-08T18:17:45.982Z",
+			"updated_at": "2022-09-08T18:17:45.982Z",
+			"deleted_at": null
+		}
+	},
+	{
+		"model": "users.customuser",
+		"pk": 7,
+		"fields": {
+			"last_login": null,
+			"first_name": "Usuario",
+			"last_name": "6",
+			"email": "6@gmail.com",
+			"password": "",
+			"is_active": true,
+			"role_system": null,
+			"created_at": "2022-09-08T18:17:45.983Z",
+			"updated_at": "2022-09-08T18:17:45.983Z",
+			"deleted_at": null
+		}
+	},
+	{
+		"model": "users.customuser",
+		"pk": 8,
+		"fields": {
+			"last_login": null,
+			"first_name": "Usuario",
+			"last_name": "7",
+			"email": "7@gmail.com",
+			"password": "",
+			"is_active": true,
+			"role_system": null,
+			"created_at": "2022-09-08T18:17:45.985Z",
+			"updated_at": "2022-09-08T18:17:45.985Z",
+			"deleted_at": null
+		}
+	},
+	{
+		"model": "users.customuser",
+		"pk": 9,
+		"fields": {
+			"last_login": null,
+			"first_name": "Usuario",
+			"last_name": "8",
+			"email": "8@gmail.com",
+			"password": "",
+			"is_active": true,
+			"role_system": null,
+			"created_at": "2022-09-08T18:17:45.987Z",
+			"updated_at": "2022-09-08T18:17:45.987Z",
+			"deleted_at": null
+		}
+	},
+	{
+		"model": "users.customuser",
+		"pk": 10,
+		"fields": {
+			"last_login": null,
+			"first_name": "Usuario",
+			"last_name": "9",
+			"email": "9@gmail.com",
+			"password": "",
+			"is_active": true,
+			"role_system": null,
+			"created_at": "2022-09-08T18:17:45.988Z",
+			"updated_at": "2022-09-08T18:17:45.988Z",
+			"deleted_at": null
+		}
+	},
+	{
+		"model": "projects.role",
+		"pk": 1,
+		"fields": {
+			"name": "Scrum Master",
+			"description": "",
+			"project": null,
+			"created_at": "2022-09-08T18:17:45.967Z",
+			"updated_at": "2022-09-08T18:17:45.967Z",
+			"deleted_at": null,
+			"permissions": []
+		}
+	},
+	{
+		"model": "projects.role",
+		"pk": 2,
+		"fields": {
+			"name": "Developer",
+			"description": "",
+			"project": null,
+			"created_at": "2022-09-08T18:17:45.971Z",
+			"updated_at": "2022-09-08T18:17:45.971Z",
+			"deleted_at": null,
+			"permissions": []
+		}
+	}
+]
