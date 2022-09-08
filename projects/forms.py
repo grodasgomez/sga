@@ -1,5 +1,5 @@
 from django import forms
-from projects.models import UserStoryType
+from projects.models import UserStoryType, Role
 from projects.usecase import ProjectUseCase
 from projects.utils import build_field_error
 from sga import widgets
@@ -37,10 +37,34 @@ class FormCreateProjectMember(forms.Form):
 
 class FormCreateRole(forms.Form):
 
-    name_role = forms.CharField(max_length=100)  # nombre del rol
-    description_role = forms.CharField(max_length=100)  # descripcion del rol
+    name = forms.CharField(max_length=100, label='Nombre',widget=widgets.TextInput())  # nombre del rol
+    description = forms.CharField(max_length=100, label='Descripcion',widget=widgets.TextInput())  # descripcion del rol
     permissions = forms.ModelMultipleChoiceField(
-        queryset=Permission.objects.all(), widget=forms.CheckboxSelectMultiple())
+        queryset=Permission.objects.all(), widget=forms.CheckboxSelectMultiple(), label='Permisos')
+    
+    def __init__(self, project_id, id=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.id = id
+        self.project_id = project_id
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+
+        if(self.id):
+            already_exists = Role.objects.filter(
+            name=name, project_id=self.project_id).exclude(id=self.id).exists()
+        else:    
+            already_exists = Role.objects.filter(
+            name=name, project_id=self.project_id).exists()
+        
+        if already_exists:
+            raise forms.ValidationError(build_field_error(
+                'name', 'Ya existe un rol con ese nombre'))
+
+        return cleaned_data
+
+    
 
 
 class FormUserStoryType(forms.Form):

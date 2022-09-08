@@ -87,18 +87,16 @@ class ProjectUseCase:
 class RoleUseCase:
 
     @staticmethod
-    def create_role(id, name_role, description_role, permissions):
-        existing_role=Role.objects.all().filter(name=name_role) #vemos si hay un rol en la bd con ese nombre
-        if not existing_role:
-            new_role= Role(name=name_role,description=description_role,project=Project.objects.get(id=id)) #creamos un rol
-            new_role.save() #guardamos el rol en bd
-            #veremos cada permiso
-            for perm in permissions:
-                #tomamos de la bd cada permiso con el id correspondiente
-                #agregamos el permiso al rol nuevo
-                new_role.permissions.add(perm)
-            return True #se guardo un rol
-        return False #el rol ya existe
+    def create_role(id, name, description, permissions):
+        existing_role=Role.objects.all().filter(name=name) #vemos si hay un rol en la bd con ese nombre
+        
+        new_role= Role(name=name,description=description,project=Project.objects.get(id=id)) #creamos un rol
+        new_role.save() #guardamos el rol en bd
+        #veremos cada permiso
+        for perm in permissions:
+            #tomamos de la bd cada permiso con el id correspondiente
+            #agregamos el permiso al rol nuevo
+            new_role.permissions.add(perm)
 
     @classmethod
     def get_scrum_role(self):
@@ -114,3 +112,40 @@ class RoleUseCase:
         Retorna los roles de un proyecto y los roles por defecto
         """
         return Role.objects.filter(Q(project_id=project_id) | Q(project_id=None))
+
+    @staticmethod
+    def get_roles_by_project_no_default(project_id):
+        """
+        Retorna los roles de un proyecto
+        """
+        return Role.objects.filter(project_id=project_id)
+
+    @staticmethod
+    def get_role_by_id(role_id):
+        return Role.objects.get(id=role_id)
+    
+    @staticmethod
+    def edit_role(id, name, description, permissions):
+        role=Role.objects.get(id=id) #rol editado
+        new_array_permissions=[item.id for item in permissions] #nuevos permisos seleccionados por el usuario
+        original_permissions=role.permissions.all()
+        original_permissions_id=[item.id for item in original_permissions] #permisos originales de la BD
+        #permisos que esten entre los nuevos y no entre los originales
+        to_agg=list(set(new_array_permissions) - set(original_permissions_id)) 
+        #permisos que esten entre los originales pero no entre los nuevos
+        to_remove=list(set(original_permissions_id) - set(new_array_permissions)) 
+
+        for perm in permissions: 
+            if perm.id in to_agg:
+                role.permissions.add(perm)
+
+        for perm in original_permissions:
+            if perm.id in to_remove:
+                role.permissions.remove(perm)
+
+        data = {}
+        if name:
+            data['name'] = name
+        if description:
+            data['description'] = description
+        return Role.objects.filter(id=id).update(**data)

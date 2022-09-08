@@ -110,30 +110,28 @@ class ProjectMemberCreateView(LoginRequiredMixin, View):
 class ProjectRoleCreateView(LoginRequiredMixin, View):
     form_class = FormCreateRole
 
-    def get(self, request, id):
-        form = self.form_class()
-        return render(request, 'roles/create.html', {'form': form,'project_id':id})
+    def get(self, request, project_id):
+        form = self.form_class(project_id)
+        return render(request, 'roles/create.html', {'form': form,'project_id':project_id})
 
-    def post(self, request, id):
-        form=self.form_class(request.POST) #creamos un form con los datos cargados
+    def post(self, request, project_id):
+        form=self.form_class(project_id,None,request.POST) #creamos un form con los datos cargados
 
         if form.is_valid(): #vemos si es valido
             cleaned_data=form.cleaned_data #tomamos los datos
-            if RoleUseCase.create_role(id=id, **cleaned_data):
-                messages.success(request, 'Rol creado correctamente')
-                return HttpResponseRedirect('/projects/'+str(id)+'/roles')
-            else:
-                messages.warning(request, 'El rol ya existe')
+            RoleUseCase.create_role(id=project_id, **cleaned_data)
+            messages.success(request, 'Rol creado correctamente')
+            return HttpResponseRedirect('/projects/'+str(project_id)+'/roles')
         #si el form no es valido retorna a la misma pagina
-        return render(request, 'roles/create.html', {'form': form, 'project_id':id})
+        return render(request, 'roles/create.html', {'form': form, 'project_id':project_id})
 
 class ProjectRoleView (LoginRequiredMixin, View): #Para ver  los roles
-    def get(self, request, id):
-        data = RoleUseCase.get_roles_by_project(id) #tomamos todos los roles del proyecto con esa id
+    def get(self, request, project_id):
+        data = RoleUseCase.get_roles_by_project_no_default(project_id) #tomamos todos los roles del proyecto con esa id
         #data =  Role.objects.all().filter(Q(project=id) | Q(project=None)) #esta linea hace lo mismo
         context = { #ponemos en contextx
             'roles': data,
-            'project_id': id #id del proyecto para usar en el template
+            'project_id': project_id #id del proyecto para usar en el template
         }
         return render(request, 'roles/index.html', context) #le pasamos a la vista
 
@@ -164,7 +162,7 @@ class UserStoryTypeEditView(LoginRequiredMixin, View):
     def get(self, request, project_id, id):
         data = ProjectUseCase.get_user_story_type(id).__dict__
         data['columns'] = ",".join(data.get('columns'))
-        print(project_id, id)
+        #print(project_id, id)
         form = FormEditUserStoryType(id, project_id, initial=data)
         return render(request, 'user_story_type/edit.html', {'form': form})
 
@@ -198,3 +196,28 @@ class UserStoryTypeListView(LoginRequiredMixin, ListView):
         for item in context['object_list']:
             item.columns = ",".join(item.columns)
         return context
+
+class ProjectRoleEditView(LoginRequiredMixin, View):
+    def get(self, request, project_id, role_id):
+        role = RoleUseCase.get_role_by_id(role_id)
+        data = role.__dict__
+        permissions= role.permissions.all()
+        # newlist = [item.__dict__ for item in permissions]
+        # print(newlist)
+        data['permissions']=permissions
+        form = FormCreateRole(project_id,role_id,initial=data)
+        context= {
+            "form" : form,
+            'role_id':role_id,
+            'project_id':project_id
+        }
+        return render(request, 'roles/edit.html', context)
+    def post(self, request, project_id, role_id):
+        form = FormCreateRole(project_id,role_id,request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            RoleUseCase.edit_role(role_id, **cleaned_data)
+            messages.success(request, f"Rol editado correctamente")
+            
+            return HttpResponseRedirect(f"/projects/{project_id}/roles")
+        return render(request, 'roles/edit.html', {'form': form, 'project_id':project_id, 'role_id':role_id})
