@@ -245,7 +245,9 @@ class RoleUseCase:
         """
         Edita un miembro de un proyecto
         """
-        member=ProjectMember.objects.get(id, project_id)
+        user = RoleUseCase.get_project_member_by_id(id, project_id)
+        project = Project.objects.get(id=project_id)
+        member = ProjectMember.objects.get(user=user, project=project)
         new_array_roles=[item.id for item in roles] #nuevos roles seleccionados por el usuario
         original_roles=RoleUseCase.get_roles_from_member_id(id, project_id)
         original_roles_id=[item.id for item in original_roles] #roles originales de la BD
@@ -255,14 +257,12 @@ class RoleUseCase:
         to_remove=list(set(original_roles_id) - set(new_array_roles))
 
         for role in roles:
-            member.roles.add(role)
-
-        for role in roles:
             if role.id in to_agg:
                 member.roles.add(role)
 
         for role in original_roles:
-            if role.id in to_remove:
-                member.roles.remove(role)
+            if role.name != "Scrum Master":
+                if role.id in to_remove:
+                    member.roles.remove(role)
 
         return True
