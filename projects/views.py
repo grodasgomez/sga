@@ -84,12 +84,18 @@ class ProjectMembersView(LoginRequiredMixin, View):
             return HttpResponseRedirect('/projects')
         context= {
             "members" : [],
-            "project_id" : project_id
+            "project_id" : project_id,
         }
+        scrum_master = False
         for member in members:
+            roles = RoleUseCase.get_roles_from_member(member, data)
+            for role in roles:
+                if role.name == "Scrum Master":
+                    scrum_master = True
             context["members"].append({
                 "project_member": member,
-                "roles": RoleUseCase.get_roles_from_member(member, data)
+                "roles": RoleUseCase.get_roles_from_member(member, data),
+                "scrum_master": scrum_master
             })
         return render(request, 'projects/project_members.html', context)
 
@@ -314,6 +320,10 @@ class ProjectMemberEditView(ProjectPermissionMixin, View):
         print (member)
         data = member.__dict__
         roles= RoleUseCase.get_roles_from_member_id(member_id,project_id)
+        for role in roles:
+            if role.name == "Scrum Master":
+                messages.warning(request, "El Scrum Master no puede ser editado")
+                return HttpResponseRedirect(f"/projects/{project_id}/members")
         print (roles)
         data['roles']=roles
         form = FormEditProjectMember(project_id,initial=data)
