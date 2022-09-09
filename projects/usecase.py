@@ -154,6 +154,8 @@ class RoleUseCase:
             #agregamos el permiso al rol nuevo
             new_role.permissions.add(perm)
 
+        return new_role
+
     @classmethod
     def get_scrum_role(self):
         """

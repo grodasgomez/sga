@@ -1,13 +1,11 @@
 from django.test import TestCase
 from django import setup
 import os
-from projects.models import Permission, Project, ProjectMember, Role, UserStoryType
-
-from projects.usecase import ProjectUseCase
-from users.models import CustomUser
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sga.settings")
 setup()
-
+from projects.models import Permission, Project, ProjectMember, Role, UserStoryType
+from projects.usecase import ProjectUseCase, RoleUseCase
+from users.models import CustomUser
 
 class ProjectUseCaseTest(TestCase):
     def setUp(self):
@@ -139,5 +137,57 @@ class ProjectUseCaseTest(TestCase):
         result_false = ProjectUseCase.member_has_permissions(user_id=self.scrum_master.id, project_id=project.id, permissions=permissions_false)
         self.assertTrue(result_true, "El miembro debe tener el permiso ABM Roles")
         self.assertFalse(result_false, "El miembro no debe tener el permiso ABM Proyectos")
+
+    def test_create_role(self):
+        data = {
+            'name': 'Rol nuevo prueba',
+            'description': 'Prueba de creacion de rol',
+        }
+        data_project = {
+            'name': 'Proyecto 2',
+            'description': 'Descripcion del proyecto 2',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+
+        project = ProjectUseCase.create_project(**data_project) #creacion de proyecto
+        permissions = [self.permission] #tomamos un permiso
+        role=RoleUseCase.create_role(project.id,data['name'],data['description'],permissions) #creamos el rol
+
+        self.assertIn(role, RoleUseCase.get_roles_by_project_no_default(project.id), "El rol no fue agregado al proyecto")
+        self.assertIn(self.permission, role.permissions.all(), "El permiso no fue agregado al rol")
+
+    def test_edit_role(self):
+        data_original = {
+            'name': 'Rol nuevo prueba',
+            'description': 'Prueba de creacion de rol',
+        }
+        data = {
+            'name': 'Rol edit prueba',
+            'description': 'Prueba de edicion de rol',
+        }
+        data_project = {
+            'name': 'Proyecto 3',
+            'description': 'Descripcion del proyecto 3',
+            'prefix': 'P3',
+            'scrum_master': self.scrum_master,
+        }
+
+        project = ProjectUseCase.create_project(**data_project) #creacion de proyecto
+        permissions = [self.permission] #tomamos un permiso
+        role=RoleUseCase.create_role(project.id,data_original['name'],data_original['description'],permissions) #creamos el rol
+
+        new_permission=Permission.objects.create(name="Nuevo permiso",description="Nuevo permiso de prueba")
+        permissions_new = [new_permission] #tomamos un permiso nuevo
+        #permissions_new = [self.permission,new_permission] #tomamos dos permisos para hacer fallar
+
+        RoleUseCase.edit_role(role.id,data['name'],data['description'],permissions_new) #editamos el rol
+        role=RoleUseCase.get_role_by_id(role.id)
+
+        self.assertIn(role, RoleUseCase.get_roles_by_project_no_default(project.id), "El rol no fue agregado al proyecto")
+        self.assertNotIn(self.permission, role.permissions.all(), "El permiso no fue borrado al rol")
+        self.assertIn(new_permission, role.permissions.all(), "El permiso no fue agregado al rol")
+
+
 
 
