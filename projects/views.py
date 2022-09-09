@@ -269,3 +269,29 @@ class ProjectRoleEditView(ProjectPermissionMixin, View):
             return HttpResponseRedirect(f"/projects/{project_id}/roles")
 
         return render(request, 'roles/edit.html', {'form': form, 'project_id':project_id, 'role_id':role_id})
+
+class ProjectRoleDeleteView(ProjectPermissionMixin, View):
+    """
+    Clase encargada de manejar el borrado de roles
+    """
+
+    permissions = ['ABM Roles']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id, role_id):
+        role = RoleUseCase.get_role_by_id(role_id)
+        data = role.__dict__ #convertimos los datos del rol a un diccionario
+        permissions= role.permissions.all()
+        data['permissions']=permissions
+        form = FormCreateRole(project_id,role_id,initial=data)
+        context= {
+            "form" : form,
+            'role_id':role_id,
+            'project_id':project_id
+        }
+        return render(request, 'roles/delete.html', context)
+
+    def post(self, request, project_id, role_id):
+        RoleUseCase.delete_role(role_id)
+        messages.success(request, f"Rol borrado correctamente")
+        return HttpResponseRedirect(f"/projects/{project_id}/roles")

@@ -1,0 +1,13 @@
+<div class="col-md-6">
+  <label for="{{ field.id_for_label}}" class="form-label">{{field.label}}</label>
+  <fieldset disabled="disabled">
+    {{ field }}
+  </fieldset>
+  {% if field.errors %}
+    <div class="invalid-feedback" style="display:block">
+      {% for error in field.errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>

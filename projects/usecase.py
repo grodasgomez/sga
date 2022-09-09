@@ -206,3 +206,11 @@ class RoleUseCase:
         if description:
             data['description'] = description
         return Role.objects.filter(id=id).update(**data)
+
+    @staticmethod
+    def delete_role(id):
+        """
+        Borra un rol
+        """
+        role=Role.objects.get(id=id) #rol editado
+        role.delete()
