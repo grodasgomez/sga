@@ -86,8 +86,8 @@ class ProjectMembersView(LoginRequiredMixin, View):
             "members" : [],
             "project_id" : project_id,
         }
-        scrum_master = False
         for member in members:
+            scrum_master = False
             roles = RoleUseCase.get_roles_from_member(member, data)
             for role in roles:
                 if role.name == "Scrum Master":
