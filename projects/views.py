@@ -10,7 +10,7 @@ from projects.forms import FormCreateProject, FormCreateProjectMember, FormCreat
 from projects.models import Project, UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
 from projects.models import Permission
-from sga.mixin import ProjectPermissionMixin
+from projects.mixin import ProjectPermissionMixin
 from users.models import CustomUser
 
 # Create your views here.
