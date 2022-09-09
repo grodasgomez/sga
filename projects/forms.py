@@ -37,11 +37,15 @@ class FormCreateProjectMember(forms.Form):
 
 class FormCreateRole(forms.Form):
 
+    """
+    Formulario para crear y editar roles de un proyecto
+    """
+
     name = forms.CharField(max_length=100, label='Nombre',widget=widgets.TextInput())  # nombre del rol
     description = forms.CharField(max_length=100, label='Descripcion',widget=widgets.TextInput())  # descripcion del rol
     permissions = forms.ModelMultipleChoiceField(
         queryset=Permission.objects.all(), widget=forms.CheckboxSelectMultiple(), label='Permisos')
-    
+
     def __init__(self, project_id, id=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.id = id
@@ -57,7 +61,7 @@ class FormCreateRole(forms.Form):
         else:    #crear roles, pues no tienen un id
             already_exists = Role.objects.filter(
             name=name, project_id=self.project_id).exists()
-        
+
         if already_exists:
             raise forms.ValidationError(build_field_error(
                 'name', 'Ya existe un rol con ese nombre'))
@@ -71,9 +75,6 @@ class FormCreateRole(forms.Form):
                 'name', 'Ya existe un rol por defecto con ese nombre'))
 
         return cleaned_data
-
-    
-
 
 class FormUserStoryType(forms.Form):
     """

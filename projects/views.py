@@ -129,10 +129,13 @@ class ProjectRoleCreateView(ProjectPermissionMixin, View):
         #si el form no es valido retorna a la misma pagina
         return render(request, 'roles/create.html', {'form': form, 'project_id':project_id})
 
-class ProjectRoleView(LoginRequiredMixin, View):
+class ProjectRoleView(ProjectPermissionMixin, View):
     """
     Clase encargada de mostrar los roles de un proyecto
     """
+    permissions = ['ABM Roles']
+    roles = ['Scrum Master']
+
     def get(self, request, project_id):
         #tomamos todos los roles del proyecto
         data = RoleUseCase.get_roles_by_project_no_default(project_id)
@@ -200,13 +203,17 @@ class UserStoryTypeListView(LoginRequiredMixin, ListView):
             item.columns = ",".join(item.columns)
         return context
 
-class ProjectRoleEditView(LoginRequiredMixin, View):
+class ProjectRoleEditView(ProjectPermissionMixin, View):
     """
     Clase encargada de manejar la edicion de roles
     """
+
+    permissions = ['ABM Roles']
+    roles = ['Scrum Master']
+
     def get(self, request, project_id, role_id):
         role = RoleUseCase.get_role_by_id(role_id)
-        data = role.__dict__
+        data = role.__dict__ #convertimos los datos del rol a un diccionario
         permissions= role.permissions.all()
         data['permissions']=permissions
         form = FormCreateRole(project_id,role_id,initial=data)
