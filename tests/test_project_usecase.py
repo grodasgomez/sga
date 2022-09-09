@@ -61,7 +61,7 @@ class ProjectUseCaseTest(TestCase):
         non_members = ProjectUseCase.get_non_members(project.id)
         self.assertNotIn(self.scrum_master, non_members, "El Scrum Master no debe estar en la lista de no miembros")
         self.assertNotIn(self.admin, non_members, "El Admin no debe estar en la lista de no miembros")
-    
+
     def test_get_members(self):
         data = {
             'name': 'Proyecto 1',
@@ -94,4 +94,5 @@ class ProjectUseCaseTest(TestCase):
         self.assertIn(new_member, project.project_members.all(), "El miembro no fue agregado al proyecto")
         self.assertIn(self.scrum_rol, member.roles.all(), "El rol no fue agregado al miembro")
 
-        
+    #TODO Test de member_has_roles y member_has_permissions
+

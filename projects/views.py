@@ -1,7 +1,7 @@
 from django.views.generic import ListView
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.contrib import messages
 from django.views import View
 from django.db.models.query import QuerySet
@@ -12,6 +12,7 @@ from projects.usecase import ProjectUseCase, RoleUseCase
 
 #todo
 from projects.models import Permission
+from sga.mixin import ProjectPermissionMixin
 from users.models import CustomUser
 
 # Create your views here.
@@ -107,8 +108,10 @@ class ProjectMemberCreateView(LoginRequiredMixin, View):
         return render(request, 'project_member/create.html', {'form': form})
 
 
-class ProjectRoleCreateView(LoginRequiredMixin, View):
+class ProjectRoleCreateView(ProjectPermissionMixin, View):
     form_class = FormCreateRole
+    permissions = ['ABM Roles dsadsad']
+    roles = ['Scrum Master dasdasd']
 
     def get(self, request, project_id):
         form = self.form_class(project_id)

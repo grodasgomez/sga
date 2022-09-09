@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.views import View
@@ -9,7 +9,7 @@ from users.models import CustomUser
 from django.views.generic import FormView
 
 # Create your views here.
-class UsersView(LoginRequiredMixin, View):
+class UsersView(PermissionRequiredMixin, View):
     def get(self, request):
         user: CustomUser = request.user
         if not user.is_admin():

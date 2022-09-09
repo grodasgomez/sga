@@ -83,6 +83,24 @@ class ProjectUseCase:
     def get_user_story_type(id):
         return UserStoryType.objects.get(id=id)
 
+    @staticmethod
+    def member_has_permissions(user_id, project_id, permissions):
+        """
+        Verifica si un miembro del proyecto tiene una lista de permisos
+        """
+        return ProjectMember.objects.filter(
+           user_id=user_id,project_id=project_id, roles__permissions__name__in=permissions
+        ).exists()
+
+    @staticmethod
+    def member_has_roles(user_id, project_id, roles):
+        """
+        Verifica si un miembro del proyecto tiene una lista de roles
+        """
+        return ProjectMember.objects.filter(
+            user_id=user_id,project_id=project_id, roles__name__in=roles
+        ).exists()
+
 
 class RoleUseCase:
 
