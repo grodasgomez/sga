@@ -54,8 +54,12 @@ class ProjectView(LoginRequiredMixin, View):
         if user not in members:
             messages.warning(request, "No eres miembro")
             return HttpResponseRedirect('/projects')
+
+        puede_iniciar_proyecto = ProjectUseCase.can_start_project(user.id ,project_id)
         context= {
-            "object" : data
+            "object" : data,
+            "members" : members,
+            "puede_iniciar_proyecto" : puede_iniciar_proyecto
         }
         return render(request, 'projects/project_detail.html', context)
 

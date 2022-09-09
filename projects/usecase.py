@@ -125,6 +125,19 @@ class ProjectUseCase:
         return ProjectMember.objects.filter(
             user_id=user_id,project_id=project_id, roles__name__in=roles
         ).exists()
+#########
+    @staticmethod
+    def can_start_project(user_id, project_id):
+        """
+        Verifica si un miembro de proyecto puede tiene permisos para iniciar el proyecto
+        """
+        permissions = ['Iniciar Proyecto']
+        roles = ['Scrum Master']
+        tiene_permisos = ProjectUseCase.member_has_permissions(user_id, project_id, permissions)
+        es_scrum_master = ProjectUseCase.member_has_roles(user_id, project_id, roles)
+        print(es_scrum_master, tiene_permisos)
+
+        return es_scrum_master or tiene_permisos
 
 
 class RoleUseCase:
