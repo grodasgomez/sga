@@ -88,7 +88,7 @@ class ProjectMembersView(LoginRequiredMixin, View):
         for member in members:
             context["members"].append({
                 "project_member": member,
-                "roles": ProjectMember.objects.get(user=member, project=data).roles.all()
+                "roles": RoleUseCase.get_roles_from_member(member, data)
             })
         return render(request, 'projects/project_members.html', context)
 

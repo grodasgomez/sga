@@ -227,3 +227,7 @@ class RoleUseCase:
         """
         role=Role.objects.get(id=id) #rol editado
         role.delete()
+
+    @staticmethod
+    def get_roles_from_member(member, project):
+        return ProjectMember.objects.get(user=member, project=project).roles.all()
