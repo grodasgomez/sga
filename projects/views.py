@@ -43,11 +43,11 @@ class ProjectView(LoginRequiredMixin, View):
     """
     Clase encargada de mostrar los detalles de una view
     """
-    def get(self, request, id):
+    def get(self, request, project_id):
         user: CustomUser = request.user
         if not user.is_user():
             return HttpResponseRedirect('/')
-        data: Project = Project.objects.get(id=id)
+        data: Project = Project.objects.get(id=project_id)
         members: QuerySet = data.project_members.all()
         if user not in members:
             messages.warning(request, "No eres miembro")
@@ -58,8 +58,8 @@ class ProjectView(LoginRequiredMixin, View):
         }
         return render(request, 'projects/project_detail.html', context)
 
-    def post(self, request, id):
-        ProjectUseCase.start_project(id)
+    def post(self, request, project_id):
+        ProjectUseCase.start_project(project_id)
         messages.success(request, 'Proyecto iniciado correctamente')
         return redirect(request.META['HTTP_REFERER'])
 
@@ -87,21 +87,24 @@ class ProjectCreateView(LoginRequiredMixin, View):
         return render(request, 'projects/create.html', {'form': form})
 
 
-class ProjectMemberCreateView(LoginRequiredMixin, View):
+class ProjectMemberCreateView(ProjectPermissionMixin, View):
     """
     Clase encargada de manejar la asignacion de miembros a un proyecto
     """
     form_class = FormCreateProjectMember
 
-    def get(self, request, id):
-        form = self.form_class(project_id=id)
+    permissions = ['ABM Miembros']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id):
+        form = self.form_class(project_id=project_id)
         return render(request, 'project_member/create.html', {'form': form})
 
-    def post(self, request, id):
-        form = self.form_class(id, request.POST)
+    def post(self, request, project_id):
+        form = self.form_class(project_id, request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
-            ProjectUseCase.add_member(project_id=id, **cleaned_data)
+            ProjectUseCase.add_member(project_id=project_id, **cleaned_data)
             messages.success(request, f"Miembro agregado correctamente")
             return HttpResponseRedirect('/projects')
         return render(request, 'project_member/create.html', {'form': form})
@@ -146,10 +149,13 @@ class ProjectRoleView(ProjectPermissionMixin, View):
         return render(request, 'roles/index.html', context) #le pasamos a la vista
 
 #User Story
-class UserStoryTypeCreateView(LoginRequiredMixin, View):
+class UserStoryTypeCreateView(ProjectPermissionMixin, View):
     """
     Vista para crear un tipo de historia de usuario en un proyecto
     """
+    permissions = ['ABM Tipo US']
+    roles = ['Scrum Master']
+
     def get(self, request, project_id):
         form = FormCreateUserStoryType(project_id)
         return render(request, 'user_story_type/create.html', {'form': form})
@@ -164,10 +170,13 @@ class UserStoryTypeCreateView(LoginRequiredMixin, View):
             return HttpResponseRedirect(f"/projects/{project_id}/user-story-type")
         return render(request, 'user_story_type/create.html', {'form': form})
 
-class UserStoryTypeEditView(LoginRequiredMixin, View):
+class UserStoryTypeEditView(ProjectPermissionMixin, View):
     """
     Vista para editar un tipo de historia de usuario de un proyecto
     """
+    permissions = ['ABM Tipo US']
+    roles = ['Scrum Master']
+
     def get(self, request, project_id, id):
         data = ProjectUseCase.get_user_story_type(id).__dict__
         data['columns'] = ",".join(data.get('columns'))
@@ -184,10 +193,13 @@ class UserStoryTypeEditView(LoginRequiredMixin, View):
 
         return render(request, 'user_story_type/edit.html', {'form': form})
 
-class UserStoryTypeListView(LoginRequiredMixin, ListView):
+class UserStoryTypeListView(ProjectPermissionMixin, ListView):
     """
     Vista que lista tipos de historias de usuario de un projecto
     """
+    permissions = ['ABM Tipo US']
+    roles = ['Scrum Master']
+
     model = UserStoryType
     template_name = 'user_story_type/index.html'
 
