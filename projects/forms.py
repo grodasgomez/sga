@@ -41,7 +41,7 @@ class FormEditProjectMember(forms.Form):
     """
     def __init__(self, project_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['email'] = forms.CharField(max_length=100, label='Miembro',widget=widgets.TextInput())
+        self.fields['email'] = forms.CharField(max_length=100, label='Miembro',widget=widgets.TextInput(attrs={'readonly': 'readonly'}))
         self.fields['roles'] = forms.ModelMultipleChoiceField(
             queryset=RoleUseCase.get_roles_by_project(project_id).exclude(name='Scrum Master'),
             label='Roles', widget=widgets.SelectMultipleInput())
