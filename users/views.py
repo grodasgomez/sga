@@ -26,13 +26,10 @@ class UsersView(LoginRequiredMixin, View):
     def post(self, request):
         #trae el value del boton con name user
         user_id = request.POST.get('user_id')
-        if (int(request.user.id) == int(user_id)):
-            messages.warning(request, "No puedes cambiar tu rol")
-        else:
-            if "user" in request.POST:
-                UserUseCase.update_system_role(user_id, "user")
-            if "admin" in request.POST:
-                UserUseCase.update_system_role(user_id, "admin")
+        if "user" in request.POST:
+            UserUseCase.update_system_role(user_id, "user")
+        if "admin" in request.POST:
+            UserUseCase.update_system_role(user_id, "admin")
         return redirect(request.META['HTTP_REFERER'])
 
 class ProfileView(LoginRequiredMixin, FormView):
