@@ -22,3 +22,7 @@ form > div.invalid-feedback {
 div.alert {
   margin-top: var(--bs-alert-margin-bottom);
 }
+
+span.btn-label {
+  margin-right: 0.3rem;
+}

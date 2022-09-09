@@ -1,17 +1,18 @@
 {% extends 'sga/layout/base_generic.html'%}
 {% block content %}
   {% include 'utils/messages.html' %}
-  <h1>Project {{object.name}}</h1>
-
-  <a href="{% url 'user-story-type-list' project_id=object.id %}" class="btn btn-labeled btn-info">
-    <span class="btn-label"><i class="fa-solid fa-book"></i></span>Ver tipos de historia de usuario
-  </a>
-  <a href="{% url 'index-roles' project_id=object.id %}" class="btn btn-labeled btn-info">
-    <span class="btn-label"><i class="fa-solid fa-book"></i></span>Ver Roles
-  </a>
-  <a href="{% url 'project-members' project_id=object.id %}" class="btn btn-labeled btn-info">
-    <span class="btn-label"><i class="fa-solid fa-book"></i></span>Ver Miembros
-  </a>
+  <h1>Proyecto {{object.name}}</h1>
+  <div>
+    <a href="{% url 'user-story-type-list' project_id=object.id %}" class="btn btn-info" role="button">
+      <span class="btn-label"><i class="fa-solid fa-book"></i></span>Ver tipos de historia de usuario
+    </a>
+    <a href="{% url 'index-roles' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
+      <span class="btn-label"><i class="fa-solid fa-shield-halved"></i></span>Ver Roles
+    </a>
+    <a href="{% url 'project-members' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
+      <span class="btn-label"><i class="fa-solid fa-users"></i></span>Ver Miembros
+    </a>
+  </div>
   <h2>Detalles</h2>
   <p><strong>Nombre:</strong> {{object.name}}</p>
   <p><strong>Descripción:</strong> {{object.description}}</p>
@@ -21,7 +22,10 @@
   {% if object.status == "CREATED" and puede_iniciar_proyecto %}
     <form method="post">
       {% csrf_token %}
-      <input type="submit" value="Iniciar Proyecto">
+      <button type="submit" class="btn btn-primary">
+        <span class="btn-label"><i class="fa-solid fa-rocket"></i></span>
+        Iniciar proyecto
+      </button
     </form>
   {% endif %}
 {% endblock %}
