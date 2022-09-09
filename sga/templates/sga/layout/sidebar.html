@@ -20,24 +20,28 @@
         Home
       </a>
     </li>
-    <li>
-      <a href="/projects" class="nav-link {% if 'project' in request.path%}active{%else%} link-dark {%endif%}">
-        <i class="fa-solid fa-diagram-project"></i>
-        Proyectos
-      </a>
-    </li>
-    <li>
-      <a href="#" class="nav-link link-dark">
-        <i class="fa-solid fa-table"></i>
-        Tablero
-      </a>
-    </li>
-    <li>
-      <a href="/users" class="nav-link {% if 'users' in request.path%}active{%else%} link-dark {%endif%}">
-        <i class="fa-solid fa-circle-user"></i>
-        Usuarios
-      </a>
-    </li>
+    {% if user.is_user%}
+      <li>
+        <a href="/projects" class="nav-link {% if 'project' in request.path%}active{%else%} link-dark {%endif%}">
+          <i class="fa-solid fa-diagram-project"></i>
+          Proyectos
+        </a>
+      </li>
+      {% comment %} <li>
+        <a href="#" class="nav-link link-dark">
+          <i class="fa-solid fa-table"></i>
+          Tablero
+        </a>
+      </li> {% endcomment %}
+      {% if user.is_admin%}
+        <li>
+          <a href="/users" class="nav-link {% if 'users' in request.path%}active{%else%} link-dark {%endif%}">
+            <i class="fa-solid fa-circle-user"></i>
+            Usuarios
+          </a>
+        </li>
+      {% endif %}
+    {% endif %}
   </ul>
   <hr />
   <div class="dropdown">
