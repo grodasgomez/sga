@@ -21,6 +21,11 @@ class TestUser(TestCase):
         user.role_system = "user"
         self.assertEqual(user.is_user(), True, "User no es user")
 
+    def test_is_not_admin(self):
+        user = CustomUser()
+        user.role_system = ""
+        self.assertNotEqual(user.is_admin(), True, "User es admin")
+
     def test_is_admin(self):
         user = CustomUser()
         user.role_system = "admin"
