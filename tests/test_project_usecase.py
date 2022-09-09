@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django import setup
 import os
-from projects.models import Project, ProjectMember, Role, UserStoryType
+from projects.models import Permission, Project, ProjectMember, Role, UserStoryType
 
 from projects.usecase import ProjectUseCase
 from users.models import CustomUser
@@ -35,6 +35,12 @@ class ProjectUseCaseTest(TestCase):
             password='dsad',
             is_active=True,
             role_system='admin')
+
+        self.permission = Permission.objects.create(
+            name='ABM Roles',
+            description='Descripcion')
+
+        self.scrum_rol.permissions.add(self.permission)
 
 
     def test_create_project(self):
@@ -94,5 +100,44 @@ class ProjectUseCaseTest(TestCase):
         self.assertIn(new_member, project.project_members.all(), "El miembro no fue agregado al proyecto")
         self.assertIn(self.scrum_rol, member.roles.all(), "El rol no fue agregado al miembro")
 
-    #TODO Test de member_has_roles y member_has_permissions
+    def test_member_has_roles(self):
+        data = {
+            'name': 'Proyecto 1',
+            'description': 'Descripcion del proyecto 1',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+        project = ProjectUseCase.create_project(**data)
+        roles = ['Scrum Master']
+        result = ProjectUseCase.member_has_roles(user_id=self.scrum_master.id, project_id=project.id, roles=roles)
+        self.assertTrue(result, "El miembro debe tener el rol Scrum Master")
+
+    def test_member_has_permissions(self):
+        data = {
+            'name': 'Proyecto 1',
+            'description': 'Descripcion del proyecto 1',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+        project = ProjectUseCase.create_project(**data)
+        new_user = CustomUser.objects.create(
+            first_name='New',
+            last_name='Member',
+            email='newmember@gmail.com',
+            password='dsad',
+            is_active=True,
+            role_system='user'
+        )
+        new_member = ProjectMember.objects.create(
+            user=new_user,
+            project=project,
+        )
+        new_member.roles.add(self.scrum_rol)
+        permissions = ['ABM Roles']
+        permissions_false = ['ABM Proyectos']
+        result_true = ProjectUseCase.member_has_permissions(user_id=self.scrum_master.id, project_id=project.id, permissions=permissions)
+        result_false = ProjectUseCase.member_has_permissions(user_id=self.scrum_master.id, project_id=project.id, permissions=permissions_false)
+        self.assertTrue(result_true, "El miembro debe tener el permiso ABM Roles")
+        self.assertFalse(result_false, "El miembro no debe tener el permiso ABM Proyectos")
+
 
