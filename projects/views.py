@@ -9,7 +9,7 @@ from django.db.models.query import QuerySet
 from projects.forms import FormCreateProject, FormCreateProjectMember, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole
 from projects.models import Project, UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
-from projects.models import Permission
+from projects.models import ProjectMember
 from projects.mixin import ProjectPermissionMixin
 from users.models import CustomUser
 
@@ -21,6 +21,7 @@ class ProjectListView(LoginRequiredMixin, View):
     def get(self, request):
         user: CustomUser = request.user
         if not user.is_user():
+            messages.warning(request, "No eres un usuario verificado")
             return HttpResponseRedirect('/')
         if user.is_admin():
             data = Project.objects.all()
@@ -46,6 +47,7 @@ class ProjectView(LoginRequiredMixin, View):
     def get(self, request, project_id):
         user: CustomUser = request.user
         if not user.is_user():
+            messages.warning(request, "No eres un usuario verificado")
             return HttpResponseRedirect('/')
         data: Project = Project.objects.get(id=project_id)
         members: QuerySet = data.project_members.all()
@@ -53,8 +55,7 @@ class ProjectView(LoginRequiredMixin, View):
             messages.warning(request, "No eres miembro")
             return HttpResponseRedirect('/projects')
         context= {
-            "object" : data,
-            "members" : members
+            "object" : data
         }
         return render(request, 'projects/project_detail.html', context)
 
@@ -63,6 +64,29 @@ class ProjectView(LoginRequiredMixin, View):
         messages.success(request, 'Proyecto iniciado correctamente')
         return redirect(request.META['HTTP_REFERER'])
 
+class ProjectMembersView(LoginRequiredMixin, View):
+    """
+    Clase encargada de mostrar los miembros de un proyecto
+    """
+    def get(self, request, project_id):
+        user: CustomUser = request.user
+        if not user.is_user():
+            messages.warning(request, "No eres un usuario verificado")
+            return HttpResponseRedirect('/')
+        data: Project = Project.objects.get(id=project_id)
+        members: QuerySet = data.project_members.all()
+        if user not in members:
+            messages.warning(request, "No eres miembro")
+            return HttpResponseRedirect('/projects')
+        context= {
+            "members" : []
+        }
+        for member in members:
+            context["members"].append({
+                "project_member": member,
+                "roles": ProjectMember.objects.get(user=member, project=data).roles.all()
+            })
+        return render(request, 'projects/project_members.html', context)
 
 class ProjectCreateView(LoginRequiredMixin, View):
     """

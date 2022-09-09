@@ -9,18 +9,15 @@
   <a href="{% url 'index-roles' project_id=object.id %}" class="btn btn-labeled btn-info">
     <span class="btn-label"><i class="fa-solid fa-book"></i></span>Ver Roles
   </a>
+  <a href="{% url 'project-members' project_id=object.id %}" class="btn btn-labeled btn-info">
+    <span class="btn-label"><i class="fa-solid fa-book"></i></span>Ver Miembros
+  </a>
   <h2>Detalles</h2>
   <p><strong>Nombre:</strong> {{object.name}}</p>
   <p><strong>Descripción:</strong> {{object.description}}</p>
   <p><strong>Fecha de inicio:</strong> {{object.start_date|date:"d/m/Y"}}</p>
   <p><strong>Fecha de fin:</strong> {{object.end_date|date:"d/m/Y"}}</p>
   <p><strong>Estado:</strong> {{object.get_status_display}}</p>
-  <h2>Miembros del proyecto</h2>
-  <ul>
-    {% for member in members %}
-      <li>{{member}}</li>
-    {% endfor %}
-  </ul>
   {% if object.status == "CREATED" %}
     <form method="post">
       {% csrf_token %}

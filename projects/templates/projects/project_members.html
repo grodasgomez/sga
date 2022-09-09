@@ -1,0 +1,34 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+	{% include 'utils/messages.html' %}
+	<h2>Miembros del proyecto</h2>
+	<table class="table">
+		<thead>
+		<tr>
+			<th scope="col">Apellido</th>
+			<th scope="col">Nombre</th>
+			<th scope="col">Correo</th>
+			<th scope="col">Roles</th>
+		</tr>
+		</thead>
+		<tbody>
+		{% for member in members %}
+		<tr>
+			{{project_member}}
+			<td>{{ member.project_member.last_name }}</td>
+			<td>{{ member.project_member.first_name }}</td>
+			<td>{{ member.project_member.email }}</td>
+			<td>
+			{% for role in member.roles %}
+				{% if forloop.last %}
+					{{ role }}
+				{% else %}
+					{{ role }},
+				{% endif %}
+			{% endfor %}
+			</td>
+		</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}
