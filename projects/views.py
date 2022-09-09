@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.views import View
 from django.db.models.query import QuerySet
 
-from projects.forms import FormCreateProject, FormCreateProjectMember, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole
+from projects.forms import FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole
 from projects.models import Project, UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
 from projects.models import ProjectMember
@@ -83,7 +83,8 @@ class ProjectMembersView(LoginRequiredMixin, View):
             messages.warning(request, "No eres miembro")
             return HttpResponseRedirect('/projects')
         context= {
-            "members" : []
+            "members" : [],
+            "project_id" : project_id
         }
         for member in members:
             context["members"].append({
@@ -299,3 +300,36 @@ class ProjectRoleDeleteView(ProjectPermissionMixin, View):
         RoleUseCase.delete_role(role_id)
         messages.success(request, f"Rol borrado correctamente")
         return HttpResponseRedirect(f"/projects/{project_id}/roles")
+
+class ProjectMemberEditView(ProjectPermissionMixin, View):
+    """
+    Clase encargada de manejar la edicion de roles
+    """
+
+    permissions = ['ABM Miembros']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id, member_id):
+        member = RoleUseCase.get_project_member_by_id(member_id,project_id)
+        print (member)
+        data = member.__dict__
+        roles= RoleUseCase.get_roles_from_member_id(member_id,project_id)
+        print (roles)
+        data['roles']=roles
+        form = FormEditProjectMember(project_id,initial=data)
+        context= {
+            "form" : form,
+            'member_id':member_id,
+            'project_id':project_id
+        }
+        return render(request, 'projects/project_member_edit.html', context)
+
+    def post(self, request, project_id, member_id):
+        form = FormEditProjectMember(project_id,request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            RoleUseCase.edit_project_member(member_id,project_id, **cleaned_data)
+            messages.success(request, f"Miembro editado correctamente")
+            return HttpResponseRedirect(f"/projects/{project_id}/members")
+
+        return render(request, 'projects/project_member_edit.html', {'form': form, 'project_id':project_id, 'member_id':member_id})

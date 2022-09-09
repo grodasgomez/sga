@@ -9,6 +9,7 @@
 			<th scope="col">Nombre</th>
 			<th scope="col">Correo</th>
 			<th scope="col">Roles</th>
+			<th scope="col">Acciones</th>
 		</tr>
 		</thead>
 		<tbody>
@@ -26,6 +27,11 @@
 					{{ role }},
 				{% endif %}
 			{% endfor %}
+			</td>
+			<td>
+				<a href="{% url 'project-member-edit' project_id=project_id member_id=member.project_member.id %}" class="btn">
+				  <span class="btn-label"><i class="fa fa-pencil"></i></span>
+				</a>
 			</td>
 		</tr>
 		{% endfor %}

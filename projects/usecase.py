@@ -146,8 +146,6 @@ class RoleUseCase:
         """
         Crea un rol y lo guarda en la base de datos
         """
-        existing_role=Role.objects.all().filter(name=name) #vemos si hay un rol en la bd con ese nombre
-
         new_role= Role(name=name,description=description,project=Project.objects.get(id=id)) #creamos un rol
         new_role.save() #guardamos el rol en bd
         #veremos cada permiso
@@ -231,3 +229,40 @@ class RoleUseCase:
     @staticmethod
     def get_roles_from_member(member, project):
         return ProjectMember.objects.get(user=member, project=project).roles.all()
+
+    @staticmethod
+    def get_roles_from_member_id(member_id, project_id):
+        project=Project.objects.get(id=project_id)
+        member=project.project_members.get(id=member_id)
+        return RoleUseCase.get_roles_from_member(member,project)
+
+    def get_project_member_by_id(member_id,project_id):
+        project=Project.objects.get(id=project_id)
+        return project.project_members.get(id=member_id)
+
+    @staticmethod
+    def edit_project_member(id, project_id, email, roles):
+        """
+        Edita un miembro de un proyecto
+        """
+        member=ProjectMember.objects.get(id, project_id)
+        new_array_roles=[item.id for item in roles] #nuevos roles seleccionados por el usuario
+        original_roles=RoleUseCase.get_roles_from_member_id(id, project_id)
+        original_roles_id=[item.id for item in original_roles] #roles originales de la BD
+        #roles que esten entre los nuevos y no entre los originales
+        to_agg=list(set(new_array_roles) - set(original_roles_id))
+        #roles que esten entre los originales pero no entre los nuevos
+        to_remove=list(set(original_roles_id) - set(new_array_roles))
+
+        for role in roles:
+            member.roles.add(role)
+
+        for role in roles:
+            if role.id in to_agg:
+                member.roles.add(role)
+
+        for role in original_roles:
+            if role.id in to_remove:
+                member.roles.remove(role)
+
+        return True

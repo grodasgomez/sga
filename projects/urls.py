@@ -7,6 +7,7 @@ urlpatterns = [
     path('<int:project_id>/', views.ProjectView.as_view(), name='project-detail'),
     path('<int:project_id>/members/create', views.ProjectMemberCreateView.as_view(), name='create-member'),
     path('<int:project_id>/members', views.ProjectMembersView.as_view(), name='project-members'),
+    path('<int:project_id>/members/<int:member_id>/edit', views.ProjectMemberEditView.as_view(), name='project-member-edit'),
 
     #User story type
     path('<int:project_id>/user-story-type/', views.UserStoryTypeListView.as_view(), name='user-story-type-list'),
