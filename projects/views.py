@@ -9,8 +9,6 @@ from django.db.models.query import QuerySet
 from projects.forms import FormCreateProject, FormCreateProjectMember, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole
 from projects.models import Project, UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
-
-#todo
 from projects.models import Permission
 from sga.mixin import ProjectPermissionMixin
 from users.models import CustomUser
@@ -42,6 +40,9 @@ class ProjectListView(LoginRequiredMixin, View):
         return render(request, 'projects/index.html', context)
 
 class ProjectView(LoginRequiredMixin, View):
+    """
+    Clase encargada de mostrar los detalles de una view
+    """
     def get(self, request, id):
         user: CustomUser = request.user
         if not user.is_user():
@@ -58,9 +59,7 @@ class ProjectView(LoginRequiredMixin, View):
         return render(request, 'projects/project_detail.html', context)
 
     def post(self, request, id):
-        data: Project = Project.objects.get(id=id)
-        data.status = ProjectStatus.IN_PROGRESS
-        data.save()
+        ProjectUseCase.start_project(id)
         messages.success(request, 'Proyecto iniciado correctamente')
         return redirect(request.META['HTTP_REFERER'])
 
@@ -107,11 +106,13 @@ class ProjectMemberCreateView(LoginRequiredMixin, View):
             return HttpResponseRedirect('/projects')
         return render(request, 'project_member/create.html', {'form': form})
 
-
 class ProjectRoleCreateView(ProjectPermissionMixin, View):
+    """
+    Clase encargada de manejar la creacion de roles
+    """
     form_class = FormCreateRole
-    permissions = ['ABM Roles dsadsad']
-    roles = ['Scrum Master dasdasd']
+    permissions = ['ABM Roles']
+    roles = ['Scrum Master']
 
     def get(self, request, project_id):
         form = self.form_class(project_id)
@@ -128,16 +129,18 @@ class ProjectRoleCreateView(ProjectPermissionMixin, View):
         #si el form no es valido retorna a la misma pagina
         return render(request, 'roles/create.html', {'form': form, 'project_id':project_id})
 
-class ProjectRoleView (LoginRequiredMixin, View): #Para ver  los roles
+class ProjectRoleView(LoginRequiredMixin, View):
+    """
+    Clase encargada de mostrar los roles de un proyecto
+    """
     def get(self, request, project_id):
-        data = RoleUseCase.get_roles_by_project_no_default(project_id) #tomamos todos los roles del proyecto con esa id
-        #data =  Role.objects.all().filter(Q(project=id) | Q(project=None)) #esta linea hace lo mismo
-        context = { #ponemos en contextx
+        #tomamos todos los roles del proyecto
+        data = RoleUseCase.get_roles_by_project_no_default(project_id)
+        context = {
             'roles': data,
             'project_id': project_id #id del proyecto para usar en el template
         }
         return render(request, 'roles/index.html', context) #le pasamos a la vista
-
 
 #User Story
 class UserStoryTypeCreateView(LoginRequiredMixin, View):
@@ -154,7 +157,7 @@ class UserStoryTypeCreateView(LoginRequiredMixin, View):
             cleaned_data = form.cleaned_data
             ProjectUseCase.create_user_story_type(project_id=project_id, **cleaned_data)
             messages.success(request, f"Tipo de historia de usuario creado correctamente")
-            
+
             return HttpResponseRedirect(f"/projects/{project_id}/user-story-type")
         return render(request, 'user_story_type/create.html', {'form': form})
 
@@ -165,7 +168,6 @@ class UserStoryTypeEditView(LoginRequiredMixin, View):
     def get(self, request, project_id, id):
         data = ProjectUseCase.get_user_story_type(id).__dict__
         data['columns'] = ",".join(data.get('columns'))
-        #print(project_id, id)
         form = FormEditUserStoryType(id, project_id, initial=data)
         return render(request, 'user_story_type/edit.html', {'form': form})
 
@@ -175,8 +177,8 @@ class UserStoryTypeEditView(LoginRequiredMixin, View):
             cleaned_data = form.cleaned_data
             ProjectUseCase.edit_user_story_type(id, **cleaned_data)
             messages.success(request, f"Tipo de historia de usuario editado correctamente")
-            
             return HttpResponseRedirect(f"/projects/{project_id}/user-story-type")
+
         return render(request, 'user_story_type/edit.html', {'form': form})
 
 class UserStoryTypeListView(LoginRequiredMixin, ListView):
@@ -191,16 +193,17 @@ class UserStoryTypeListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         # Agregamos el id del proyecto en el contexto para ser usado en el template
         context['project_id'] = self.kwargs.get('project_id')
-
         #Convertimos las columnas de lista de str a un str separado por comas
         for item in context['object_list']:
             item.columns = ",".join(item.columns)
         return context
 
 class ProjectRoleEditView(LoginRequiredMixin, View):
+    """
+    Clase encargada de manejar la edicion de roles
+    """
     def get(self, request, project_id, role_id):
         role = RoleUseCase.get_role_by_id(role_id)
         data = role.__dict__
@@ -213,12 +216,13 @@ class ProjectRoleEditView(LoginRequiredMixin, View):
             'project_id':project_id
         }
         return render(request, 'roles/edit.html', context)
+
     def post(self, request, project_id, role_id):
         form = FormCreateRole(project_id,role_id,request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
             RoleUseCase.edit_role(role_id, **cleaned_data)
             messages.success(request, f"Rol editado correctamente")
-            
             return HttpResponseRedirect(f"/projects/{project_id}/roles")
+
         return render(request, 'roles/edit.html', {'form': form, 'project_id':project_id, 'role_id':role_id})

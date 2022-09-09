@@ -1,11 +1,11 @@
-from projects.models import Project, ProjectMember, ProjectStatus, UserStoryType
-from users.models import CustomUser
-from projects.models import Role
 from django.db.models import Q
+from datetime import date
 
+from projects.models import Project, ProjectMember, ProjectStatus
+from projects.models import Role, UserStoryType
+from users.models import CustomUser
 
 class ProjectUseCase:
-
     @staticmethod
     def create_project(name, description, prefix, scrum_master)-> Project:
         """
@@ -29,6 +29,16 @@ class ProjectUseCase:
         return project
 
     @staticmethod
+    def start_project(project_id):
+        """
+        Inicia un proyecto
+        """
+        project = Project.objects.get(id=project_id)
+        project.status = ProjectStatus.IN_PROGRESS
+        project.start_date = date.today()
+        project.save()
+
+    @staticmethod
     def create_default_user_story_type(project_id):
         """
         Crea un tipo de historia de usuario por defecto para el proyecto dado
@@ -48,10 +58,16 @@ class ProjectUseCase:
 
     @staticmethod
     def get_members(project_id):
+        """
+        Obtener los usuarios que son parte del proyecto
+        """
         return CustomUser.objects.filter(projectmember__project_id=project_id)
 
     @staticmethod
     def add_member(user, roles, project_id):
+        """
+        Agrega un usuario al proyecto
+        """
         project = Project.objects.get(id=project_id)
         project_member = ProjectMember.objects.create(
             project=project,
@@ -63,6 +79,9 @@ class ProjectUseCase:
 
     @staticmethod
     def create_user_story_type(name, columns, project_id):
+        """
+        Crea un tipo de historia de usuario para el proyecto dado
+        """
         project = Project.objects.get(id=project_id)
         return UserStoryType.objects.create(
             name=name,
@@ -72,6 +91,9 @@ class ProjectUseCase:
 
     @staticmethod
     def edit_user_story_type(id, name, columns):
+        """
+        Edita un tipo de historia de usuario
+        """
         data = {}
         if name:
             data['name'] = name
@@ -81,6 +103,9 @@ class ProjectUseCase:
 
     @staticmethod
     def get_user_story_type(id):
+        """
+        Obtiene un tipo de historia de usuario
+        """
         return UserStoryType.objects.get(id=id)
 
     @staticmethod
@@ -103,11 +128,13 @@ class ProjectUseCase:
 
 
 class RoleUseCase:
-
     @staticmethod
     def create_role(id, name, description, permissions):
+        """
+        Crea un rol y lo guarda en la base de datos
+        """
         existing_role=Role.objects.all().filter(name=name) #vemos si hay un rol en la bd con ese nombre
-        
+
         new_role= Role(name=name,description=description,project=Project.objects.get(id=id)) #creamos un rol
         new_role.save() #guardamos el rol en bd
         #veremos cada permiso
@@ -118,42 +145,54 @@ class RoleUseCase:
 
     @classmethod
     def get_scrum_role(self):
+        """
+        Obtiene el rol de scrum master
+        """
         return self.get_role_by_name('Scrum Master')
 
     @classmethod
     def get_role_by_name(self, name):
+        """
+        Obtiene un rol por su nombre
+        """
         return Role.objects.get(name=name)
 
     @classmethod
     def get_roles_by_project(self, project_id):
         """
-        Retorna los roles de un proyecto y los roles por defecto
+        Retorna todos los roles de un proyecto
         """
         return Role.objects.filter(Q(project_id=project_id) | Q(project_id=None))
 
     @staticmethod
     def get_roles_by_project_no_default(project_id):
         """
-        Retorna los roles de un proyecto
+        Retorna los roles custom de un proyecto
         """
         return Role.objects.filter(project_id=project_id)
 
     @staticmethod
     def get_role_by_id(role_id):
+        """
+        Retorna un rol por su id
+        """
         return Role.objects.get(id=role_id)
-    
+
     @staticmethod
     def edit_role(id, name, description, permissions):
+        """
+        Edita un rol
+        """
         role=Role.objects.get(id=id) #rol editado
         new_array_permissions=[item.id for item in permissions] #nuevos permisos seleccionados por el usuario
         original_permissions=role.permissions.all()
         original_permissions_id=[item.id for item in original_permissions] #permisos originales de la BD
         #permisos que esten entre los nuevos y no entre los originales
-        to_agg=list(set(new_array_permissions) - set(original_permissions_id)) 
+        to_agg=list(set(new_array_permissions) - set(original_permissions_id))
         #permisos que esten entre los originales pero no entre los nuevos
-        to_remove=list(set(original_permissions_id) - set(new_array_permissions)) 
+        to_remove=list(set(original_permissions_id) - set(new_array_permissions))
 
-        for perm in permissions: 
+        for perm in permissions:
             if perm.id in to_agg:
                 role.permissions.add(perm)
 

@@ -3,7 +3,6 @@ from django.contrib.auth.models import AbstractBaseUser
 
 from .manager import CustomUserManager
 
-
 class CustomUser(AbstractBaseUser):
     first_name = models.CharField(max_length=100, verbose_name='Nombres')
     last_name = models.CharField(max_length=100, verbose_name='Apellidos')

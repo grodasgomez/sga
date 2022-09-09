@@ -6,10 +6,10 @@ from users.models import CustomUser
 # Create your models here.
 class Permission(models.Model):
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=100) 
+    description = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name 
+        return self.name
 
 class Role(models.Model):
     name = models.CharField(max_length=100)
@@ -22,6 +22,7 @@ class Role(models.Model):
 
     def __str__(self):
         return self.name
+
 class ProjectStatus(models.TextChoices):
     CREATED = 'CREATED', 'Creado'
     IN_PROGRESS = 'IN_PROGRESS', 'En progreso'
@@ -51,7 +52,6 @@ class ProjectMember(models.Model):
     def __str__(self):
         return f"{self.user.email} - {self.project.name}"
 
-
 class UserStoryType(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -59,4 +59,3 @@ class UserStoryType(models.Model):
 
     def __str__(self):
         return self.name
-

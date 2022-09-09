@@ -9,7 +9,10 @@ from users.models import CustomUser
 from django.views.generic import FormView
 
 # Create your views here.
-class UsersView(PermissionRequiredMixin, View):
+class UsersView(LoginRequiredMixin, View):
+    """
+    Clase encargada de mostrar los usuarios y cambiar el rol de sistema
+    """
     def get(self, request):
         user: CustomUser = request.user
         if not user.is_admin():
@@ -18,9 +21,7 @@ class UsersView(PermissionRequiredMixin, View):
         custom_users = CustomUser.objects.all().exclude(id=user.id)
         users = [user for user in custom_users]
         context = { "users" :  users }
-
         return render(request, 'index.html', context)
-
 
     def post(self, request):
         #trae el value del boton con name user
