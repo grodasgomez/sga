@@ -30,7 +30,7 @@
 			</td>
 			<td>
 				{% if not member.scrum_master %}
-					<a href="{% url 'project-member-edit' project_id=project_id member_id=member.project_member.id %}" class="btn">
+					<a href="{% url 'projects:project-member-edit' project_id=project_id member_id=member.project_member.id %}" class="btn">
 						<span class="btn-label"><i class="fa fa-pencil"></i></span>
 					</a>
 				{% endif %}
