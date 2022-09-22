@@ -3,13 +3,13 @@
   {% include 'utils/messages.html' %}
   <h1>Proyecto {{object.name}}</h1>
   <div>
-    <a href="{% url 'user-story-type-list' project_id=object.id %}" class="btn btn-info" role="button">
+    <a href="{% url 'projects:user-story-type-list' project_id=object.id %}" class="btn btn-info" role="button">
       <span class="btn-label"><i class="fa-solid fa-book"></i></span>Ver tipos de historia de usuario
     </a>
-    <a href="{% url 'index-roles' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
+    <a href="{% url 'projects:index-roles' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
       <span class="btn-label"><i class="fa-solid fa-shield-halved"></i></span>Ver Roles
     </a>
-    <a href="{% url 'project-members' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
+    <a href="{% url 'projects:project-members' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
       <span class="btn-label"><i class="fa-solid fa-users"></i></span>Ver Miembros
     </a>
   </div>

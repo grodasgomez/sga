@@ -15,7 +15,7 @@
   <hr />
   <ul class="nav nav-pills flex-column mb-auto">
     <li class="nav-item">
-      <a href="/" class="nav-link {% if '/' == request.path%}active{%else%} link-dark {%endif%}" >
+      <a href="{% url 'index' %}" class="nav-link {% if '/' == request.path%}active{%else%} link-dark {%endif%}" >
         <i class="fa-solid fa-house"></i>
         Home
       </a>
@@ -35,7 +35,7 @@
       </li> {% endcomment %}
       {% if user.is_admin%}
         <li>
-          <a href="/users" class="nav-link {% if 'users' in request.path%}active{%else%} link-dark {%endif%}">
+          <a href="{% url 'users:index' %}"" class="nav-link {% if 'users' in request.path%}active{%else%} link-dark {%endif%}">
             <i class="fa-solid fa-circle-user"></i>
             Usuarios
           </a>

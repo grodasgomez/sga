@@ -26,6 +26,6 @@ urlpatterns = [
     path('profile/', views_users.ProfileView.as_view(), name='profile'),
     path('', views.index, name='index'),
 
-    path('projects/', include('projects.urls')),
-    path('users/', include('users.urls')),
+    path('projects/', include(('projects.urls', 'projects'))),
+    path('users/', include(('users.urls', 'users')))
 ]

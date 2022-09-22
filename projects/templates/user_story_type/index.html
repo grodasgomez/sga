@@ -1,7 +1,7 @@
 {% extends 'sga/layout/base_generic.html'%} 
 {% block content %}
 
-  <a href="{% url 'user-story-type-create' project_id=project_id %}" class="btn btn-labeled btn-info">
+  <a href="{% url 'projects:user-story-type-create' project_id=project_id %}" class="btn btn-labeled btn-info">
     <span class="btn-label"><i class="fa fa-plus"></i></span>Crear tipo de HU
   </a>
   {% include 'utils/messages.html'%}
@@ -19,7 +19,7 @@
         <td>{{ object.name }}</td>
         <td>{{ object.columns }}</td>
         <td>
-          <a href="{% url 'user-story-type-edit' project_id=project_id id=object.id %}" class="btn">
+          <a href="{% url 'projects:user-story-type-edit' project_id=project_id id=object.id %}" class="btn">
             <span class="btn-label"><i class="fa fa-pencil"></i></span>
           </a>
         </td>
