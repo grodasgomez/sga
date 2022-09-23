@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.views import View
 from django.db.models.query import QuerySet
 
-from projects.forms import FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole
+from projects.forms import FormCreateUserStory,FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole
 from projects.models import Project, UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
 from projects.models import ProjectMember
@@ -370,4 +370,26 @@ class ProductBacklogView(ProjectPermissionMixin, View):
             "project_id" : project_id,
         }
 
-        return render(request, 'projects/backlog.html', context)
+        return render(request, 'backlog/index.html', context)
+
+class ProductBacklogCreateView(ProjectPermissionMixin, View):
+    """
+    Clase encargada de cargar el product Backlog de un proyecto
+    """
+    permissions = ['ABM US']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id):
+        form = FormCreateUserStory(project_id)
+        return render(request, 'backlog/create.html', {'form': form})
+
+    def post(self, request, project_id):
+        form = FormCreateUserStory(project_id, request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            code=str(project_id)+"-"+str(ProjectUseCase.count_user_stories_by_project(project_id)+1)
+            ProjectUseCase.create_user_story(code,project_id=project_id, **cleaned_data)
+            messages.success(request, f"Historia de usuario creado correctamente")
+
+            return HttpResponseRedirect(f"/projects/{project_id}/backlog")
+        return render(request, 'backlog/create.html', {'form': form})

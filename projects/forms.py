@@ -166,33 +166,23 @@ class FormEditUserStoryType(FormUserStoryType):
         columns = cleaned_data.get('columns')
         cleaned_data['columns'] = self.custom_clean_columns(columns)
         return cleaned_data
-
-class FormUserStory(forms.Form):
-
-    """
-    Formulario para US
-    """
-    def __init__(self, project_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['us_type'] = forms.ModelChoiceField(
-            queryset=ProjectUseCase.filter_user_story_type_by_project(project_id), label='Tipo de Historia de Usuario',
-            empty_label='Seleccione un usuario',
-            widget=widgets.SelectInput()
-        )
-        self.fields['code']= forms.CharField(max_length=100, label='Codigo',widget=widgets.TextInput())  # codigo del US
-        self.fields['title'] = forms.CharField(max_length=100, label='Titulo',widget=widgets.TextInput())  # TITULO del US
-        self.fields['description'] = forms.CharField(max_length=100, label='Titulo',widget=widgets.TextInput())  # descripcion del US
-        self.fields['business_value'] = forms.IntegerField(label='Valor de Negocio',widget=widgets.NumberInput())  # Valor de Negocio del US
-        self.fields['technical_priority'] = forms.IntegerField(label='Prioridad Tecnica',widget=widgets.NumberInput())  # Prioridad Tecnica del US
-        self.fields['estimation_time'] = forms.IntegerField(label='Tiempo estimado',widget=widgets.NumberInput())  # Tiempo estimado del US
-
-class FormCreateUserStory(FormUserStory):
+class FormCreateUserStory(forms.Form):
     """
     Formulario para crear una historia de usuario en un proyecto
     """
     def __init__(self, project_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.project_id = project_id
+        self.fields['us_type'] = forms.ModelChoiceField(
+            queryset=ProjectUseCase.filter_user_story_type_by_project(project_id), label='Tipo de Historia de Usuario',
+            empty_label='Seleccione un tipo',
+            widget=widgets.SelectInput()
+        )
+        self.fields['title'] = forms.CharField(max_length=100, label='Titulo',widget=widgets.TextInput())  # TITULO del US
+        self.fields['description'] = forms.CharField(max_length=100, label='Descripcion',widget=widgets.TextInput())  # descripcion del US
+        self.fields['business_value'] = forms.IntegerField( min_value=1, max_value=100 ,label='Valor de Negocio',widget=widgets.NumberInput())  # Valor de Negocio del US
+        self.fields['technical_priority'] = forms.IntegerField(min_value=1, max_value=100 ,label='Prioridad Tecnica',widget=widgets.NumberInput())  # Prioridad Tecnica del US
+        self.fields['estimation_time'] = forms.IntegerField(min_value=1, max_value=100 , label='Tiempo estimado',widget=widgets.NumberInput())  # Tiempo estimado del US
 
     def clean(self):
         cleaned_data = super().clean()

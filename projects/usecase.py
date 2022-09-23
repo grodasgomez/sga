@@ -154,6 +154,29 @@ class ProjectUseCase:
         """
         return UserStory.objects.filter(project_id=project_id)
 
+    @staticmethod
+    def count_user_stories_by_project(project_id):
+        """
+        cuenta las historias de usuario de un proyecto
+        """
+        return UserStory.objects.filter(project_id=project_id).count()
+
+    @staticmethod
+    def create_user_story(code, title, description, business_value,technical_priority,estimation_time,us_type, project_id):
+        """
+        Crea un tipo de historia de usuario para el proyecto dado
+        """
+        project = Project.objects.get(id=project_id)
+        return UserStory.objects.create(
+            code=code,
+            title=title,
+            description=description,
+            business_value=business_value,
+            technical_priority=technical_priority,
+            estimation_time=estimation_time,
+            us_type=us_type,
+            project=project)
+
 
 class RoleUseCase:
     @staticmethod
