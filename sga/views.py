@@ -4,7 +4,8 @@ from django.views.decorators.cache import never_cache
 
 @login_required()
 def index(request):
-    return render(request, 'sga/index.html')
+    context = {"homepage" : True}
+    return render(request, 'sga/index.html', context)
 
 @never_cache
 def login(request):

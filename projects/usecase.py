@@ -143,7 +143,6 @@ class ProjectUseCase:
         roles = ['Scrum Master']
         tiene_permisos = ProjectUseCase.member_has_permissions(user_id, project_id, permissions)
         es_scrum_master = ProjectUseCase.member_has_roles(user_id, project_id, roles)
-        print(es_scrum_master, tiene_permisos)
 
         return es_scrum_master or tiene_permisos
 

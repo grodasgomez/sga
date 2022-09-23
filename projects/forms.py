@@ -140,7 +140,6 @@ class FormCreateUserStoryType(FormUserStoryType):
         if already_exists:
             raise forms.ValidationError(build_field_error(
                 'name', 'Ya existe un tipo de historia con ese nombre'))
-        print(columns)
         cleaned_data['columns'] = self.custom_clean_columns(columns)
         return cleaned_data
 
