@@ -317,14 +317,12 @@ class ProjectMemberEditView(ProjectPermissionMixin, View):
 
     def get(self, request, project_id, member_id):
         member = RoleUseCase.get_project_member_by_id(member_id,project_id)
-        print (member)
         data = member.__dict__
         roles= RoleUseCase.get_roles_from_member_id(member_id,project_id)
         for role in roles:
             if role.name == "Scrum Master":
                 messages.warning(request, "El Scrum Master no puede ser editado")
                 return HttpResponseRedirect(f"/projects/{project_id}/members")
-        print (roles)
         data['roles']=roles
         form = FormEditProjectMember(project_id,initial=data)
         context= {
