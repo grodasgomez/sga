@@ -12,6 +12,7 @@ from projects.usecase import ProjectUseCase, RoleUseCase
 from projects.models import ProjectMember
 from projects.mixin import ProjectPermissionMixin
 from users.models import CustomUser
+from user_stories.models import UserStory
 
 # Create your views here.
 class ProjectListView(LoginRequiredMixin, View):
@@ -343,3 +344,30 @@ class ProjectMemberEditView(ProjectPermissionMixin, View):
             return HttpResponseRedirect(f"/projects/{project_id}/members")
 
         return render(request, 'projects/project_member_edit.html', {'form': form, 'project_id':project_id, 'member_id':member_id})
+
+
+class ProductBacklogView(ProjectPermissionMixin, View):
+    """
+    Clase encargada de mostrar el product Backlog de un proyecto
+    """
+    permissions = ['ABM US']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id):
+        user: CustomUser = request.user
+        if not user.is_user():
+            messages.warning(request, "No eres un usuario verificado")
+            return HttpResponseRedirect('/')
+        data: Project = Project.objects.get(id=project_id)
+        members: QuerySet = data.project_members.all()
+        if user not in members:
+            messages.warning(request, "No eres miembro")
+            return HttpResponseRedirect('/projects')
+
+        user_stories = ProjectUseCase.user_stories_by_project(project_id)
+        context= {
+            "user_stories" : user_stories,
+            "project_id" : project_id,
+        }
+
+        return render(request, 'projects/backlog.html', context)

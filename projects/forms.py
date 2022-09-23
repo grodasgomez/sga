@@ -6,6 +6,7 @@ from sga import widgets
 from users.models import CustomUser
 from projects.usecase import RoleUseCase
 from projects.models import Permission
+from user_stories.models import UserStory
 
 class FormCreateProject(forms.Form):
 
@@ -184,4 +185,23 @@ class FormUserStory(forms.Form):
         self.fields['business_value'] = forms.IntegerField(label='Valor de Negocio',widget=widgets.NumberInput())  # Valor de Negocio del US
         self.fields['technical_priority'] = forms.IntegerField(label='Prioridad Tecnica',widget=widgets.NumberInput())  # Prioridad Tecnica del US
         self.fields['estimation_time'] = forms.IntegerField(label='Tiempo estimado',widget=widgets.NumberInput())  # Tiempo estimado del US
+
+class FormCreateUserStory(FormUserStory):
+    """
+    Formulario para crear una historia de usuario en un proyecto
+    """
+    def __init__(self, project_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project_id = project_id
+
+    def clean(self):
+        cleaned_data = super().clean()
+        title = cleaned_data.get('title')
+
+        already_exists = UserStory.objects.filter(
+            title=title, project_id=self.project_id).exists()
+        if already_exists:
+            raise forms.ValidationError(build_field_error(
+                'title', 'Ya existe una historia de usuario con ese nombre'))
+        return cleaned_data
 

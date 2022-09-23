@@ -4,6 +4,7 @@ from datetime import date
 from projects.models import Project, ProjectMember, ProjectStatus
 from projects.models import Role, UserStoryType
 from users.models import CustomUser
+from user_stories.models import UserStory
 
 class ProjectUseCase:
     @staticmethod
@@ -145,6 +146,13 @@ class ProjectUseCase:
         print(es_scrum_master, tiene_permisos)
 
         return es_scrum_master or tiene_permisos
+
+    @staticmethod
+    def user_stories_by_project(project_id):
+        """
+        Retorna las historias de usuario de un proyecto
+        """
+        return UserStory.objects.filter(project_id=project_id)
 
 
 class RoleUseCase:
