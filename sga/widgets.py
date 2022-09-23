@@ -27,3 +27,8 @@ class TextareaInput(forms.Textarea):
     def __init__(self, attrs={}, **kwargs):
         attrs['class'] = 'form-control'
         super().__init__(attrs, **kwargs)
+
+class NumberInput(forms.NumberInput):
+    def __init__(self, attrs={}, **kwargs):
+        attrs['class'] = 'form-control'
+        super().__init__(attrs, **kwargs)

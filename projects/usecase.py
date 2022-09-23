@@ -109,6 +109,13 @@ class ProjectUseCase:
         return UserStoryType.objects.get(id=id)
 
     @staticmethod
+    def filter_user_story_type_by_project(project_id):
+        """
+        Obtiene los tipos de historia de usuario de un proyecto
+        """
+        return UserStoryType.objects.filter(project_id=project_id)
+
+    @staticmethod
     def member_has_permissions(user_id, project_id, permissions):
         """
         Verifica si un miembro del proyecto tiene una lista de permisos
