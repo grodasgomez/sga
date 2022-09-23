@@ -36,6 +36,10 @@
           <a href="{% url 'projects:sprints:start' project_id=project_id id=object.id %}" class="btn">
             <span class="btn-label"><i class="fa fa-rocket"></i></span>
           </a>
+
+          <a href="{% url 'projects:sprints:member-create' project_id=project_id sprint_id=object.id %}" class="btn">
+            <span class="btn-label"><i class="fa fa-user-plus"></i></span>
+          </a>
         </td>
       </tr>
       {% endfor %}
