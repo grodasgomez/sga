@@ -1,4 +1,3 @@
-import json
 from django.db import models
 
 from users.models import CustomUser
@@ -12,14 +11,18 @@ class SprintStatus(models.TextChoices):
 class Sprint(models.Model):
     project = models.ForeignKey('projects.Project', on_delete=models.CASCADE)
     status = models.CharField(choices=SprintStatus.choices, max_length=15, verbose_name='Estado')
-    number = models.CharField(max_length=100)
-    capacity = models.IntegerField(verbose_name='Capacidad en horas')
-    duration = models.IntegerField(verbose_name='Duración en días')
+    number = models.IntegerField()
+    capacity = models.IntegerField(null=True, verbose_name='Capacidad en horas')
+    duration = models.IntegerField(null=True, verbose_name='Duración en días')
     start_date = models.DateField(null=True, verbose_name='Fecha de inicio')
     end_date = models.DateField(null=True, verbose_name='Fecha de finalización')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
+
+    @property
+    def name(self):
+        return f"Sprint {self.number}"
 
     def __str__(self):
         return f"Sprint {self.number} - {self.project.name}"

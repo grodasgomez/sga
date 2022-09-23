@@ -1,0 +1,9 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+  {% include 'utils/messages.html' %}
+  <h1>{{object.name}}</h1>
+  <p><strong>Capacidad:</strong> {{object.capacity}}</p>
+  <p><strong>Fecha de inicio:</strong> {{object.start_date|date:"d/m/Y"}}</p>
+  <p><strong>Fecha de fin:</strong> {{object.end_date|date:"d/m/Y"}}</p>
+  <p><strong>Estado:</strong> {{object.get_status_display}}</p>
+{% endblock %}

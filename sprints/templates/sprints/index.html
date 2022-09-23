@@ -1,0 +1,44 @@
+{% extends 'sga/layout/base_generic.html'%} 
+{% block content %}
+  <form action="{% url 'projects:sprints:create' project_id=project_id %}" method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-labeled btn-info">
+      <span class="btn-label"><i class="fa fa-plus"></i></span>Crear sprint
+    </button>
+  </form>
+  {% include 'utils/messages.html'%}
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Nombre</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Capacidad en horas</th>
+        <th scope="col">Duración en dias</th>
+        <th scope="col">Fecha inicio</th>
+        <th scope="col">Fecha fin</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for object in object_list %}
+      <tr>
+        <td>
+          <a href="{% url 'projects:sprints:detail' project_id=project_id pk=object.id %}" class="btn">
+            <span class="btn-label">{{ object.name }}</span>
+          </a>
+        </td>
+        <td>{{ object.get_status_display }}</td>
+        <td>{{ object.capacity }}</td>
+        <td>{{ object.duration }}</td>
+        <td>{{ object.start_date }}</td>
+        <td>{{ object.end_date }}</td>
+        <td>
+          <a href="{% url 'projects:sprints:start' project_id=project_id id=object.id %}" class="btn">
+            <span class="btn-label"><i class="fa fa-rocket"></i></span>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

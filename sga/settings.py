@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'sga',
     'users',
     'projects',
+    'sprints',
+    'user_stories',
     # allauth apps
     'allauth',
     'allauth.account',
