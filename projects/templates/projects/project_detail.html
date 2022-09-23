@@ -15,6 +15,9 @@
     <a href="{% url 'projects:sprints:index' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
       <span class="btn-label"><i class="fa-solid fa-arrows-spin"></i></i></span>Ver Sprints
     </a>
+    <a href="{% url 'projects:project-backlog' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
+      <span class="btn-label"><i class="fa-solid fa-layer-group"></i></i></i></span>Backlog
+    </a>
   </div>
   <h2>Detalles</h2>
   <p><strong>Nombre:</strong> {{object.name}}</p>
