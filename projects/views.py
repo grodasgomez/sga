@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.views import View
 from django.db.models.query import QuerySet
 from django.urls import reverse
-
+#todo arreglar imports
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
     FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory)
 from projects.models import Project, UserStoryType, ProjectStatus
@@ -312,7 +312,7 @@ class ProjectRoleDeleteView(ProjectPermissionMixin, View):
 
 class ProjectMemberEditView(ProjectPermissionMixin, View):
     """
-    Clase encargada de manejar la edicion de roles
+    Clase encargada de manejar la edicion de Miembro de proyecto
     """
 
     permissions = ['ABM Miembros']
@@ -327,6 +327,7 @@ class ProjectMemberEditView(ProjectPermissionMixin, View):
                 messages.warning(request, "El Scrum Master no puede ser editado")
                 return HttpResponseRedirect(f"/projects/{project_id}/members")
         data['roles']=roles
+        print(data)
         form = FormEditProjectMember(project_id,initial=data)
         context= {
             "form" : form,
@@ -404,8 +405,8 @@ class ProductBacklogView(ProjectPermissionMixin, View):
     """
     Clase encargada de mostrar el product Backlog de un proyecto
     """
-    permissions = ['ABM US']
-    roles = ['Scrum Master']
+    permissions = ['Ver Product Backlog']
+    roles = ['Scrum Master', 'Developer', 'Product Owner']
 
     def get(self, request, project_id):
         user: CustomUser = request.user
@@ -431,7 +432,7 @@ class ProductBacklogCreateView(ProjectPermissionMixin, View):
     Clase encargada de cargar el product Backlog de un proyecto
     """
     permissions = ['ABM US']
-    roles = ['Scrum Master']
+    roles = ['Scrum Master', 'Product Owner']
 
     def get(self, request, project_id):
         form = FormCreateUserStory(project_id)

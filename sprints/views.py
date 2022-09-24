@@ -19,7 +19,7 @@ class SprintListView(ProjectPermissionMixin, ListView):
     Vista que lista tipos de historias de usuario de un projecto
     """
     permissions = ['ABM Sprint']
-    roles = ['Scrum Master']
+    roles = ['Scrum Master', 'Developer']
 
     model = Sprint
     template_name = 'sprints/index.html'
@@ -169,7 +169,7 @@ class SprintBacklogView(ProjectPermissionMixin, View):
     Clase encargada de mostrar el product Backlog de un Sprint
     """
     permissions = ['ABM US']#todo
-    roles = ['Scrum Master']#todo
+    roles = ['Scrum Master', 'Developer']
 
     def get(self, request, project_id, sprint_id):
         user: CustomUser = request.user
@@ -199,18 +199,24 @@ class SprintBacklogAssignView(ProjectPermissionMixin, View):
     """
     form_class = AssignSprintMemberForm
 
-    permissions = ['ABM Miembros']#todo
-    roles = ['Scrum Master']#todo
+    permissions = ['ABM US Miembro Sprint']
+    roles = ['Scrum Master']
 
     def get(self, request, project_id, sprint_id, user_story_id):
-        form = self.form_class(sprint_id=sprint_id)
+        try:
+            sprint_member = SprintMember.objects.get(userstory=user_story_id)
+        except SprintMember.DoesNotExist:
+            sprint_member = None
+        form = self.form_class(sprint_id=sprint_id,initial={'sprint_member': sprint_member})
+
         return render(request, 'sprints/backlog_assign.html', {'form': form})
 
     def post(self, request, project_id, sprint_id, user_story_id):
         form = self.form_class(sprint_id, request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
-            SprintUseCase.assign_sprint_member(user_story_id, **cleaned_data)
+            print(cleaned_data)
+            SprintUseCase.assign_sprint_member(**cleaned_data, user_story_id=user_story_id)
             messages.success(request, f"Miembro asignado correctamente")
-            return HttpResponseRedirect('/sprints/{sprint_id}/backlog')
+            return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
         return render(request, 'sprints/backlog_assign.html', {'form': form})

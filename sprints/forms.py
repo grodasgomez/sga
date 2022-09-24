@@ -59,6 +59,7 @@ class AssignSprintMemberForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields['sprint_member'] = forms.ModelChoiceField(
             queryset=SprintUseCase.get_assignable_sprint_members(sprint_id), label='Miembro',
-            empty_label='Seleccione un Miembro',
-            widget=widgets.SelectInput()
+            empty_label='Sin Asignar',
+            widget=widgets.SelectInput(),
+            required=False
         )

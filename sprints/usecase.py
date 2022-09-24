@@ -121,10 +121,15 @@ class SprintUseCase:
         """
         Edita un tipo de historia de usuario
         """
-        data = {
-            'sprint_member': sprint_member.id,
-        }
-
+        data = {}
+        if not sprint_member:
+            data = {
+                'sprint_member': None,
+            }
+        else:
+            data = {
+                'sprint_member': sprint_member,
+            }
         return UserStory.objects.filter(id=user_story_id).update(**data)
 
     @staticmethod

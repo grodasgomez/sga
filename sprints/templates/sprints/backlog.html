@@ -2,9 +2,6 @@
 {% block content %}
 	{% include 'utils/messages.html' %}
 	<h2> Backlog del Sprint</h2>
-    <a href="{% url 'projects:project-backlog-create' project_id=project_id %}" class="btn btn-labeled btn-info">
-        <span class="btn-label"><i class="fa fa-plus"></i></span>Crear US
-    </a>
 	<table class="table">
 		<thead>
 		<tr>

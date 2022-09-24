@@ -30,6 +30,7 @@ class CustomUser(AbstractBaseUser):
     @property
     def name(self):
         return f"{self.first_name} {self.last_name}"
+
     class Meta:
         db_table = 'sga_user'
         ordering = ['last_name']

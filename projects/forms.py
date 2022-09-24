@@ -37,7 +37,7 @@ class FormCreateProjectMember(forms.Form):
 
 class FormEditProjectMember(forms.Form):
     """
-    Formulario para crear un miembro de un proyecto
+    Formulario para editar un miembro de un proyecto
     """
     def __init__(self, project_id, *args, **kwargs):
         super().__init__(*args, **kwargs)

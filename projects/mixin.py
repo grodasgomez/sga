@@ -28,4 +28,5 @@ class ProjectPermissionMixin(LoginRequiredMixin, PermissionRequiredMixin):
         Metodo que se ejecuta cuando el usuario no tiene permisos para acceder a la vista
         """
         messages.warning(self.request, 'No tienes permisos para realizar esta accion')
+        print(self.request.META.get('HTTP_REFERER', '/'))
         return HttpResponseRedirect(self.request.META.get('HTTP_REFERER', '/'))

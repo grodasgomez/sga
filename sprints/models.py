@@ -35,4 +35,4 @@ class SprintMember(models.Model):
     deleted_at = models.DateTimeField(null=True)
 
     def __str__(self):
-        return f"{self.sprint.name} - {self.user.name}"
+        return f"{self.user.name}"
