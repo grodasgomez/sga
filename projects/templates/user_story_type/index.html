@@ -1,8 +1,11 @@
-{% extends 'sga/layout/base_generic.html'%} 
+{% extends 'sga/layout/base_generic.html'%}
 {% block content %}
-
+  <h2>Tipos de Historia de Usuario</h2>
   <a href="{% url 'projects:user-story-type-create' project_id=project_id %}" class="btn btn-labeled btn-info">
     <span class="btn-label"><i class="fa fa-plus"></i></span>Crear tipo de HU
+  </a>
+  <a href="{% url 'projects:user-story-type-import1' project_id=project_id %}" class="btn btn-labeled btn-info">
+    <span class="btn-label"><i class="fa fa-file-import"></i></span>Importar tipos de HU
   </a>
   {% include 'utils/messages.html'%}
   <table class="table">

@@ -1,3 +1,5 @@
+{% load sga_extras %}
+
 <div
   id="sidebar"
   class="d-flex flex-column flex-shrink-0 p-3 bg-light"
@@ -26,13 +28,39 @@
           <i class="fa-solid fa-diagram-project"></i>
           Proyectos
         </a>
+        {% get_path_param request "project_id" as project_id %}
+        {% if project_id %}
+          <div class="collapse show" id="home-collapse">
+            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+
+              <li>
+                <a href="{% url 'projects:user-story-type-list' project_id=project_id%}" 
+                  class="nav-sub-link link-dark {% is_active request 'user-story-type'%}">
+                  Tipos Historia Usuario
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'projects:index-roles' project_id=project_id%}"
+                  class="nav-sub-link link-dark {% is_active request 'roles'%}">
+                  Roles
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'projects:project-members' project_id=project_id%}"
+                  class="nav-sub-link link-dark {% is_active request 'projects/\d/members'%}">
+                  Miembros
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'projects:sprints:index' project_id=project_id%}"
+                  class="nav-sub-link link-dark {% is_active request 'sprints'%}">
+                  Sprints
+                </a>
+              </li>
+            </ul>
+          </div>
+        {% endif %}
       </li>
-      {% comment %} <li>
-        <a href="#" class="nav-link link-dark">
-          <i class="fa-solid fa-table"></i>
-          Tablero
-        </a>
-      </li> {% endcomment %}
       {% if user.is_admin%}
         <li>
           <a href="{% url 'users:index' %}" class="nav-link {% if 'users' in request.path%}active{%else%} link-dark {%endif%}">
