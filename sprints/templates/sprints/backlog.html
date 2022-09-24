@@ -1,7 +1,7 @@
 {% extends 'sga/layout/base_generic.html'%}
 {% block content %}
 	{% include 'utils/messages.html' %}
-	<h2> Backlog del Proyecto</h2>
+	<h2> Backlog del Sprint</h2>
     <a href="{% url 'projects:project-backlog-create' project_id=project_id %}" class="btn btn-labeled btn-info">
         <span class="btn-label"><i class="fa fa-plus"></i></span>Crear US
     </a>
@@ -15,6 +15,8 @@
 			<th scope="col">Prioridad Tecnica</th>
             <th scope="col">Tiempo Estimado (Hs)</th>
             <th scope="col">Tipo</th>
+            <th scope="col">Usuario Asignado</th>
+            <th scope="col">Acciones</th>
 		</tr>
 		</thead>
 		<tbody>
@@ -27,6 +29,7 @@
 			<td>{{ user_story.technical_priority }}</td>
 			<td>{{ user_story.estimation_time }}</td>
             <td>{{ user_story.us_type.name }}</td>
+            <td>{{ user_story.sprint_member.user.name }}</td>
 		</tr>
 		{% endfor %}
 		</tbody>

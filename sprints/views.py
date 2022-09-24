@@ -3,11 +3,15 @@ from django.views import View
 from django.contrib import messages
 from django.urls import reverse
 from django.shortcuts import redirect, render
+from django.http import HttpResponseRedirect
+from django.db.models.query import QuerySet
 
 
 
 from projects.mixin import ProjectPermissionMixin
-from sprints.forms import SprintMemberCreateForm
+from sprints.models import SprintMember
+from users.models import CustomUser
+from sprints.forms import SprintMemberCreateForm, AssignSprintMemberForm
 from sprints.models import Sprint
 from sprints.usecase import SprintUseCase
 
@@ -119,3 +123,53 @@ class SprintStartView(ProjectPermissionMixin, View):
         # SprintUseCase.create_sprint(project_id)
         messages.success(request, 'Proyecto creado correctamente')
         return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
+
+class SprintBacklogView(ProjectPermissionMixin, View):
+    """
+    Clase encargada de mostrar el product Backlog de un Sprint
+    """
+    permissions = ['ABM US']#todo
+    roles = ['Scrum Master']#todo
+
+    def get(self, request, project_id, sprint_id):
+        user: CustomUser = request.user
+        if not user.is_user():
+            messages.warning(request, "No eres un usuario verificado")
+            return HttpResponseRedirect('/')
+        members = SprintUseCase.get_sprint_members(sprint_id)
+        print("members", members)
+        # if user not in members:
+        #     messages.warning(request, "No eres miembro del Sprint")
+        #     return HttpResponseRedirect('/')
+
+        user_stories = SprintUseCase.user_stories_by_sprint(sprint_id)
+
+        #creo un Sprintmember
+        context= {
+            "user_stories" : user_stories,
+            "project_id" : project_id,
+        }
+
+        return render(request, 'sprints/backlog.html', context)
+
+class SprintBacklogAssignView(ProjectPermissionMixin, View):
+    """
+    Clase encargada de asignar US en el product Backlog de un Sprint
+    """
+    form_class = AssignSprintMemberForm
+
+    permissions = ['ABM Miembros']#todo
+    roles = ['Scrum Master']#todo
+
+    def get(self, request, project_id, sprint_id, user_story_id):
+        form = self.form_class(sprint_id=sprint_id)
+        return render(request, 'sprints/backlog_assign.html', {'form': form})
+
+    def post(self, request, project_id, sprint_id, user_story_id):
+        form = self.form_class(sprint_id, request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            SprintUseCase.assign_sprint_member(user_story_id, **cleaned_data)
+            messages.success(request, f"Miembro asignado correctamente")
+            return HttpResponseRedirect('/sprints/{sprint_id}/backlog')
+        return render(request, 'sprints/backlog_assign.html', {'form': form})

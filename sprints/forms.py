@@ -43,3 +43,17 @@ class SprintStartForm(forms.ModelForm):
         self.fields['capacity'].label = 'Capacidad en horas'
         self.fields['duration'].label = 'Duración en días'
         self.fields['start_date'].label = 'Fecha de inicio'
+
+
+
+class AssignSprintMemberForm(forms.Form):
+    """
+    Formulario para asignar un sprint member a una user story
+    """
+    def __init__(self, sprint_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['sprint_member'] = forms.ModelChoiceField(
+            queryset=SprintUseCase.get_assignable_sprint_members(sprint_id), label='Miembro',
+            empty_label='Seleccione un Miembro',
+            widget=widgets.SelectInput()
+        )

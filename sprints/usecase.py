@@ -4,6 +4,7 @@ from sprints.models import Sprint, SprintMember, SprintStatus
 from django.db.models.query import QuerySet
 
 from users.models import CustomUser
+from user_stories.models import UserStory
 
 
 class SprintUseCase:
@@ -65,12 +66,28 @@ class SprintUseCase:
         users = CustomUser.objects.filter(id__in=user_ids)
         print(users)
         return users
+
     @staticmethod
     def get_sprint_members(sprint_id):
         """
         Método para obtener los usuarios que pueden ser agregados a un sprint
         """
         return SprintMember.objects.filter(sprint_id=sprint_id)
+
+    @staticmethod       #todo
+    def get_assignable_sprint_members(sprint_id):
+        """
+        Método para obtener los sprint members que pueden ser asignados a una historia de usuario
+        """
+        #todo en user ids estan los members?
+        # user_ids = SprintMember.objects.filter(
+        #     sprint_id=sprint_id
+        # ).exclude(
+        #     # roles__name__in=['Scrum Master', 'Product Owner']
+        # )
+        # print(user_ids)
+        # return user_ids}
+        return SprintUseCase.get_sprint_members(sprint_id)
 
     @staticmethod
     def add_sprint_member(user, sprint_id, workload):
@@ -87,3 +104,21 @@ class SprintUseCase:
         sprint.capacity += workload
         sprint.save()
         return sprint_member
+
+    @staticmethod #todo, verificacion, esta bien esto?
+    def assign_sprint_member(sprint_member, user_story_id):
+        """
+        Edita un tipo de historia de usuario
+        """
+        data = {
+            'sprint_member': sprint_member.id,
+        }
+
+        return UserStory.objects.filter(id=user_story_id).update(**data)
+
+    @staticmethod
+    def user_stories_by_sprint(project_id):
+        """
+        Retorna las historias de usuario de un proyecto
+        """
+        return UserStory.objects.filter(project_id=project_id)
