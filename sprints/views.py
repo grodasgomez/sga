@@ -148,6 +148,7 @@ class SprintBacklogView(ProjectPermissionMixin, View):
         context= {
             "user_stories" : user_stories,
             "project_id" : project_id,
+            "sprint_id" : sprint_id
         }
 
         return render(request, 'sprints/backlog.html', context)

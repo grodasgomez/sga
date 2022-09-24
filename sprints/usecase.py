@@ -70,23 +70,15 @@ class SprintUseCase:
     @staticmethod
     def get_sprint_members(sprint_id):
         """
-        Método para obtener los usuarios que pueden ser agregados a un sprint
+        Método para obtener los sprint_members que estan en un sprint
         """
         return SprintMember.objects.filter(sprint_id=sprint_id)
 
-    @staticmethod       #todo
+    @staticmethod
     def get_assignable_sprint_members(sprint_id):
         """
         Método para obtener los sprint members que pueden ser asignados a una historia de usuario
         """
-        #todo en user ids estan los members?
-        # user_ids = SprintMember.objects.filter(
-        #     sprint_id=sprint_id
-        # ).exclude(
-        #     # roles__name__in=['Scrum Master', 'Product Owner']
-        # )
-        # print(user_ids)
-        # return user_ids}
         return SprintUseCase.get_sprint_members(sprint_id)
 
     @staticmethod
