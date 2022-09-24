@@ -1,5 +1,6 @@
 {% extends 'sga/layout/base_generic.html'%} 
 {% block content %}
+  <h2>Sprints</h2>
   <form action="{% url 'projects:sprints:create' project_id=project_id %}" method="post">
     {% csrf_token %}
     <button type="submit" class="btn btn-labeled btn-info">

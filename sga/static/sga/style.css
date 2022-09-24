@@ -26,3 +26,28 @@ div.alert {
 span.btn-label {
   margin-right: 0.3rem;
 }
+
+.btn-toggle-nav a {
+  display: inline-flex;
+  padding-block: .1875rem;
+  padding-left: .5rem;
+  margin-top: .125rem;
+  margin-left: 3.25rem;
+  text-decoration: none;
+}
+
+.nav-sub-link.active {
+  position: relative;
+}
+.nav-sub-link.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 3px;
+  height: 80%;
+  background-color: #0d6efd;
+}
+.btn-toggle-nav a:hover,
+.btn-toggle-nav a:focus {
+  background-color: #d2f4ea;
+}

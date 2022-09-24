@@ -1,5 +1,6 @@
 {% extends 'sga/layout/base_generic.html'%}
 {% block content %}
+  {{ request.resolver_match.namespace }}{{ request.resolver_match.url_name }}
   {% include 'utils/messages.html' %}
   <h1>{{object.name}}</h1>
   <a href="{% url 'projects:sprints:member-list' project_id=project_id sprint_id=object.id %}" class="btn btn-labeled btn-info" role="button">
