@@ -1,5 +1,5 @@
 from django import forms
-from projects.models import UserStoryType, Role
+from projects.models import Project, UserStoryType, Role
 from projects.usecase import ProjectUseCase
 from projects.utils import build_field_error
 from sga import widgets
@@ -19,7 +19,6 @@ class FormCreateProject(forms.Form):
     scrum_master = forms.ModelChoiceField(
         queryset=CustomUser.objects.filter(role_system='user'), label='Scrum Master', empty_label='Seleccione un usuario',
         widget=widgets.SelectInput())
-
 
 class FormCreateProjectMember(forms.Form):
     """
@@ -47,9 +46,7 @@ class FormEditProjectMember(forms.Form):
             queryset=RoleUseCase.get_roles_by_project(project_id).exclude(name='Scrum Master'),
             label='Roles', widget=widgets.SelectMultipleInput())
 
-
 class FormCreateRole(forms.Form):
-
     """
     Formulario para crear y editar roles de un proyecto
     """
@@ -121,7 +118,6 @@ class FormUserStoryType(forms.Form):
                     'columns', 'No puede haber columnas vacias'))
         return array_column
 
-
 class FormCreateUserStoryType(FormUserStoryType):
     """
     Formulario para crear un tipo de historia de usuario en un proyecto
@@ -142,7 +138,6 @@ class FormCreateUserStoryType(FormUserStoryType):
                 'name', 'Ya existe un tipo de historia con ese nombre'))
         cleaned_data['columns'] = self.custom_clean_columns(columns)
         return cleaned_data
-
 
 class FormEditUserStoryType(FormUserStoryType):
     """
@@ -165,6 +160,7 @@ class FormEditUserStoryType(FormUserStoryType):
         columns = cleaned_data.get('columns')
         cleaned_data['columns'] = self.custom_clean_columns(columns)
         return cleaned_data
+
 class FormCreateUserStory(forms.Form):
     """
     Formulario para crear una historia de usuario en un proyecto
@@ -194,3 +190,51 @@ class FormCreateUserStory(forms.Form):
                 'title', 'Ya existe una historia de usuario con ese nombre'))
         return cleaned_data
 
+class ImportUserStoryTypeForm1(forms.Form):
+    """
+    Formulario para seleccionar un proyecto de donde importar los tipos de historia de usuario
+    """
+
+    def __init__(self, project_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project_id = project_id
+        self.fields['project'] = forms.ModelChoiceField(
+            queryset=Project.objects.exclude(id=project_id),
+            empty_label='Seleccione un proyecto',
+            label='Proyecto', widget=widgets.SelectInput())
+
+    def clean(self):
+        cleaned_data = super().clean()
+        project = cleaned_data.get('project')
+
+        amount_us_type = UserStoryType.objects.filter(project_id=project.id).count()
+        if amount_us_type == 1:
+            raise forms.ValidationError(build_field_error(
+                'project', 'El proyecto seleccionado no tiene tipos de historia de usuario a importar'))
+        return cleaned_data
+
+class ImportUserStoryTypeForm2(forms.Form):
+    """
+    Formulario para seleccionar los tipos de historia de usuario a importar de un proyecto
+    """
+
+    def __init__(self, from_project_id, to_project_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.from_project_id = from_project_id
+        self.to_project_id = to_project_id
+        self.fields['user_story_types'] = forms.ModelMultipleChoiceField(
+           queryset=UserStoryType.objects.filter(project_id=from_project_id).exclude(name='Historia de Usuario'),
+           label='Seleccione los tipos de US que desea importar', widget=widgets.SelectMultipleInput())
+
+    def clean(self):
+        cleaned_data = super().clean()
+        user_story_types = cleaned_data.get('user_story_types')
+
+        # Verificar si el proyecto destino tiene tipos de historia de usuario con el mismo nombre
+        for user_story_type in user_story_types:
+            already_exists = UserStoryType.objects.filter(
+                name=user_story_type.name, project_id=self.to_project_id).exists()
+            if already_exists:
+                raise forms.ValidationError(build_field_error(
+                    'user_story_types', 'El proyecto destino ya tiene un tipo de historia de usuario con el nombre: ' + user_story_type.name))
+        return cleaned_data

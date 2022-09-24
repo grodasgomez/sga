@@ -176,6 +176,15 @@ class ProjectUseCase:
             us_type=us_type,
             project=project)
 
+    @staticmethod
+    def import_user_story_types(project_id, user_story_types):
+        """
+        Importa los tipos de user story de un proyecto
+        """
+        for user_story_type in user_story_types:
+            ProjectUseCase.create_user_story_type(
+                project_id=project_id, name=user_story_type.name, columns=user_story_type.columns)
+
 
 class RoleUseCase:
     @staticmethod

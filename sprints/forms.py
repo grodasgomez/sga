@@ -22,6 +22,15 @@ class SprintMemberCreateForm(forms.Form):
             label='Usuario', widget=widgets.SelectInput())
 
 
+class SprintMemberEditForm(forms.Form):
+    """
+    Formulario para cambiar la carga horaria de un miembro de un sprint
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    workload = forms.IntegerField(label='Carga de trabajo', min_value=1,
+                                  max_value=12, widget=widgets.TextInput(attrs={'type': 'number'}))
 
 
 class SprintStartForm(forms.ModelForm):
@@ -33,16 +42,12 @@ class SprintStartForm(forms.ModelForm):
         model = Sprint
         fields = ['capacity', 'duration', 'start_date']
         widgets = {
-            'capacity': widgets.TextInput(attrs={'type': 'number'}),
             'duration': widgets.TextInput(attrs={'type': 'number'}),
-            'start_date': widgets.DateInput(),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['capacity'].label = 'Capacidad en horas'
         self.fields['duration'].label = 'Duración en días'
-        self.fields['start_date'].label = 'Fecha de inicio'
 
 
 

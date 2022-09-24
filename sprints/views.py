@@ -9,10 +9,9 @@ from django.db.models.query import QuerySet
 
 
 from projects.mixin import ProjectPermissionMixin
-from sprints.models import SprintMember
 from users.models import CustomUser
-from sprints.forms import SprintMemberCreateForm, AssignSprintMemberForm
-from sprints.models import Sprint
+from sprints.forms import SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm
+from sprints.models import Sprint, SprintMember
 from sprints.usecase import SprintUseCase
 
 class SprintListView(ProjectPermissionMixin, ListView):
@@ -97,6 +96,44 @@ class SprintMemberCreateView(ProjectPermissionMixin, FormView):
         messages.success(self.request, 'Usuario agregado al sprint correctamente')
         return super().form_valid(form)
 
+class SprintMemberEditView(ProjectPermissionMixin, FormView):
+    permissions = ['ABM Miembro Sprint']
+    roles = ['Scrum Master']
+    template_name = 'sprint-members/edit.html'
+    form_class = SprintMemberEditForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        sprint_member = SprintMember.objects.get(id=self.kwargs.get('sprint_member_id'))
+        kwargs['initial'] = {
+            'workload': sprint_member.workload,
+        }
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sprint_member = SprintMember.objects.get(id=self.kwargs.get('sprint_member_id'))
+        context['sprint_member'] = sprint_member
+        return context
+    def get_success_url(self):
+        return reverse('projects:sprints:member-list', kwargs={
+            'project_id': self.kwargs.get('project_id'),
+            'sprint_id': self.kwargs.get('sprint_id'),
+        })
+
+    def form_valid(self, form):
+        """
+        Metodo que se ejecuta si el formulario es valido
+        """
+        data = form.cleaned_data
+        sprint_member_id = self.kwargs.get('sprint_member_id')
+        SprintUseCase.edit_sprint_member(
+            sprint_member_id=sprint_member_id,
+            workload=data['workload']
+        )
+        messages.success(self.request, 'Miembro editado correctamente')
+        return super().form_valid(form)
+
 class SprintMemberListView(ProjectPermissionMixin, View):
     permissions = ['ABM Miembro Sprint']
     roles = ['Scrum Master']
@@ -113,12 +150,15 @@ class SprintMemberListView(ProjectPermissionMixin, View):
         print(context)
         return render(request, 'sprint-members/index.html', context)
 
-class SprintStartView(ProjectPermissionMixin, View):
+class SprintStartView(ProjectPermissionMixin, FormView):
     """
-    Vista para crear un nuevo sprint
+    Vista para iniciar un sprint
     """
     permissions = ['ABM Sprint']
     roles = ['Scrum Master']
+    template_name = 'sprints/start.html'
+    form_class = SprintStartForm
+
     def post(self, request, project_id):
         # SprintUseCase.create_sprint(project_id)
         messages.success(request, 'Proyecto creado correctamente')

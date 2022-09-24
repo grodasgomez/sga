@@ -97,6 +97,25 @@ class SprintUseCase:
         sprint.save()
         return sprint_member
 
+    @staticmethod
+    def edit_sprint_member(sprint_member_id, workload):
+        """
+        Método para editar la carga horaria de un miembro de un sprint
+        """
+        sprint_member = SprintMember.objects.get(id=sprint_member_id)
+        sprint = sprint_member.sprint
+
+        # Actualizar la capacidad del sprint
+        sprint.capacity -= sprint_member.workload
+        sprint.capacity += workload
+        sprint.save()
+
+        # Actualizar la carga horaria del miembro
+        sprint_member.workload = workload
+        sprint_member.save()
+
+        return sprint_member
+
     @staticmethod #todo, verificacion, esta bien esto?
     def assign_sprint_member(sprint_member, user_story_id):
         """

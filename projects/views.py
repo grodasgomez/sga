@@ -1,12 +1,14 @@
-from django.views.generic import ListView
+from django.views.generic import ListView, FormView
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.contrib import messages
 from django.views import View
 from django.db.models.query import QuerySet
+from django.urls import reverse
 
-from projects.forms import FormCreateUserStory,FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole
+from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
+    FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory)
 from projects.models import Project, UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
 from projects.models import ProjectMember
@@ -342,6 +344,60 @@ class ProjectMemberEditView(ProjectPermissionMixin, View):
             return HttpResponseRedirect(f"/projects/{project_id}/members")
 
         return render(request, 'projects/project_member_edit.html', {'form': form, 'project_id':project_id, 'member_id':member_id})
+
+class UserStoryTypeImportView1(ProjectPermissionMixin, FormView):
+    """
+    Clase encargada de manejar la primera parte de la importacion de tipos de historias de usuario,
+    seleccionando el proyecto de donde se importaran los tipos de historias de usuario
+    """
+
+    permissions = ['ABM Tipo US']
+    roles = ['Scrum Master']
+
+    template_name = 'user_story_type/import1.html'
+    form_class = ImportUserStoryTypeForm1
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['project_id'] = self.kwargs.get('project_id')
+        return kwargs
+
+    def form_valid(self, form):
+        from_project = form.cleaned_data['project']
+        self.from_project_id = from_project.id
+        self.project_id = self.kwargs.get('project_id')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('projects:user-story-type-import2', kwargs={'project_id': self.project_id, 'from_project_id': self.from_project_id})
+
+class UserStoryTypeImportView2(ProjectPermissionMixin, FormView):
+    """
+    Clase encargada de manejar la segunda parte de la importacion de tipos de historias de usuario,
+    seleccionando los tipos de historias de usuario a importar
+    """
+
+    permissions = ['ABM Tipo US']
+    roles = ['Scrum Master']
+
+    template_name = 'user_story_type/import2.html'
+    form_class = ImportUserStoryTypeForm2
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['from_project_id'] = self.kwargs.get('from_project_id')
+        kwargs['to_project_id'] = self.kwargs.get('project_id')
+        return kwargs
+
+    def form_valid(self, form):
+        to_project_id = self.kwargs.get('project_id')
+        user_story_types = form.cleaned_data['user_story_types']
+        ProjectUseCase.import_user_story_types(to_project_id, user_story_types)
+        messages.success(self.request, f"Tipos de Historias de Usuario importados correctamente")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('projects:user-story-type-list', kwargs={'project_id': self.kwargs.get('project_id')})
 
 
 class ProductBacklogView(ProjectPermissionMixin, View):
