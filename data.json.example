@@ -263,11 +263,19 @@
         }
     },
 	{
+		"model": "projects.permission",
+		"pk": 9,
+		"fields": {
+		    "name": "ABM US Sprint",
+		    "description": "Cargar y borrar US de un Sprint"
+		}
+	},
+	{
         "model": "projects.permission",
-        "pk": 9,
+        "pk": 10,
         "fields": {
             "name": "ABM US Proyecto",
             "description": "ABM US Proyecto"
         }
-    },
+    }
 ]
