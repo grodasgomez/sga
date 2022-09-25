@@ -238,4 +238,36 @@
             "description": "Finalizar un proyecto"
         }
     }
+	{
+        "model": "projects.permission",
+        "pk": 6,
+        "fields": {
+            "name": "ABM US Miembro Sprint",
+            "description": "ABM US a un miembro del sprint"
+        }
+    },
+	{
+        "model": "projects.permission",
+        "pk": 7,
+        "fields": {
+            "name": "ABM Sprint",
+            "description": "ABM de Sprint"
+        }
+    },
+	{
+        "model": "projects.permission",
+        "pk": 8,
+        "fields": {
+            "name": "Ver Product Backlog",
+            "description": "Ver Product Backlog"
+        }
+    },
+	{
+        "model": "projects.permission",
+        "pk": 9,
+        "fields": {
+            "name": "ABM US Proyecto",
+            "description": "ABM US Proyecto"
+        }
+    },
 ]
