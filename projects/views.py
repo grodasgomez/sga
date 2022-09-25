@@ -351,7 +351,7 @@ class ProductBacklogView(ProjectPermissionMixin, View):
     """
     Clase encargada de mostrar el product Backlog de un proyecto
     """
-    permissions = ['ABM US']
+    permissions = ['ABM US Proyecto']
     roles = ['Scrum Master']
 
     def get(self, request, project_id):
@@ -377,7 +377,7 @@ class ProductBacklogCreateView(ProjectPermissionMixin, View):
     """
     Clase encargada de cargar el product Backlog de un proyecto
     """
-    permissions = ['ABM US']
+    permissions = ['ABM US Proyecto']
     roles = ['Scrum Master']
 
     def get(self, request, project_id):
