@@ -23,6 +23,8 @@ urlpatterns = [
     path('<int:project_id>/roles', views.ProjectRoleView.as_view(), name='index-roles'), #el index de roles dedl proyecto, el id es del proyecto
     path('<int:project_id>/roles/<int:role_id>/edit', views.ProjectRoleEditView.as_view(), name='edit-role'), #esto debe arreglar ale
     path('<int:project_id>/roles/<int:role_id>/delete', views.ProjectRoleDeleteView.as_view(), name='delete-role'),
+    path('<int:project_id>/roles/import', views.RoleImportView1.as_view(), name='import-role1'),
+    path('<int:project_id>/roles/import/<int:from_project_id>', views.RoleImportView2.as_view(), name='import-role2'),
 
     #Sprint
     path('<int:project_id>/sprints/', include(('sprints.urls', 'sprints'))),

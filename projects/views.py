@@ -7,7 +7,7 @@ from django.views import View
 from django.db.models.query import QuerySet
 from django.urls import reverse
 
-from projects.forms import FormCreateProject, FormCreateProjectMember, FormEditProjectMember,FormCreateUserStory, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2
+from projects.forms import FormCreateProject, FormCreateProjectMember, FormEditProjectMember,FormCreateUserStory, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1
 from projects.models import Project, UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
 from projects.models import ProjectMember
@@ -394,6 +394,7 @@ class ProductBacklogCreateView(ProjectPermissionMixin, View):
 
             return HttpResponseRedirect(f"/projects/{project_id}/backlog")
         return render(request, 'backlog/create.html', {'form': form})
+
 class UserStoryTypeImportView1(ProjectPermissionMixin, FormView):
     """
     Clase encargada de manejar la primera parte de la importacion de tipos de historias de usuario,
@@ -447,3 +448,45 @@ class UserStoryTypeImportView2(ProjectPermissionMixin, FormView):
 
     def get_success_url(self):
         return reverse('projects:user-story-type-list', kwargs={'project_id': self.kwargs.get('project_id')})
+
+class RoleImportView1(ProjectPermissionMixin, FormView):
+    """
+    Clase encargada de manejar la primera parte de la importacion de roles,
+    seleccionando el proyecto de donde se importaran los roles
+    """
+
+    permissions = ['ABM Roles']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id):
+        form = ImportRoleForm1(project_id)
+        return render(request, 'roles/import1.html', {'form': form})
+
+    def post(self, request, project_id):
+        form = ImportRoleForm1(project_id, request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            from_project_id=cleaned_data.project.id
+            return HttpResponseRedirect(f"/projects/{project_id}/import/{from_project_id}")
+        return render(request, 'roles/import1.html', {'form': form})
+
+class RoleImportView2(ProjectPermissionMixin, FormView):
+    """
+    Clase encargada de manejar la segunda parte de la importacion de roles,
+    seleccionando los roles a importar
+    """
+
+    permissions = ['ABM Roles']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id, from_project_id):
+        form = ImportRoleForm1(project_id)
+        return render(request, 'roles/import2.html', {'form': form})
+        
+    def post(self, request, project_id):
+        form = ImportRoleForm1(project_id, request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            from_project_id=cleaned_data.project.id
+            return HttpResponseRedirect(f"/projects/{project_id}/import/{from_project_id}")
+        return render(request, 'roles/import1.html', {'form': form})

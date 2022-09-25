@@ -246,3 +246,26 @@ class ImportUserStoryTypeForm2(forms.Form):
                 raise forms.ValidationError(build_field_error(
                     'user_story_types', 'El proyecto destino ya tiene un tipo de historia de usuario con el nombre: ' + user_story_type.name))
         return cleaned_data
+
+class ImportRoleForm1(forms.Form):
+    """
+    Formulario para seleccionar un proyecto de donde importar los roles
+    """
+
+    def __init__(self, project_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project_id = project_id
+        self.fields['project'] = forms.ModelChoiceField(
+            queryset=Project.objects.exclude(id=project_id),
+            empty_label='Seleccione un proyecto',
+            label='Proyecto', widget=widgets.SelectInput())
+
+    def clean(self):
+        cleaned_data = super().clean()
+        project = cleaned_data.get('project')
+
+        amount_role = Role.objects.filter(project_id=project.id).count()
+        if amount_role == 1:
+            raise forms.ValidationError(build_field_error(
+                'project', 'El proyecto seleccionado no tiene roles a importar'))
+        return cleaned_data
