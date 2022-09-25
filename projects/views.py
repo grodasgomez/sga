@@ -7,7 +7,7 @@ from django.views import View
 from django.db.models.query import QuerySet
 from django.urls import reverse
 
-from projects.forms import FormCreateProject, FormCreateProjectMember, FormEditProjectMember,FormCreateUserStory, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1
+from projects.forms import FormCreateProject, FormCreateProjectMember, FormEditProjectMember,FormCreateUserStory, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1,ImportRoleForm2
 from projects.models import Project, UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
 from projects.models import ProjectMember
@@ -466,8 +466,8 @@ class RoleImportView1(ProjectPermissionMixin, FormView):
         form = ImportRoleForm1(project_id, request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
-            from_project_id=cleaned_data.project.id
-            return HttpResponseRedirect(f"/projects/{project_id}/import/{from_project_id}")
+            from_project_id=cleaned_data.get('project').id
+            return HttpResponseRedirect(f"/projects/{project_id}/roles/import/{from_project_id}")
         return render(request, 'roles/import1.html', {'form': form})
 
 class RoleImportView2(ProjectPermissionMixin, FormView):
@@ -480,13 +480,16 @@ class RoleImportView2(ProjectPermissionMixin, FormView):
     roles = ['Scrum Master']
 
     def get(self, request, project_id, from_project_id):
-        form = ImportRoleForm1(project_id)
+        form = ImportRoleForm2(from_project_id)
         return render(request, 'roles/import2.html', {'form': form})
-        
-    def post(self, request, project_id):
-        form = ImportRoleForm1(project_id, request.POST)
+
+    def post(self, request, project_id, from_project_id):
+        form = ImportRoleForm2(from_project_id, request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
-            from_project_id=cleaned_data.project.id
-            return HttpResponseRedirect(f"/projects/{project_id}/import/{from_project_id}")
-        return render(request, 'roles/import1.html', {'form': form})
+            for role in cleaned_data.get('roles'):
+                role.name=role.name+" (importado "+str(project_id)+")"
+                RoleUseCase.create_role(project_id, role.name, role.description,role.permissions.all())
+            messages.success(request, 'Rol/es importado/s correctamente')
+            return HttpResponseRedirect(f"/projects/{project_id}/roles")
+        return render(request, 'roles/import2.html', {'form': form})
