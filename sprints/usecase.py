@@ -133,8 +133,8 @@ class SprintUseCase:
         return UserStory.objects.filter(id=user_story_id).update(**data)
 
     @staticmethod
-    def user_stories_by_sprint(project_id):
+    def user_stories_by_sprint(sprint_id):
         """
-        Retorna las historias de usuario de un proyecto
+        Retorna las historias de usuario de un Sprint
         """
-        return UserStory.objects.filter(project_id=project_id)
+        return UserStory.objects.filter(sprint_id=sprint_id)
