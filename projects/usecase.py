@@ -154,6 +154,13 @@ class ProjectUseCase:
         return UserStory.objects.filter(project_id=project_id)
 
     @staticmethod
+    def user_stories_by_project_and_us_type(project_id,user_story_type_id):
+        """
+        Retorna las historias de usuario de un proyecto
+        """
+        return UserStory.objects.filter(project_id=project_id,us_type=user_story_type_id)
+
+    @staticmethod
     def count_user_stories_by_project(project_id):
         """
         cuenta las historias de usuario de un proyecto

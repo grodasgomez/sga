@@ -5,6 +5,23 @@
     <a href="{% url 'projects:project-backlog-create' project_id=project_id %}" class="btn btn-labeled btn-info">
         <span class="btn-label"><i class="fa fa-plus"></i></span>Crear US
     </a>
+	<form method="post">
+		{% csrf_token %}
+		<label>Filtrar por tipo:</label>
+		<select name="filtro" >
+			<option value="empty">Todos</option>
+			{% for user_story_type in user_story_types %}
+			<option
+				value="{{ user_story_type.id }}"
+				{% if us_type_filter_id == user_story_type.id %}
+					selected
+				{% endif %}>
+				{{ user_story_type.name }}
+			</option>
+			{% endfor %}
+		</select>
+		<input class="btn btn-info" type="submit" name="filtrar" value="filtrar">
+	</form>
 	<table class="table">
 		<thead>
 		<tr>

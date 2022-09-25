@@ -400,7 +400,6 @@ class UserStoryTypeImportView2(ProjectPermissionMixin, FormView):
     def get_success_url(self):
         return reverse('projects:user-story-type-list', kwargs={'project_id': self.kwargs.get('project_id')})
 
-
 class ProductBacklogView(ProjectPermissionMixin, View):
     """
     Clase encargada de mostrar el product Backlog de un proyecto
@@ -419,13 +418,29 @@ class ProductBacklogView(ProjectPermissionMixin, View):
             messages.warning(request, "No eres miembro")
             return HttpResponseRedirect('/projects')
 
-        user_stories = ProjectUseCase.user_stories_by_project(project_id)
+        user_stories = []
+        us_type_filter_id = request.GET.get("type_us","")
+        if us_type_filter_id != "":
+            us_type_filter_id = int(us_type_filter_id)
+            user_stories = ProjectUseCase.user_stories_by_project_and_us_type(project_id,us_type_filter_id)
+        else:
+            user_stories = ProjectUseCase.user_stories_by_project(project_id)
+
+        user_story_types = ProjectUseCase.filter_user_story_type_by_project(project_id)
         context= {
+            "us_type_filter_id" : us_type_filter_id,
             "user_stories" : user_stories,
             "project_id" : project_id,
+            "user_story_types" : user_story_types
         }
-
+        print(user_story_types)
         return render(request, 'backlog/index.html', context)
+
+    def post(self, request, project_id):
+        user_story_type_id = request.POST.get("filtro","")
+        if user_story_type_id == "empty":
+            return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id}))
+        return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id})+'?type_us='+user_story_type_id)
 
 class ProductBacklogCreateView(ProjectPermissionMixin, View):
     """
