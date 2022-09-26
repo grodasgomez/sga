@@ -32,10 +32,10 @@
           <td>{{ project.end_date|date:"d/m/Y" }}</td>
           <td>{{ project.get_status_display }}</td>
           <td>
+            {% comment %}
             <a class="btn">
               <span class="btn-label"><i class="fa fa-pencil"></i></span>
             </a>
-            {% comment %}
             <a class="btn">
               <span class="btn-label"><i class="fa fa-trash"></i></span>
             </a>

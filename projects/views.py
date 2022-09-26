@@ -327,7 +327,6 @@ class ProjectMemberEditView(ProjectPermissionMixin, View):
                 messages.warning(request, "El Scrum Master no puede ser editado")
                 return HttpResponseRedirect(f"/projects/{project_id}/members")
         data['roles']=roles
-        print(data)
         form = FormEditProjectMember(project_id,initial=data)
         context= {
             "form" : form,
@@ -380,7 +379,6 @@ class ProductBacklogView(ProjectPermissionMixin, View):
             "project_id" : project_id,
             "user_story_types" : user_story_types
         }
-        print(user_story_types)
         return render(request, 'backlog/index.html', context)
 
     def post(self, request, project_id):
@@ -394,7 +392,7 @@ class ProductBacklogCreateView(ProjectPermissionMixin, View):
     Clase encargada de cargar el product Backlog de un proyecto
     """
     permissions = ['ABM US Proyecto']
-    roles = ['Scrum Master','Product Owner']
+    roles = ['Scrum Master', 'Product Owner']
 
     def get(self, request, project_id):
         user = self.request.user
@@ -430,8 +428,8 @@ class ProductBacklogCreateView(ProjectPermissionMixin, View):
             if not ('estimation_time' in cleaned_data):
                 cleaned_data['estimation_time'] = 0
 
-            code=str(project_id)+"-"+str(ProjectUseCase.count_user_stories_by_project(project_id)+1)
-            ProjectUseCase.create_user_story(code,project_id=project_id, **cleaned_data)
+            code = Project.objects.get(id=project_id).prefix + "-" + str(ProjectUseCase.count_user_stories_by_project(project_id) + 1)
+            ProjectUseCase.create_user_story(code, project_id=project_id, **cleaned_data)
             messages.success(request, f"Historia de usuario creado correctamente")
             return HttpResponseRedirect(f"/projects/{project_id}/backlog")
 

@@ -144,7 +144,6 @@ class SprintMemberListView(ProjectPermissionMixin, View):
             'sprint': sprint,
             'objects': objects,
         }
-        print(context)
         return render(request, 'sprint-members/index.html', context)
 
 class SprintStartView(ProjectPermissionMixin, FormView):
