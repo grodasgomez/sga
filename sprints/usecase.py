@@ -1,11 +1,8 @@
-
 from projects.models import Project, ProjectMember
 from sprints.models import Sprint, SprintMember, SprintStatus
-from django.db.models.query import QuerySet
-
+from projects.usecase import ProjectUseCase
 from users.models import CustomUser
 from user_stories.models import UserStory
-
 
 class SprintUseCase:
 
@@ -115,19 +112,29 @@ class SprintUseCase:
 
         return sprint_member
 
-    @staticmethod #todo, verificacion, esta bien esto?
-    def assign_sprint_member(sprint_member, user_story_id):
+    @staticmethod
+    def assign_us_sprint(sprint_id, user_story_id):
         """
-        Edita un tipo de historia de usuario
+        Asigna una historia de usuario a un sprint
+        """
+        data = {
+            'sprint': sprint_id
+        }
+        return UserStory.objects.filter(id=user_story_id).update(**data)
+
+    @staticmethod #todo, verificacion, esta bien esto?
+    def assign_us_sprint_member(sprint_member, user_story_id):
+        """
+        Asigna una historia de usuario a un miembro de un sprint
         """
         data = {}
         if not sprint_member:
             data = {
-                'sprint_member': None,
+                'sprint_member': None
             }
         else:
             data = {
-                'sprint_member': sprint_member,
+                'sprint_member': sprint_member
             }
         return UserStory.objects.filter(id=user_story_id).update(**data)
 
@@ -137,3 +144,10 @@ class SprintUseCase:
         Retorna las historias de usuario de un Sprint
         """
         return UserStory.objects.filter(sprint_id=sprint_id)
+
+    @staticmethod
+    def assignable_us_to_sprint(project_id, sprint_id):
+        """
+        Retorna las historias de usuario de un Sprint
+        """
+        return ProjectUseCase.user_stories_by_project(project_id).exclude(sprint=sprint_id)

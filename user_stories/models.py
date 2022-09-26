@@ -19,7 +19,7 @@ class UserStory(models.Model):
     deleted_at = models.DateTimeField(null=True)
 
     def __str__(self):
-        return self.name
+        return self.code
 
     class Meta:
-        ordering = ['code']
+        ordering = ['id']

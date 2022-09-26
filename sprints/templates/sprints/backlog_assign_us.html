@@ -1,0 +1,13 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+<b></b>
+	<h1>Asignar US</h1>
+	<form method="post">
+		{% csrf_token %}
+		{% for us in user_stories %}
+			<td><input type="checkbox" id="{{ us.title }}" name="us" value="{{ us.id }}">
+			<label>{{ us.code }}: {{ us.title }}</label><br>
+		{% endfor  %}
+		<input type="submit" value="Asignar">
+	</form>
+{% endblock %}
