@@ -7,7 +7,7 @@ from django.views import View
 from django.db.models.query import QuerySet
 from django.urls import reverse
 
-from projects.forms import FormCreateProject, FormCreateProjectMember, FormEditProjectMember,FormCreateUserStory, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1,ImportRoleForm2
+from projects.forms import FormCreateProject, FormCreateProjectMember, FormEditProjectMember,FormCreateUserStory, FormCreateUserStoryType, FormEditUserStoryType, FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1,ImportRoleForm2, FormCreateUserStoryPO
 from projects.models import Project, UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
 from projects.models import ProjectMember
@@ -235,7 +235,7 @@ class UserStoryTypeListView(ProjectPermissionMixin, ListView):
     Vista que lista tipos de historias de usuario de un projecto
     """
     permissions = ['ABM Tipo US']
-    roles = ['Scrum Master']
+    roles = ['Scrum Master', 'Product Owner']
 
     model = UserStoryType
     template_name = 'user_story_type/index.html'
@@ -352,7 +352,7 @@ class ProductBacklogView(ProjectPermissionMixin, View):
     Clase encargada de mostrar el product Backlog de un proyecto
     """
     permissions = ['ABM US Proyecto']
-    roles = ['Scrum Master']
+    roles = ['Scrum Master','Product Owner']
 
     def get(self, request, project_id):
         user: CustomUser = request.user
@@ -378,21 +378,47 @@ class ProductBacklogCreateView(ProjectPermissionMixin, View):
     Clase encargada de cargar el product Backlog de un proyecto
     """
     permissions = ['ABM US Proyecto']
-    roles = ['Scrum Master']
+    roles = ['Scrum Master','Product Owner']
 
     def get(self, request, project_id):
+        user = self.request.user
+        has_perm = ProjectUseCase.member_has_permissions(user.id, project_id, self.permissions)
+        has_role_SM = ProjectUseCase.member_has_roles(user.id, project_id, ['Scrum Master'])
+        has_role_PO = ProjectUseCase.member_has_roles(user.id, project_id, ['Product Owner'])
+
         form = FormCreateUserStory(project_id)
+        if has_perm or has_role_SM:
+            form = FormCreateUserStory(project_id)
+        elif (has_role_PO):
+            form = FormCreateUserStoryPO(project_id)
+
         return render(request, 'backlog/create.html', {'form': form})
 
     def post(self, request, project_id):
+
+        user = self.request.user
+        has_perm = ProjectUseCase.member_has_permissions(user.id, project_id, self.permissions)
+        has_role_SM = ProjectUseCase.member_has_roles(user.id, project_id, ['Scrum Master'])
+        has_role_PO = ProjectUseCase.member_has_roles(user.id, project_id, ['Product Owner'])
+
         form = FormCreateUserStory(project_id, request.POST)
+        if has_perm or has_role_SM:
+            form = FormCreateUserStory(project_id, request.POST)
+        elif (has_role_PO):
+            form = FormCreateUserStoryPO(project_id, request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
+
+            if not ('technical_priority' in cleaned_data):
+                cleaned_data['technical_priority'] = 0
+            if not ('estimation_time' in cleaned_data):
+                cleaned_data['estimation_time'] = 0
+
             code=str(project_id)+"-"+str(ProjectUseCase.count_user_stories_by_project(project_id)+1)
             ProjectUseCase.create_user_story(code,project_id=project_id, **cleaned_data)
             messages.success(request, f"Historia de usuario creado correctamente")
-
             return HttpResponseRedirect(f"/projects/{project_id}/backlog")
+
         return render(request, 'backlog/create.html', {'form': form})
 
 class UserStoryTypeImportView1(ProjectPermissionMixin, FormView):
