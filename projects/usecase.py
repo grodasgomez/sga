@@ -237,6 +237,12 @@ class RoleUseCase:
         """
         return Role.objects.filter(project_id=project_id)
 
+    def count_roles_by_project_no_default(project_id):
+        """
+        Retorna los roles custom de un proyecto
+        """
+        return Role.objects.filter(project_id=project_id).count()
+
     @staticmethod
     def get_role_by_id(role_id):
         """

@@ -8,7 +8,7 @@ from django.db.models.query import QuerySet
 from django.urls import reverse
 #todo arreglar imports
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
-    FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory)
+    FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1,ImportRoleForm2, FormCreateUserStoryPO)
 from projects.models import Project, UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
 from projects.models import ProjectMember
@@ -236,7 +236,7 @@ class UserStoryTypeListView(ProjectPermissionMixin, ListView):
     Vista que lista tipos de historias de usuario de un projecto
     """
     permissions = ['ABM Tipo US']
-    roles = ['Scrum Master']
+    roles = ['Scrum Master', 'Product Owner']
 
     model = UserStoryType
     template_name = 'user_story_type/index.html'
@@ -346,6 +346,97 @@ class ProjectMemberEditView(ProjectPermissionMixin, View):
 
         return render(request, 'projects/project_member_edit.html', {'form': form, 'project_id':project_id, 'member_id':member_id})
 
+
+class ProductBacklogView(ProjectPermissionMixin, View):
+    """
+    Clase encargada de mostrar el product Backlog de un proyecto
+    """
+    permissions = ['Ver Product Backlog']
+    roles = ['Scrum Master', 'Developer', 'Product Owner']
+
+    def get(self, request, project_id):
+        user: CustomUser = request.user
+        if not user.is_user():
+            messages.warning(request, "No eres un usuario verificado")
+            return HttpResponseRedirect('/')
+        data: Project = Project.objects.get(id=project_id)
+        members: QuerySet = data.project_members.all()
+        if user not in members:
+            messages.warning(request, "No eres miembro")
+            return HttpResponseRedirect('/projects')
+
+        user_stories = []
+        us_type_filter_id = request.GET.get("type_us","")
+        if us_type_filter_id != "":
+            us_type_filter_id = int(us_type_filter_id)
+            user_stories = ProjectUseCase.user_stories_by_project_and_us_type(project_id,us_type_filter_id)
+        else:
+            user_stories = ProjectUseCase.user_stories_by_project(project_id)
+
+        user_story_types = ProjectUseCase.filter_user_story_type_by_project(project_id)
+        context= {
+            "us_type_filter_id" : us_type_filter_id,
+            "user_stories" : user_stories,
+            "project_id" : project_id,
+            "user_story_types" : user_story_types
+        }
+        print(user_story_types)
+        return render(request, 'backlog/index.html', context)
+
+    def post(self, request, project_id):
+        user_story_type_id = request.POST.get("filtro","")
+        if user_story_type_id == "empty":
+            return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id}))
+        return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id})+'?type_us='+user_story_type_id)
+
+class ProductBacklogCreateView(ProjectPermissionMixin, View):
+    """
+    Clase encargada de cargar el product Backlog de un proyecto
+    """
+    permissions = ['ABM US Proyecto']
+    roles = ['Scrum Master','Product Owner']
+
+    def get(self, request, project_id):
+        user = self.request.user
+        has_perm = ProjectUseCase.member_has_permissions(user.id, project_id, self.permissions)
+        has_role_SM = ProjectUseCase.member_has_roles(user.id, project_id, ['Scrum Master'])
+        has_role_PO = ProjectUseCase.member_has_roles(user.id, project_id, ['Product Owner'])
+
+        form = FormCreateUserStory(project_id)
+        if has_perm or has_role_SM:
+            form = FormCreateUserStory(project_id)
+        elif (has_role_PO):
+            form = FormCreateUserStoryPO(project_id)
+
+        return render(request, 'backlog/create.html', {'form': form})
+
+    def post(self, request, project_id):
+
+        user = self.request.user
+        has_perm = ProjectUseCase.member_has_permissions(user.id, project_id, self.permissions)
+        has_role_SM = ProjectUseCase.member_has_roles(user.id, project_id, ['Scrum Master'])
+        has_role_PO = ProjectUseCase.member_has_roles(user.id, project_id, ['Product Owner'])
+
+        form = FormCreateUserStory(project_id, request.POST)
+        if has_perm or has_role_SM:
+            form = FormCreateUserStory(project_id, request.POST)
+        elif (has_role_PO):
+            form = FormCreateUserStoryPO(project_id, request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+
+            if not ('technical_priority' in cleaned_data):
+                cleaned_data['technical_priority'] = 0
+            if not ('estimation_time' in cleaned_data):
+                cleaned_data['estimation_time'] = 0
+
+            code=str(project_id)+"-"+str(ProjectUseCase.count_user_stories_by_project(project_id)+1)
+            ProjectUseCase.create_user_story(code,project_id=project_id, **cleaned_data)
+            messages.success(request, f"Historia de usuario creado correctamente")
+            return HttpResponseRedirect(f"/projects/{project_id}/backlog")
+
+        return render(request, 'backlog/create.html', {'form': form})
+
 class UserStoryTypeImportView1(ProjectPermissionMixin, FormView):
     """
     Clase encargada de manejar la primera parte de la importacion de tipos de historias de usuario,
@@ -400,66 +491,47 @@ class UserStoryTypeImportView2(ProjectPermissionMixin, FormView):
     def get_success_url(self):
         return reverse('projects:user-story-type-list', kwargs={'project_id': self.kwargs.get('project_id')})
 
-class ProductBacklogView(ProjectPermissionMixin, View):
+class RoleImportView1(ProjectPermissionMixin, FormView):
     """
-    Clase encargada de mostrar el product Backlog de un proyecto
+    Clase encargada de manejar la primera parte de la importacion de roles,
+    seleccionando el proyecto de donde se importaran los roles
     """
-    permissions = ['Ver Product Backlog']
-    roles = ['Scrum Master', 'Developer', 'Product Owner']
+
+    permissions = ['ABM Roles']
+    roles = ['Scrum Master']
 
     def get(self, request, project_id):
-        user: CustomUser = request.user
-        if not user.is_user():
-            messages.warning(request, "No eres un usuario verificado")
-            return HttpResponseRedirect('/')
-        data: Project = Project.objects.get(id=project_id)
-        members: QuerySet = data.project_members.all()
-        if user not in members:
-            messages.warning(request, "No eres miembro")
-            return HttpResponseRedirect('/projects')
-
-        user_stories = []
-        us_type_filter_id = request.GET.get("type_us","")
-        if us_type_filter_id != "":
-            us_type_filter_id = int(us_type_filter_id)
-            user_stories = ProjectUseCase.user_stories_by_project_and_us_type(project_id,us_type_filter_id)
-        else:
-            user_stories = ProjectUseCase.user_stories_by_project(project_id)
-
-        user_story_types = ProjectUseCase.filter_user_story_type_by_project(project_id)
-        context= {
-            "us_type_filter_id" : us_type_filter_id,
-            "user_stories" : user_stories,
-            "project_id" : project_id,
-            "user_story_types" : user_story_types
-        }
-        print(user_story_types)
-        return render(request, 'backlog/index.html', context)
+        form = ImportRoleForm1(project_id)
+        return render(request, 'roles/import1.html', {'form': form})
 
     def post(self, request, project_id):
-        user_story_type_id = request.POST.get("filtro","")
-        if user_story_type_id == "empty":
-            return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id}))
-        return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id})+'?type_us='+user_story_type_id)
-
-class ProductBacklogCreateView(ProjectPermissionMixin, View):
-    """
-    Clase encargada de cargar el product Backlog de un proyecto
-    """
-    permissions = ['ABM US']
-    roles = ['Scrum Master', 'Product Owner']
-
-    def get(self, request, project_id):
-        form = FormCreateUserStory(project_id)
-        return render(request, 'backlog/create.html', {'form': form})
-
-    def post(self, request, project_id):
-        form = FormCreateUserStory(project_id, request.POST)
+        form = ImportRoleForm1(project_id, request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
-            code=str(project_id)+"-"+str(ProjectUseCase.count_user_stories_by_project(project_id)+1)
-            ProjectUseCase.create_user_story(code,project_id=project_id, **cleaned_data)
-            messages.success(request, f"Historia de usuario creado correctamente")
+            from_project_id=cleaned_data.get('project').id
+            return HttpResponseRedirect(f"/projects/{project_id}/roles/import/{from_project_id}")
+        return render(request, 'roles/import1.html', {'form': form})
 
-            return HttpResponseRedirect(f"/projects/{project_id}/backlog")
-        return render(request, 'backlog/create.html', {'form': form})
+class RoleImportView2(ProjectPermissionMixin, FormView):
+    """
+    Clase encargada de manejar la segunda parte de la importacion de roles,
+    seleccionando los roles a importar
+    """
+
+    permissions = ['ABM Roles']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id, from_project_id):
+        form = ImportRoleForm2(from_project_id)
+        return render(request, 'roles/import2.html', {'form': form})
+
+    def post(self, request, project_id, from_project_id):
+        form = ImportRoleForm2(from_project_id, request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            for role in cleaned_data.get('roles'):
+                role.name=role.name+" (importado "+str(project_id)+")"
+                RoleUseCase.create_role(project_id, role.name, role.description,role.permissions.all())
+            messages.success(request, 'Rol/es importado/s correctamente')
+            return HttpResponseRedirect(f"/projects/{project_id}/roles")
+        return render(request, 'roles/import2.html', {'form': form})

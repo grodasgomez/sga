@@ -1,9 +1,11 @@
 {% extends 'sga/layout/base_generic.html'%} 
 {% block content %}
   <h2>Roles</h2>
-<!-- Aun debe codificarse el boton de crear rol para que lleve a la ventana de crear rol que debe arreglar ale -->
   <a href="{% url 'projects:create-role' project_id=project_id %}" class="btn btn-labeled btn-info">
     <span class="btn-label"><i class="fa fa-plus"></i></span>Crear Rol
+  </a>
+  <a href="{% url 'projects:import-role1' project_id=project_id %}" class="btn btn-labeled btn-info">
+    <span class="btn-label"><i class="fa fa-plus"></i></span>Importar Rol
   </a>
   {% include 'utils/messages.html'%}
   <table class="table">
@@ -20,7 +22,6 @@
         <td>{{ role.name }}</td>
         <td>{{ role.description }}</td>
         <td>
-          <!-- Aun no funciona borrar y editar roles -->
           <a href="{% url 'projects:edit-role' project_id=project_id role_id=role.id %}" class="btn">
             <span class="btn-label"><i class="fa fa-pencil"></i></span>
           </a>

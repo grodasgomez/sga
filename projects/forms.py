@@ -160,7 +160,6 @@ class FormEditUserStoryType(FormUserStoryType):
         columns = cleaned_data.get('columns')
         cleaned_data['columns'] = self.custom_clean_columns(columns)
         return cleaned_data
-
 class FormCreateUserStory(forms.Form):
     """
     Formulario para crear una historia de usuario en un proyecto
@@ -182,6 +181,32 @@ class FormCreateUserStory(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
         title = cleaned_data.get('title')
+        already_exists = UserStory.objects.filter(
+            title=title, project_id=self.project_id).exists()
+        if already_exists:
+            raise forms.ValidationError(build_field_error(
+                'title', 'Ya existe una historia de usuario con ese nombre'))
+        return cleaned_data
+
+class FormCreateUserStoryPO(forms.Form):
+    """
+    Formulario para crear una historia de usuario en un proyecto
+    """
+    def __init__(self, project_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project_id = project_id
+        self.fields['us_type'] = forms.ModelChoiceField(
+            queryset=ProjectUseCase.filter_user_story_type_by_project(project_id), label='Tipo de Historia de Usuario',
+            empty_label='Seleccione un tipo',
+            widget=widgets.SelectInput()
+        )
+        self.fields['title'] = forms.CharField(max_length=100, label='Titulo',widget=widgets.TextInput())  # TITULO del US
+        self.fields['description'] = forms.CharField(max_length=100, label='Descripcion',widget=widgets.TextInput())  # descripcion del US
+        self.fields['business_value'] = forms.IntegerField( min_value=1, max_value=100 ,label='Valor de Negocio',widget=widgets.NumberInput())  # Valor de Negocio del US
+
+    def clean(self):
+        cleaned_data = super().clean()
+        title = cleaned_data.get('title')
 
         already_exists = UserStory.objects.filter(
             title=title, project_id=self.project_id).exists()
@@ -189,6 +214,7 @@ class FormCreateUserStory(forms.Form):
             raise forms.ValidationError(build_field_error(
                 'title', 'Ya existe una historia de usuario con ese nombre'))
         return cleaned_data
+
 
 class ImportUserStoryTypeForm1(forms.Form):
     """
@@ -238,3 +264,39 @@ class ImportUserStoryTypeForm2(forms.Form):
                 raise forms.ValidationError(build_field_error(
                     'user_story_types', 'El proyecto destino ya tiene un tipo de historia de usuario con el nombre: ' + user_story_type.name))
         return cleaned_data
+
+class ImportRoleForm1(forms.Form):
+    """
+    Formulario para seleccionar un proyecto de donde importar los roles
+    """
+
+    def __init__(self, project_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project_id = project_id
+        self.fields['project'] = forms.ModelChoiceField(
+            queryset=Project.objects.exclude(id=project_id),
+            empty_label='Seleccione un proyecto',
+            label='Proyecto', widget=widgets.SelectInput())
+
+    def clean(self):
+        cleaned_data = super().clean()
+        project = cleaned_data.get('project')
+
+        amount_role = Role.objects.filter(project_id=project.id).count()
+        if amount_role == 0:
+            raise forms.ValidationError(build_field_error(
+                'project', 'El proyecto seleccionado no tiene roles a importar'))
+        return cleaned_data
+
+class ImportRoleForm2(forms.Form):
+    """
+    Formulario para seleccionar los roles de un proyecto para importar
+    """
+
+    def __init__(self, from_project_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.from_project_id = from_project_id
+        self.fields['roles'] = forms.ModelMultipleChoiceField(
+            queryset=RoleUseCase.get_roles_by_project_no_default(from_project_id),
+            label='Roles', widget=widgets.SelectMultipleInput())
+

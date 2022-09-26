@@ -1,0 +1,17 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+<b></b>
+	<h1>Importar Rol</h1>
+
+	<form method="post" class="form row g-3">
+		{% csrf_token %}
+		{% for field in form %}
+      {% include "utils/form_field.html" with field=field %}
+    {% endfor %}
+
+    {% for error in form.non_field_errors %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endfor %}
+		<input type="submit" value="Importar">
+	</form>
+{% endblock %}
