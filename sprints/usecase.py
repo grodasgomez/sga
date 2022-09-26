@@ -64,7 +64,6 @@ class SprintUseCase:
             user__sprints__id=sprint_id
         ).values_list('user', flat=True)
         users = CustomUser.objects.filter(id__in=user_ids)
-        print(users)
         return users
 
     @staticmethod
