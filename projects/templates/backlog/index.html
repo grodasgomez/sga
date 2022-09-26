@@ -2,9 +2,9 @@
 {% block content %}
 	{% include 'utils/messages.html' %}
 	<h2> Backlog del Proyecto</h2>
-    <a href="{% url 'projects:project-backlog-create' project_id=project_id %}" class="btn btn-labeled btn-info">
-        <span class="btn-label"><i class="fa fa-plus"></i></span>Crear US
-    </a>
+	<a href="{% url 'projects:project-backlog-create' project_id=project_id %}" class="btn btn-labeled btn-info">
+		<span class="btn-label"><i class="fa fa-plus"></i></span>Crear US
+	</a>
 	<table class="table">
 		<thead>
 		<tr>
@@ -23,7 +23,7 @@
 			<td>{{ user_story.code }}</td>
 			<td>{{ user_story.title }}</td>
 			<td>{{ user_story.description }}</td>
-            <td>{{ user_story.business_value }}</td>
+            	<td>{{ user_story.business_value }}</td>
 			<td>{{ user_story.technical_priority }}</td>
 			<td>{{ user_story.estimation_time }}</td>
             <td>{{ user_story.us_type.name }}</td>

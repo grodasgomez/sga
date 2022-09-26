@@ -4,9 +4,6 @@ from django.contrib import messages
 from django.urls import reverse
 from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect
-from django.db.models.query import QuerySet
-
-
 
 from projects.mixin import ProjectPermissionMixin
 from users.models import CustomUser
@@ -166,7 +163,7 @@ class SprintStartView(ProjectPermissionMixin, FormView):
 
 class SprintBacklogView(ProjectPermissionMixin, View):
     """
-    Clase encargada de mostrar el product Backlog de un Sprint
+    Clase encargada de mostrar el sprint Backlog
     """
     permissions = ['ABM US']#todo
     roles = ['Scrum Master', 'Developer']
@@ -177,7 +174,6 @@ class SprintBacklogView(ProjectPermissionMixin, View):
             messages.warning(request, "No eres un usuario verificado")
             return HttpResponseRedirect('/')
         members = SprintUseCase.get_sprint_members(sprint_id)
-        print("members", members)
         # if user not in members:
         #     messages.warning(request, "No eres miembro del Sprint")
         #     return HttpResponseRedirect('/')
@@ -193,9 +189,9 @@ class SprintBacklogView(ProjectPermissionMixin, View):
 
         return render(request, 'sprints/backlog.html', context)
 
-class SprintBacklogAssignView(ProjectPermissionMixin, View):
+class SprintBacklogAssignMemberView(ProjectPermissionMixin, View):
     """
-    Clase encargada de asignar US en el product Backlog de un Sprint
+    Clase encargada de asignar una US a un miembro del sprint
     """
     form_class = AssignSprintMemberForm
 
@@ -209,14 +205,36 @@ class SprintBacklogAssignView(ProjectPermissionMixin, View):
             sprint_member = None
         form = self.form_class(sprint_id=sprint_id,initial={'sprint_member': sprint_member})
 
-        return render(request, 'sprints/backlog_assign.html', {'form': form})
+        return render(request, 'sprints/backlog_assign_member.html', {'form': form})
 
     def post(self, request, project_id, sprint_id, user_story_id):
         form = self.form_class(sprint_id, request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
-            print(cleaned_data)
-            SprintUseCase.assign_sprint_member(**cleaned_data, user_story_id=user_story_id)
+            SprintUseCase.assign_us_sprint_member(**cleaned_data, user_story_id=user_story_id)
             messages.success(request, f"Miembro asignado correctamente")
             return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
-        return render(request, 'sprints/backlog_assign.html', {'form': form})
+        return render(request, 'sprints/backlog_assign_member.html', {'form': form})
+
+class SprintBacklogAssignView(ProjectPermissionMixin, View):
+    """
+    Clase encargada de asignar una US del product backlog al sprint
+    """
+    permissions = ['ABM US Sprint']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id, sprint_id):
+        user_stories = SprintUseCase.assignable_us_to_sprint(project_id, sprint_id)
+        if not user_stories:
+            messages.warning(request, "No hay US disponibles para asignar")
+            return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
+        context = {
+            "user_stories": user_stories
+        }
+        return render(request, 'sprints/backlog_assign_us.html', context)
+
+    def post(self, request, project_id, sprint_id):
+        user_stories = request.POST.getlist("us")
+        for us in user_stories:
+            SprintUseCase.assign_us_sprint(sprint_id, us)
+        return redirect(reverse("projects:sprints:backlog", kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
