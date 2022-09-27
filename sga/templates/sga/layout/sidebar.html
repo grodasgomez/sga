@@ -76,10 +76,10 @@
       {% endif %}
     {% endif %}
   </ul>
-  {% if not homepage %}
+  {% if backpage %}
     <ul class="nav">
     <li>
-      <a href="javascript:;" class="nav-link link-dark" onClick="javascript:history.back();">
+      <a href="{{ backpage }}" class="nav-link link-dark">
         <i class="fa-solid fa-left-long"></i>
         Volver
       </a>

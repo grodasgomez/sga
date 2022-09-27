@@ -7,9 +7,10 @@ from users.forms import ProfileForm
 from users.usecase import UserUseCase
 from users.models import CustomUser
 from django.views.generic import FormView
+from sga.mixin import NeverCacheMixin
 
 # Create your views here.
-class UsersView(LoginRequiredMixin, View):
+class UsersView(NeverCacheMixin, LoginRequiredMixin, View):
     """
     Clase encargada de mostrar los usuarios y cambiar el rol de sistema
     """
@@ -32,7 +33,7 @@ class UsersView(LoginRequiredMixin, View):
             UserUseCase.update_system_role(user_id, "admin")
         return redirect(request.META['HTTP_REFERER'])
 
-class ProfileView(LoginRequiredMixin, FormView):
+class ProfileView(NeverCacheMixin, LoginRequiredMixin, FormView):
     """
     Vista para mostrar el perfil del usuario, asi como tambien para editar el perfil
     """

@@ -8,16 +8,16 @@ from django.db.models.query import QuerySet
 from django.urls import reverse
 #todo arreglar imports
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
-    FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1,ImportRoleForm2, FormCreateUserStoryPO)
-from projects.models import Project, UserStoryType, ProjectStatus
+    FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole,
+    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1,ImportRoleForm2, FormCreateUserStoryPO)
+from projects.models import Project, UserStoryType
 from projects.usecase import ProjectUseCase, RoleUseCase
-from projects.models import ProjectMember
 from projects.mixin import ProjectPermissionMixin
+from sga.mixin import NeverCacheMixin
 from users.models import CustomUser
-from user_stories.models import UserStory
 
 # Create your views here.
-class ProjectListView(LoginRequiredMixin, View):
+class ProjectListView(NeverCacheMixin, LoginRequiredMixin, View):
     """
     Clase para mostrar los proyectos de acuerdo al usuario logueado
     """
@@ -41,9 +41,10 @@ class ProjectListView(LoginRequiredMixin, View):
             for p in data:
                 if p.project_members.all().filter(id=user.id):
                     context['projects'].append(p)
+        context["backpage"] = reverse("index")
         return render(request, 'projects/index.html', context)
 
-class ProjectView(LoginRequiredMixin, View):
+class ProjectView(NeverCacheMixin, LoginRequiredMixin, View):
     """
     Clase encargada de mostrar los detalles de una view
     """
@@ -58,11 +59,12 @@ class ProjectView(LoginRequiredMixin, View):
             messages.warning(request, "No eres miembro")
             return HttpResponseRedirect('/projects')
 
-        can_start_project = ProjectUseCase.can_start_project(user.id ,project_id)
+        can_start_project = ProjectUseCase.can_start_project(user.id, project_id)
         context= {
             "object" : data,
             "members" : members,
-            "can_start_project" : can_start_project
+            "can_start_project" : can_start_project,
+            "backpage": reverse("projects:index")
         }
         return render(request, 'projects/project_detail.html', context)
 
@@ -71,7 +73,7 @@ class ProjectView(LoginRequiredMixin, View):
         messages.success(request, 'Proyecto iniciado correctamente')
         return redirect(request.META['HTTP_REFERER'])
 
-class ProjectMembersView(LoginRequiredMixin, View):
+class ProjectMembersView(NeverCacheMixin, LoginRequiredMixin, View):
     """
     Clase encargada de mostrar los miembros de un proyecto
     """
@@ -88,6 +90,7 @@ class ProjectMembersView(LoginRequiredMixin, View):
         context= {
             "members" : [],
             "project_id" : project_id,
+            "backpage": reverse("projects:project-detail", kwargs={"project_id": project_id})
         }
         for member in members:
             scrum_master = False
@@ -102,7 +105,7 @@ class ProjectMembersView(LoginRequiredMixin, View):
             })
         return render(request, 'projects/project_members.html', context)
 
-class ProjectCreateView(LoginRequiredMixin, View):
+class ProjectCreateView(NeverCacheMixin, LoginRequiredMixin, View):
     """
     Clase encargada de manejar la creacion de un proyecto
     """
@@ -124,8 +127,7 @@ class ProjectCreateView(LoginRequiredMixin, View):
             return HttpResponseRedirect('/projects')
         return render(request, 'projects/create.html', {'form': form})
 
-
-class ProjectMemberCreateView(ProjectPermissionMixin, View):
+class ProjectMemberCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de manejar la asignacion de miembros a un proyecto
     """
@@ -147,7 +149,7 @@ class ProjectMemberCreateView(ProjectPermissionMixin, View):
             return HttpResponseRedirect('/projects')
         return render(request, 'project_member/create.html', {'form': form})
 
-class ProjectRoleCreateView(ProjectPermissionMixin, View):
+class ProjectRoleCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de manejar la creacion de roles
     """
@@ -170,7 +172,7 @@ class ProjectRoleCreateView(ProjectPermissionMixin, View):
         #si el form no es valido retorna a la misma pagina
         return render(request, 'roles/create.html', {'form': form, 'project_id':project_id})
 
-class ProjectRoleView(ProjectPermissionMixin, View):
+class ProjectRoleView(NeverCacheMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de mostrar los roles de un proyecto
     """
@@ -187,7 +189,7 @@ class ProjectRoleView(ProjectPermissionMixin, View):
         return render(request, 'roles/index.html', context) #le pasamos a la vista
 
 #User Story
-class UserStoryTypeCreateView(ProjectPermissionMixin, View):
+class UserStoryTypeCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
     """
     Vista para crear un tipo de historia de usuario en un proyecto
     """
@@ -208,7 +210,7 @@ class UserStoryTypeCreateView(ProjectPermissionMixin, View):
             return HttpResponseRedirect(f"/projects/{project_id}/user-story-type")
         return render(request, 'user_story_type/create.html', {'form': form})
 
-class UserStoryTypeEditView(ProjectPermissionMixin, View):
+class UserStoryTypeEditView(NeverCacheMixin, ProjectPermissionMixin, View):
     """
     Vista para editar un tipo de historia de usuario de un proyecto
     """
@@ -231,7 +233,8 @@ class UserStoryTypeEditView(ProjectPermissionMixin, View):
 
         return render(request, 'user_story_type/edit.html', {'form': form})
 
-class UserStoryTypeListView(ProjectPermissionMixin, ListView):
+
+class UserStoryTypeListView(NeverCacheMixin, ProjectPermissionMixin, ListView):
     """
     Vista que lista tipos de historias de usuario de un projecto
     """
@@ -251,9 +254,10 @@ class UserStoryTypeListView(ProjectPermissionMixin, ListView):
         #Convertimos las columnas de lista de str a un str separado por comas
         for item in context['object_list']:
             item.columns = ",".join(item.columns)
+        context['backpage'] = reverse('projects:project-detail', kwargs={'project_id': context['project_id']})
         return context
 
-class ProjectRoleEditView(ProjectPermissionMixin, View):
+class ProjectRoleEditView(NeverCacheMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de manejar la edicion de roles
     """
@@ -284,7 +288,7 @@ class ProjectRoleEditView(ProjectPermissionMixin, View):
 
         return render(request, 'roles/edit.html', {'form': form, 'project_id':project_id, 'role_id':role_id})
 
-class ProjectRoleDeleteView(ProjectPermissionMixin, View):
+class ProjectRoleDeleteView(NeverCacheMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de manejar el borrado de roles
     """
@@ -310,7 +314,7 @@ class ProjectRoleDeleteView(ProjectPermissionMixin, View):
         messages.success(request, f"Rol borrado correctamente")
         return HttpResponseRedirect(f"/projects/{project_id}/roles")
 
-class ProjectMemberEditView(ProjectPermissionMixin, View):
+class ProjectMemberEditView(NeverCacheMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de manejar la edicion de Miembro de proyecto
     """
@@ -346,7 +350,7 @@ class ProjectMemberEditView(ProjectPermissionMixin, View):
         return render(request, 'projects/project_member_edit.html', {'form': form, 'project_id':project_id, 'member_id':member_id})
 
 
-class ProductBacklogView(ProjectPermissionMixin, View):
+class ProductBacklogView(NeverCacheMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de mostrar el product Backlog de un proyecto
     """
@@ -387,7 +391,7 @@ class ProductBacklogView(ProjectPermissionMixin, View):
             return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id}))
         return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id})+'?type_us='+user_story_type_id)
 
-class ProductBacklogCreateView(ProjectPermissionMixin, View):
+class ProductBacklogCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de cargar el product Backlog de un proyecto
     """
@@ -435,7 +439,7 @@ class ProductBacklogCreateView(ProjectPermissionMixin, View):
 
         return render(request, 'backlog/create.html', {'form': form})
 
-class UserStoryTypeImportView1(ProjectPermissionMixin, FormView):
+class UserStoryTypeImportView1(NeverCacheMixin, ProjectPermissionMixin, FormView):
     """
     Clase encargada de manejar la primera parte de la importacion de tipos de historias de usuario,
     seleccionando el proyecto de donde se importaran los tipos de historias de usuario
@@ -461,7 +465,7 @@ class UserStoryTypeImportView1(ProjectPermissionMixin, FormView):
     def get_success_url(self):
         return reverse('projects:user-story-type-import2', kwargs={'project_id': self.project_id, 'from_project_id': self.from_project_id})
 
-class UserStoryTypeImportView2(ProjectPermissionMixin, View):
+class UserStoryTypeImportView2(NeverCacheMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de manejar la segunda parte de la importacion de tipos de historias de usuario,
     seleccionando los tipos de historias de usuario a importar
@@ -501,7 +505,7 @@ class UserStoryTypeImportView2(ProjectPermissionMixin, View):
         }
         return render(request, self.template_name, context)
 
-class RoleImportView1(ProjectPermissionMixin, FormView):
+class RoleImportView1(NeverCacheMixin, ProjectPermissionMixin, FormView):
     """
     Clase encargada de manejar la primera parte de la importacion de roles,
     seleccionando el proyecto de donde se importaran los roles
@@ -522,7 +526,7 @@ class RoleImportView1(ProjectPermissionMixin, FormView):
             return HttpResponseRedirect(f"/projects/{project_id}/roles/import/{from_project_id}")
         return render(request, 'roles/import1.html', {'form': form})
 
-class RoleImportView2(ProjectPermissionMixin, FormView):
+class RoleImportView2(NeverCacheMixin, ProjectPermissionMixin, FormView):
     """
     Clase encargada de manejar la segunda parte de la importacion de roles,
     seleccionando los roles a importar
