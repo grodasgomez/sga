@@ -1,7 +1,7 @@
 
 /**
  * Funcion que permite seleccionar todos los checkbox de un formulario,
- * se necesita un checkbox con id "checkAll" para que funcione.
+ * se necesita un checkbox con id "check-all" para que funcione.
  */
 document.addEventListener('DOMContentLoaded', function() {
     const checkboxes = [...document.querySelectorAll('input[type="checkbox"]:not(#check-all)')];
