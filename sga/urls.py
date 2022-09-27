@@ -27,5 +27,8 @@ urlpatterns = [
     path('', views.index, name='index'),
 
     path('projects/', include(('projects.urls', 'projects'))),
-    path('users/', include(('users.urls', 'users')))
+    path('users/', include(('users.urls', 'users'))),
+
+    ### SOLO PARA LOGEAR CON USUARIOS DE PRUEBA ###
+    path('accounts/login-email/', views.login_email, name='login-email'),
 ]
