@@ -461,7 +461,7 @@ class UserStoryTypeImportView1(ProjectPermissionMixin, FormView):
     def get_success_url(self):
         return reverse('projects:user-story-type-import2', kwargs={'project_id': self.project_id, 'from_project_id': self.from_project_id})
 
-class UserStoryTypeImportView2(ProjectPermissionMixin, FormView):
+class UserStoryTypeImportView2(ProjectPermissionMixin, View):
     """
     Clase encargada de manejar la segunda parte de la importacion de tipos de historias de usuario,
     seleccionando los tipos de historias de usuario a importar
@@ -471,23 +471,35 @@ class UserStoryTypeImportView2(ProjectPermissionMixin, FormView):
     roles = ['Scrum Master']
 
     template_name = 'user_story_type/import2.html'
-    form_class = ImportUserStoryTypeForm2
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['from_project_id'] = self.kwargs.get('from_project_id')
-        kwargs['to_project_id'] = self.kwargs.get('project_id')
-        return kwargs
+    def get(self, request, project_id, from_project_id):
+        user_story_types = UserStoryType.objects.filter(project_id=from_project_id).exclude(name='Historia de Usuario')
+        context = {
+            'user_story_types': user_story_types,
+            'project_id': project_id,
+            'from_project_id': from_project_id,
+            'form':{}
+        }
+        return render(request, self.template_name, context)
 
-    def form_valid(self, form):
-        to_project_id = self.kwargs.get('project_id')
-        user_story_types = form.cleaned_data['user_story_types']
-        ProjectUseCase.import_user_story_types(to_project_id, user_story_types)
-        messages.success(self.request, f"Tipos de Historias de Usuario importados correctamente")
-        return super().form_valid(form)
+    def post(self, request, project_id, from_project_id):
+        form = ImportUserStoryTypeForm2(from_project_id, project_id,request.POST)
+        if form.is_valid():
+            user_story_types = form.cleaned_data['user_story_types']
+            ProjectUseCase.import_user_story_types(project_id, user_story_types)
+            messages.success(request, 'Tipos de Historias de Usuario importados correctamente')
+            return redirect(reverse('projects:user-story-type-list', kwargs={'project_id': project_id}))
 
-    def get_success_url(self):
-        return reverse('projects:user-story-type-list', kwargs={'project_id': self.kwargs.get('project_id')})
+        # Obtengo el id con el tipo int de los tipos de historias de usuario que fueron seleccionados
+        checked = list(map(int, request.POST.getlist('user_story_types')))
+        context = {
+            'user_story_types': UserStoryType.objects.filter(project_id=from_project_id).exclude(name='Historia de Usuario'),
+            'project_id': project_id,
+            'from_project_id': from_project_id,
+            'checked':checked,
+            'form':form
+        }
+        return render(request, self.template_name, context)
 
 class RoleImportView1(ProjectPermissionMixin, FormView):
     """

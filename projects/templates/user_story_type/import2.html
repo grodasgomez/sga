@@ -1,12 +1,36 @@
 {% extends 'sga/layout/base_generic.html'%}
+{% load static %}
+{% block head %}
+  <script src="{% static 'sga/js/checkAll.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 <b></b>
 	<h1>Importación de Tipos de US - Parte 2</h1>
+  <p>Seleccione los tipos de usuario que desea importar</p>
 	<form  method="post" class="form row g-3">
 		{% csrf_token %}
-		{% for field in form %}
-      {% include "utils/form_field.html" with field=field %}
-    {% endfor %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"><input type="checkbox" id="check-all"></th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Columnas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for us_type in user_story_types %}
+            <tr>
+                <td>
+                  <input type="checkbox" name="user_story_types" value="{{us_type.id}}"
+                  {%if us_type.id in checked%} checked {%endif%}>
+                </td>
+                <td>{{us_type.name}}</td>
+                <td>{{us_type.columns_list}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
     {% for error in form.non_field_errors %}
       <div class="alert alert-danger">{{ error }}</div>

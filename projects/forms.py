@@ -250,19 +250,19 @@ class ImportUserStoryTypeForm2(forms.Form):
         self.to_project_id = to_project_id
         self.fields['user_story_types'] = forms.ModelMultipleChoiceField(
            queryset=UserStoryType.objects.filter(project_id=from_project_id).exclude(name='Historia de Usuario'),
-           label='Seleccione los tipos de US que desea importar', widget=widgets.SelectMultipleInput())
+           label='Seleccione los tipos de US que desea importar', widget=forms.CheckboxSelectMultiple())
 
     def clean(self):
         cleaned_data = super().clean()
         user_story_types = cleaned_data.get('user_story_types')
-
+        if not user_story_types:
+            raise forms.ValidationError('Debe seleccionar al menos un tipo de historia de usuario')
         # Verificar si el proyecto destino tiene tipos de historia de usuario con el mismo nombre
         for user_story_type in user_story_types:
             already_exists = UserStoryType.objects.filter(
                 name=user_story_type.name, project_id=self.to_project_id).exists()
             if already_exists:
-                raise forms.ValidationError(build_field_error(
-                    'user_story_types', 'El proyecto destino ya tiene un tipo de historia de usuario con el nombre: ' + user_story_type.name))
+                raise forms.ValidationError('El proyecto destino ya tiene un tipo de historia de usuario con el nombre: ' + user_story_type.name)
         return cleaned_data
 
 class ImportRoleForm1(forms.Form):

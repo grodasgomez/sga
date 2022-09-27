@@ -27,6 +27,10 @@
       href="{% static 'sga/style.css' %}"
     />
     <title>{% block title %}SGA {% endblock %}</title>
+    {% block head %}
+    {% endblock %}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
 
   <body>

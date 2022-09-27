@@ -57,5 +57,9 @@ class UserStoryType(models.Model):
     name = models.CharField(max_length=100)
     columns = models.JSONField()
 
+    @property
+    def columns_list(self):
+        return ",".join(self.columns)
+
     def __str__(self):
         return self.name
