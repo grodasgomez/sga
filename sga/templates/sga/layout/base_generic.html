@@ -33,12 +33,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
-  {% breadcrumb%}
   <body>
     <main>
       {% include "./sidebar.html"%}
       <div class="content">
-        {% block content %} 
+        {% block breadcrumb %}
+          {% breadcrumb %}
+        {% endblock %}
+        {% block content %}
         {% endblock %}
       </div>
     </main>
