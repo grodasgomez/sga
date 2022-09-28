@@ -390,7 +390,6 @@ class ProductBacklogView(NeverCacheMixin, ProjectPermissionMixin, View):
         return render(request, 'backlog/index.html', context)
 
     def post(self, request, project_id):
-        clear = request.POST.get("clear","")
         user_story_type_id = request.POST.get("filter","")
         search = request.POST.get("search","")
 
