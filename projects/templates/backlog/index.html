@@ -1,14 +1,17 @@
 {% extends 'sga/layout/base_generic.html'%}
 {% block content %}
-	{% include 'utils/messages.html' %}
 	<h2> Backlog del Proyecto</h2>
 	<a href="{% url 'projects:project-backlog-create' project_id=project_id %}" class="btn btn-labeled btn-info">
 		<span class="btn-label"><i class="fa fa-plus"></i></span>Crear US
 	</a>
+	<br>
+	<br>
 	<form method="post">
 		{% csrf_token %}
+		<input type="text" placeholder="Buscar.." name="search" value={{search}}>
+		&nbsp
 		<label>Filtrar por tipo:</label>
-		<select name="filtro" >
+		<select name="filter" >
 			<option value="empty">Todos</option>
 			{% for user_story_type in user_story_types %}
 			<option
@@ -20,8 +23,12 @@
 			</option>
 			{% endfor %}
 		</select>
-		<input class="btn btn-info" type="submit" name="filtrar" value="filtrar">
+		<button class="btn btn-labeled btn-info" type="submit"><i class="fa fa-search"></i></button>
 	</form>
+	<a href="{% url 'projects:project-backlog' project_id=project_id %}" class="btn btn-labeled btn-info">
+		<span class="btn-label"><i class="fa fa-eraser"></i></span>Limpiar
+	</a>
+	{% include 'utils/messages.html' %}
 	<table class="table">
 		<thead>
 		<tr>
