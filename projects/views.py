@@ -409,7 +409,7 @@ class ProductBacklogCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
             form = FormCreateUserStory(project_id)
         elif (has_role_PO):
             form = FormCreateUserStoryPO(project_id)
-
+        
         return render(request, 'backlog/create.html', {'form': form})
 
     def post(self, request, project_id):
@@ -516,15 +516,23 @@ class RoleImportView1(NeverCacheMixin, ProjectPermissionMixin, FormView):
 
     def get(self, request, project_id):
         form = ImportRoleForm1(project_id)
-        return render(request, 'roles/import1.html', {'form': form})
+        context={
+            "form":form,
+            "backpage":reverse("projects:index-roles", kwargs={"project_id":project_id})
+        }
+        return render(request, 'roles/import1.html', context)
 
     def post(self, request, project_id):
         form = ImportRoleForm1(project_id, request.POST)
+        context={
+            "form":form,
+            "backpage":reverse("projects:index-roles", kwargs={"project_id":project_id})
+        }
         if form.is_valid():
             cleaned_data = form.cleaned_data
             from_project_id=cleaned_data.get('project').id
             return HttpResponseRedirect(f"/projects/{project_id}/roles/import/{from_project_id}")
-        return render(request, 'roles/import1.html', {'form': form})
+        return render(request, 'roles/import1.html', context)
 
 class RoleImportView2(NeverCacheMixin, ProjectPermissionMixin, FormView):
     """
@@ -536,16 +544,44 @@ class RoleImportView2(NeverCacheMixin, ProjectPermissionMixin, FormView):
     roles = ['Scrum Master']
 
     def get(self, request, project_id, from_project_id):
-        form = ImportRoleForm2(from_project_id)
-        return render(request, 'roles/import2.html', {'form': form})
+        context={"roles":[]}
+        
+        roles_import=RoleUseCase.get_roles_by_project_no_default(from_project_id)
+        
+        for role in roles_import:
+            context["roles"].append({"role":role, "permissions":role.permissions.all()})
+        context["backpage"]=reverse("projects:import-role1", kwargs={"project_id":project_id})
+        
+        return render(request, 'roles/import2.html', context)
 
     def post(self, request, project_id, from_project_id):
-        form = ImportRoleForm2(from_project_id, request.POST)
-        if form.is_valid():
-            cleaned_data = form.cleaned_data
-            for role in cleaned_data.get('roles'):
-                role.name=role.name+" (importado "+str(project_id)+")"
-                RoleUseCase.create_role(project_id, role.name, role.description,role.permissions.all())
-            messages.success(request, 'Rol/es importado/s correctamente')
-            return HttpResponseRedirect(f"/projects/{project_id}/roles")
-        return render(request, 'roles/import2.html', {'form': form})
+        roles_import = request.POST.getlist("roles")
+        roles_actual=RoleUseCase.get_roles_by_project_no_default(project_id)
+
+        no_import=""
+        yes_import=""
+        project=Project.objects.get(id=from_project_id)
+
+        for role_id in roles_import:
+            role=RoleUseCase.get_role_by_id(role_id)
+            skip_flag=False
+            name_final=role.name+" (importado "+project.name+")"
+
+            for role_actual in roles_actual:
+                if role_actual.name==name_final:
+                    no_import=no_import+role.name+","
+                    skip_flag=True
+                    break
+
+            if not skip_flag:
+                RoleUseCase.create_role(project_id, name_final, role.description, role.permissions.all())
+                yes_import=yes_import+role.name+","
+
+        if no_import!="":
+            no_import = no_import[:-1]
+            messages.warning(request, f"Rol/es no importado/s porque ya existe/n: {no_import}")
+        if yes_import!="":
+            yes_import = yes_import[:-1]
+            messages.success(request, f"Rol/es importado/s correctamente: {yes_import}")
+        
+        return redirect(reverse('projects:index-roles', kwargs={'project_id': project_id}))
