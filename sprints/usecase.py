@@ -7,7 +7,7 @@ from user_stories.models import UserStory
 class SprintUseCase:
 
     @staticmethod
-    def create_sprint(project_id):
+    def create_sprint(project_id, duration):
         """
         Método para crear un nuevo sprint
         """
@@ -22,6 +22,7 @@ class SprintUseCase:
             project=project,
             status=SprintStatus.CREATED,
             capacity=0,
+            duration=duration,
             number=last_sprint.number + 1 if last_sprint else 1,
         )
 
@@ -89,7 +90,8 @@ class SprintUseCase:
             workload=workload,
         )
         # Aumentar la capacidad del sprint
-        sprint.capacity += workload
+        member_capacity = workload * sprint.duration
+        sprint.capacity += member_capacity
         sprint.save()
         return sprint_member
 
@@ -102,8 +104,8 @@ class SprintUseCase:
         sprint = sprint_member.sprint
 
         # Actualizar la capacidad del sprint
-        sprint.capacity -= sprint_member.workload
-        sprint.capacity += workload
+        sprint.capacity -= sprint.duration * sprint_member.workload
+        sprint.capacity += sprint.duration * workload
         sprint.save()
 
         # Actualizar la carga horaria del miembro

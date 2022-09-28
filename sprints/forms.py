@@ -6,6 +6,28 @@ from sga import widgets
 from sprints.usecase import SprintUseCase
 from users.models import CustomUser
 
+class SprintCreateForm(forms.Form):
+    """
+    Formulario para crear un nuevo sprint
+    """
+    def __init__(self, project_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project_id = project_id
+
+    duration = forms.IntegerField(
+        label='Duración en días',
+        widget=widgets.NumberInput(attrs={'class': 'form-control'}),
+        min_value=1,
+        max_value=30,
+        required=True
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if(SprintUseCase.exists_created_sprint(self.project_id)):
+            raise forms.ValidationError('Ya existe un sprint en planeación')
+        return cleaned_data
+
 
 class SprintMemberCreateForm(forms.Form):
     """

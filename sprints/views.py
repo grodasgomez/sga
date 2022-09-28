@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 
 from projects.mixin import ProjectPermissionMixin
 from users.models import CustomUser
-from sprints.forms import SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm
+from sprints.forms import SprintCreateForm, SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm
 from sprints.models import Sprint, SprintMember
 from sprints.usecase import SprintUseCase
 from sga.mixin import NeverCacheMixin
@@ -32,22 +32,46 @@ class SprintListView(NeverCacheMixin, ProjectPermissionMixin, ListView):
 
         return context
 
-class SprintCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
+class SprintCreateView(NeverCacheMixin, ProjectPermissionMixin, FormView):
     """
     Vista para crear un nuevo sprint
     """
     permissions = ['ABM Sprint']
     roles = ['Scrum Master']
-    namespace = 'projects:sprints:index'
 
-    def post(self, request, project_id):
+    form_class = SprintCreateForm
+    template_name = 'sprints/create.html'
+
+    def get(self, request, project_id, **kwargs):
         if(SprintUseCase.exists_created_sprint(project_id)):
-            messages.warning(request, 'Ya existe un sprint planeado')
-            return redirect(reverse(self.namespace, kwargs={'project_id': project_id}))
+            messages.warning(request, 'Ya existe un sprint en planeación')
+            return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
+        return super().get(request, project_id, **kwargs)
 
-        SprintUseCase.create_sprint(project_id)
-        messages.success(request, 'Sprint creado correctamente')
-        return redirect(reverse(self.namespace, kwargs={'project_id': project_id}))
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['project_id'] = self.kwargs.get('project_id')
+        return kwargs
+
+    def form_valid(self, form):
+        # Creamos el sprint
+        data = form.cleaned_data
+        project_id = self.kwargs.get('project_id')
+        SprintUseCase.create_sprint(project_id, **data)
+        messages.success(self.request, 'Sprint creado con éxito')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        namespace = 'projects:sprints:index'
+        return reverse(namespace, kwargs={'project_id': self.kwargs.get('project_id')})
+    # def post(self, request, project_id):
+    #     if(SprintUseCase.exists_created_sprint(project_id)):
+    #         messages.warning(request, 'Ya existe un sprint planeado')
+    #         return redirect(reverse(self.namespace, kwargs={'project_id': project_id}))
+
+    #     SprintUseCase.create_sprint(project_id)
+    #     messages.success(request, 'Sprint creado correctamente')
+    #     return redirect(reverse(self.namespace, kwargs={'project_id': project_id}))
 
 class SprintView(NeverCacheMixin, ProjectPermissionMixin, DetailView):
     """
