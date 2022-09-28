@@ -145,7 +145,7 @@ class ProjectMemberCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
         if form.is_valid():
             cleaned_data = form.cleaned_data
             ProjectUseCase.add_member(project_id=project_id, **cleaned_data)
-            messages.success(request, f"Miembro agregado correctamente")
+            messages.success(request, f"Miembro <strong>{cleaned_data['user'].email}</strong> agregado correctamente")
             return HttpResponseRedirect('/projects')
         return render(request, 'project_member/create.html', {'form': form})
 
@@ -167,7 +167,7 @@ class ProjectRoleCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
         if form.is_valid(): #vemos si es valido
             cleaned_data=form.cleaned_data #tomamos los datos
             RoleUseCase.create_role(id=project_id, **cleaned_data)
-            messages.success(request, 'Rol creado correctamente')
+            messages.success(request, f"Rol <strong>{cleaned_data['name']}</strong> creado correctamente")
             return HttpResponseRedirect('/projects/'+str(project_id)+'/roles')
         #si el form no es valido retorna a la misma pagina
         return render(request, 'roles/create.html', {'form': form, 'project_id':project_id})
@@ -205,7 +205,7 @@ class UserStoryTypeCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
         if form.is_valid():
             cleaned_data = form.cleaned_data
             ProjectUseCase.create_user_story_type(project_id=project_id, **cleaned_data)
-            messages.success(request, f"Tipo de historia de usuario creado correctamente")
+            messages.success(request, f"Tipo de historia de usuario <strong>{cleaned_data['name']}</strong> creado correctamente")
 
             return HttpResponseRedirect(f"/projects/{project_id}/user-story-type")
         return render(request, 'user_story_type/create.html', {'form': form})
@@ -228,7 +228,7 @@ class UserStoryTypeEditView(NeverCacheMixin, ProjectPermissionMixin, View):
         if form.is_valid():
             cleaned_data = form.cleaned_data
             ProjectUseCase.edit_user_story_type(id, **cleaned_data)
-            messages.success(request, f"Tipo de historia de usuario editado correctamente")
+            messages.success(request, f"Tipo de historia de usuario <strong>{cleaned_data['name']}</strong> editado correctamente")
             return HttpResponseRedirect(f"/projects/{project_id}/user-story-type")
 
         return render(request, 'user_story_type/edit.html', {'form': form})
@@ -283,7 +283,7 @@ class ProjectRoleEditView(NeverCacheMixin, ProjectPermissionMixin, View):
         if form.is_valid():
             cleaned_data = form.cleaned_data
             RoleUseCase.edit_role(role_id, **cleaned_data)
-            messages.success(request, f"Rol editado correctamente")
+            messages.success(request, f"Rol <strong>{cleaned_data['name']}</strong> editado correctamente")
             return HttpResponseRedirect(f"/projects/{project_id}/roles")
 
         return render(request, 'roles/edit.html', {'form': form, 'project_id':project_id, 'role_id':role_id})
@@ -310,8 +310,8 @@ class ProjectRoleDeleteView(NeverCacheMixin, ProjectPermissionMixin, View):
         return render(request, 'roles/delete.html', context)
 
     def post(self, request, project_id, role_id):
-        RoleUseCase.delete_role(role_id)
-        messages.success(request, f"Rol borrado correctamente")
+        delete_role=RoleUseCase.delete_role(role_id)
+        messages.success(request, f"Rol <strong>{delete_role.name}</strong> borrado correctamente")
         return HttpResponseRedirect(f"/projects/{project_id}/roles")
 
 class ProjectMemberEditView(NeverCacheMixin, ProjectPermissionMixin, View):
@@ -344,7 +344,7 @@ class ProjectMemberEditView(NeverCacheMixin, ProjectPermissionMixin, View):
         if form.is_valid():
             cleaned_data = form.cleaned_data
             RoleUseCase.edit_project_member(member_id,project_id, **cleaned_data)
-            messages.success(request, f"Miembro editado correctamente")
+            messages.success(request, f"Miembro <strong>{cleaned_data['email']}</strong> editado correctamente")
             return HttpResponseRedirect(f"/projects/{project_id}/members")
 
         return render(request, 'projects/project_member_edit.html', {'form': form, 'project_id':project_id, 'member_id':member_id})
@@ -434,7 +434,7 @@ class ProductBacklogCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
 
             code = Project.objects.get(id=project_id).prefix + "-" + str(ProjectUseCase.count_user_stories_by_project(project_id) + 1)
             ProjectUseCase.create_user_story(code, project_id=project_id, **cleaned_data)
-            messages.success(request, f"Historia de usuario creado correctamente")
+            messages.success(request, f"Historia de usuario <strong>{cleaned_data['title']}</strong> creado correctamente")
             return HttpResponseRedirect(f"/projects/{project_id}/backlog")
 
         return render(request, 'backlog/create.html', {'form': form})
