@@ -116,7 +116,11 @@ class ProjectCreateView(NeverCacheMixin, LoginRequiredMixin, View):
         if not user.is_admin():
             return HttpResponseRedirect('/')
         form = self.form_class()
-        return render(request, 'projects/create.html', {'form': form})
+        context={
+            "form": form,
+            "backpage": reverse("projects:index")
+        }
+        return render(request, 'projects/create.html', context)
 
     def post(self, request):
         form = self.form_class(request.POST)
@@ -138,7 +142,11 @@ class ProjectMemberCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
 
     def get(self, request, project_id):
         form = self.form_class(project_id=project_id)
-        return render(request, 'project_member/create.html', {'form': form})
+        context={
+            "form": form,
+            "backpage": reverse("projects:index")
+        }
+        return render(request, 'project_member/create.html', context)
 
     def post(self, request, project_id):
         form = self.form_class(project_id, request.POST)
@@ -159,7 +167,12 @@ class ProjectRoleCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
 
     def get(self, request, project_id):
         form = self.form_class(project_id)
-        return render(request, 'roles/create.html', {'form': form,'project_id':project_id})
+        context= {
+            "form" : form,
+            "project_id":project_id,
+            "backpage": reverse("projects:index-roles", kwargs={"project_id": project_id})
+        }
+        return render(request, 'roles/create.html', context)
 
     def post(self, request, project_id):
         form=self.form_class(project_id,None,request.POST) #creamos un form con los datos cargados
@@ -184,7 +197,8 @@ class ProjectRoleView(NeverCacheMixin, ProjectPermissionMixin, View):
         data = RoleUseCase.get_roles_by_project_no_default(project_id)
         context = {
             'roles': data,
-            'project_id': project_id #id del proyecto para usar en el template
+            'project_id': project_id, #id del proyecto para usar en el template
+            "backpage": reverse("projects:project-detail", kwargs={"project_id": project_id})
         }
         return render(request, 'roles/index.html', context) #le pasamos a la vista
 
@@ -198,7 +212,11 @@ class UserStoryTypeCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
 
     def get(self, request, project_id):
         form = FormCreateUserStoryType(project_id)
-        return render(request, 'user_story_type/create.html', {'form': form})
+        context= {
+            "form" : form,
+            "backpage": reverse("projects:user-story-type-list", kwargs={"project_id": project_id})
+        }
+        return render(request, 'user_story_type/create.html', context)
 
     def post(self, request, project_id):
         form = FormCreateUserStoryType(project_id, request.POST)
@@ -221,7 +239,11 @@ class UserStoryTypeEditView(NeverCacheMixin, ProjectPermissionMixin, View):
         data = ProjectUseCase.get_user_story_type(id).__dict__
         data['columns'] = ",".join(data.get('columns'))
         form = FormEditUserStoryType(id, project_id, initial=data)
-        return render(request, 'user_story_type/edit.html', {'form': form})
+        context = {
+            "form": form,
+            "backpage": reverse("projects:user-story-type-list", kwargs={"project_id": project_id})
+        }
+        return render(request, 'user_story_type/edit.html', context)
 
     def post(self, request, project_id, id):
         form = FormEditUserStoryType(id, project_id,request.POST)
@@ -274,7 +296,8 @@ class ProjectRoleEditView(NeverCacheMixin, ProjectPermissionMixin, View):
         context= {
             "form" : form,
             'role_id':role_id,
-            'project_id':project_id
+            'project_id':project_id,
+            "backpage": reverse("projects:index-roles", kwargs={"project_id": project_id})
         }
         return render(request, 'roles/edit.html', context)
 
@@ -305,7 +328,8 @@ class ProjectRoleDeleteView(NeverCacheMixin, ProjectPermissionMixin, View):
         context= {
             "form" : form,
             'role_id':role_id,
-            'project_id':project_id
+            'project_id':project_id,
+            "backpage": reverse("projects:index-roles", kwargs={"project_id": project_id})
         }
         return render(request, 'roles/delete.html', context)
 
@@ -335,7 +359,8 @@ class ProjectMemberEditView(NeverCacheMixin, ProjectPermissionMixin, View):
         context= {
             "form" : form,
             'member_id':member_id,
-            'project_id':project_id
+            'project_id':project_id,
+            "backpage": reverse("projects:project-members", kwargs={"project_id": project_id})
         }
         return render(request, 'projects/project_member_edit.html', context)
 
@@ -381,7 +406,8 @@ class ProductBacklogView(NeverCacheMixin, ProjectPermissionMixin, View):
             "us_type_filter_id" : us_type_filter_id,
             "user_stories" : user_stories,
             "project_id" : project_id,
-            "user_story_types" : user_story_types
+            "user_story_types" : user_story_types,
+            "backpage": reverse("projects:project-detail", kwargs={"project_id": project_id})
         }
         return render(request, 'backlog/index.html', context)
 
@@ -409,8 +435,11 @@ class ProductBacklogCreateView(NeverCacheMixin, ProjectPermissionMixin, View):
             form = FormCreateUserStory(project_id)
         elif (has_role_PO):
             form = FormCreateUserStoryPO(project_id)
-        
-        return render(request, 'backlog/create.html', {'form': form})
+        context= {
+            "form" : form,
+            "backpage": reverse("projects:project-backlog", kwargs={"project_id": project_id})
+        }
+        return render(request, 'backlog/create.html', context)
 
     def post(self, request, project_id):
 
@@ -482,7 +511,8 @@ class UserStoryTypeImportView2(NeverCacheMixin, ProjectPermissionMixin, View):
             'user_story_types': user_story_types,
             'project_id': project_id,
             'from_project_id': from_project_id,
-            'form':{}
+            'form':{},
+            "backpage": reverse("projects:user-story-type-import1", kwargs={"project_id": project_id})
         }
         return render(request, self.template_name, context)
 
@@ -554,13 +584,13 @@ class RoleImportView2(NeverCacheMixin, ProjectPermissionMixin, FormView):
 
     def get(self, request, project_id, from_project_id):
         context={"roles":[]}
-        
+
         roles_import=RoleUseCase.get_roles_by_project_no_default(from_project_id)
-        
+
         for role in roles_import:
             context["roles"].append({"role":role, "permissions":role.permissions.all()})
         context["backpage"]=reverse("projects:import-role1", kwargs={"project_id":project_id})
-        
+
         return render(request, 'roles/import2.html', context)
 
     def post(self, request, project_id, from_project_id):
@@ -596,5 +626,5 @@ class RoleImportView2(NeverCacheMixin, ProjectPermissionMixin, FormView):
         if yes_import!="":
             yes_import = yes_import[:-1]
             messages.success(request, f"Rol/es importado/s correctamente: {yes_import}")
-        
+
         return redirect(reverse('projects:index-roles', kwargs={'project_id': project_id}))
