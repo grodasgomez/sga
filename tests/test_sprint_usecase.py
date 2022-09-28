@@ -35,13 +35,14 @@ class SprintUseCaseTest(TestCase):
             'status': SprintStatus.CREATED.value,
             'number': 1,
         }
-        sprint = SprintUseCase.create_sprint(project_id)
+        sprint = SprintUseCase.create_sprint(project_id, duration=14)
         self.assertDictContainsSubset(expected_sprint, sprint.__dict__, 'El sprint creado no es el esperado')
 
     def test_get_last_sprint(self):
         project_id = self.project.id
-        SprintUseCase.create_sprint(project_id)
-        sprint2 = SprintUseCase.create_sprint(project_id)
+        duration = 14
+        SprintUseCase.create_sprint(project_id, duration=14)
+        sprint2 = SprintUseCase.create_sprint(project_id, duration=14)
         last_sprint = SprintUseCase.get_last_sprint(project_id)
         self.assertEqual(last_sprint.id, sprint2.id, 'El ultimo sprint no es el esperado')
 
@@ -49,7 +50,7 @@ class SprintUseCaseTest(TestCase):
         project_id = self.project.id
         self.assertFalse(SprintUseCase.exists_created_sprint(project_id), 'No deberia existir un sprint creado')
 
-        sprint = SprintUseCase.create_sprint(project_id)
+        sprint = SprintUseCase.create_sprint(project_id, duration=14)
         self.assertTrue(SprintUseCase.exists_created_sprint(project_id), 'Deberia existir un sprint creado')
 
         sprint.status = SprintStatus.IN_PROGRESS.value
@@ -62,7 +63,7 @@ class SprintUseCaseTest(TestCase):
         project_id = self.project.id
         self.assertFalse(SprintUseCase.exists_active_sprint(project_id), 'No deberia existir un sprint activo')
 
-        sprint = SprintUseCase.create_sprint(project_id)
+        sprint = SprintUseCase.create_sprint(project_id, duration=14)
         self.assertFalse(SprintUseCase.exists_active_sprint(project_id), 'No deberia existir un sprint activo')
 
         sprint.status = SprintStatus.IN_PROGRESS.value
@@ -94,13 +95,13 @@ class SprintUseCaseTest(TestCase):
         )
         ProjectUseCase.add_member(user = scrum_master, project_id = self.project.id, roles = [scrum_role])
         ProjectUseCase.add_member(user = developer, project_id = self.project.id, roles = [developer_role])
-        sprint = SprintUseCase.create_sprint(self.project.id)
+        sprint = SprintUseCase.create_sprint(self.project.id, duration=14)
         addable_users = SprintUseCase.get_addable_users(self.project.id, sprint.id)
 
         self.assertEqual(len(addable_users), 1, 'No se obtuvieron los usuarios esperados')
 
     def test_add_sprint_member(self):
-        sprint = SprintUseCase.create_sprint(self.project.id)
+        sprint = SprintUseCase.create_sprint(self.project.id, duration=14)
         developer = CustomUser.objects.create(
             first_name='Developer',
             last_name='Python',
@@ -114,7 +115,7 @@ class SprintUseCaseTest(TestCase):
         SprintUseCase.add_sprint_member(user = developer, sprint_id=sprint.id, **data)
 
     def test_edit_sprint_member(self):
-        sprint = SprintUseCase.create_sprint(self.project.id)
+        sprint = SprintUseCase.create_sprint(self.project.id, duration=14)
         developer = CustomUser.objects.create(
             first_name='Developer',
             last_name='Python',
@@ -132,7 +133,7 @@ class SprintUseCaseTest(TestCase):
         self.assertEqual(member.workload, 20, 'No se edito el miembro del sprint')
 
     def test_get_sprint_members(self):
-        sprint = SprintUseCase.create_sprint(self.project.id)
+        sprint = SprintUseCase.create_sprint(self.project.id, duration=14)
         members = SprintUseCase.get_sprint_members(sprint.id)
         self.assertEqual(len(members), 0, 'No deberia existir miembros en el sprint')
 
