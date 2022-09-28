@@ -257,12 +257,18 @@ class ImportUserStoryTypeForm2(forms.Form):
         user_story_types = cleaned_data.get('user_story_types')
         if not user_story_types:
             raise forms.ValidationError('Debe seleccionar al menos un tipo de historia de usuario')
+
+        from_project = Project.objects.get(id=self.from_project_id)
         # Verificar si el proyecto destino tiene tipos de historia de usuario con el mismo nombre
-        for user_story_type in user_story_types:
-            already_exists = UserStoryType.objects.filter(
-                name=user_story_type.name, project_id=self.to_project_id).exists()
-            if already_exists:
-                raise forms.ValidationError('El proyecto destino ya tiene un tipo de historia de usuario con el nombre: ' + user_story_type.name)
+        append_project_name = lambda us_type: f"{us_type.name} (importado {from_project.name})"
+        already_exists = lambda us_type: UserStoryType.objects.filter(
+            name=append_project_name(us_type), project_id=self.to_project_id).exists()
+
+        no_import_user_story_type = list(filter(already_exists, user_story_types))
+        import_user_story_type = list(set(user_story_types) - set(no_import_user_story_type))
+
+        cleaned_data['user_story_types'] = import_user_story_type
+        cleaned_data['no_import_user_story_types'] = no_import_user_story_type
         return cleaned_data
 
 class ImportRoleForm1(forms.Form):

@@ -490,8 +490,17 @@ class UserStoryTypeImportView2(NeverCacheMixin, ProjectPermissionMixin, View):
         form = ImportUserStoryTypeForm2(from_project_id, project_id,request.POST)
         if form.is_valid():
             user_story_types = form.cleaned_data['user_story_types']
-            ProjectUseCase.import_user_story_types(project_id, user_story_types)
-            messages.success(request, 'Tipos de Historias de Usuario importados correctamente')
+            not_imported = form.cleaned_data['no_import_user_story_types']
+            ProjectUseCase.import_user_story_types(project_id, from_project_id, user_story_types)
+
+            get_name = lambda list: [x.name for x in list]
+            imported_name = ",".join(get_name(user_story_types))
+            not_imported_name = ",".join(get_name(not_imported))
+
+            if imported_name:
+                messages.success(request, f"Tipo/s de Historias de Usuario importado/s correctamente: {imported_name}")
+            if not_imported_name:
+                messages.warning(request, f"Tipo/s de Historia de Usuario no importado/s porque ya existe/n: {not_imported_name}")
             return redirect(reverse('projects:user-story-type-list', kwargs={'project_id': project_id}))
 
         # Obtengo el id con el tipo int de los tipos de historias de usuario que fueron seleccionados
