@@ -6,10 +6,10 @@ from django.contrib import messages
 from django.views import View
 from django.db.models.query import QuerySet
 from django.urls import reverse
-#todo arreglar imports
+
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
     FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole,
-    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO)
+    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory)
 from projects.models import Project, UserStoryType
 from projects.usecase import ProjectUseCase, RoleUseCase
 from projects.mixin import ProjectPermissionMixin
@@ -634,3 +634,36 @@ class RoleImportView2(NeverCacheMixin, ProjectPermissionMixin, FormView):
             messages.success(request, f"Rol/es importado/s correctamente: {yes_import}")
 
         return redirect(reverse('projects:index-roles', kwargs={'project_id': project_id}))
+
+class ProductBacklogEditView(NeverCacheMixin, ProjectPermissionMixin, View):
+    """
+    Clase encargada de editar us en el product Backlog de un proyecto
+    """
+    permissions = ['ABM US Proyecto']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id, us_id):
+        user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
+        data=user_story.__dict__
+        data['us_type']=user_story.us_type
+        form = FormEditUserStory(project_id,initial=data)
+        context= {
+            "form" : form,
+            "backpage": reverse("projects:project-backlog", kwargs={"project_id": project_id})
+        }
+        return render(request, 'backlog/edit.html', context)
+
+    def post(self, request, project_id, us_id):
+
+        form = FormEditUserStory(project_id,request.POST)
+        context= {
+            "form" : form,
+            "backpage": reverse("projects:project-backlog", kwargs={"project_id": project_id})
+        }
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            ProjectUseCase.edit_user_story(us_id, **cleaned_data)
+            messages.success(request, f"Historia de usuario <strong>{cleaned_data['title']}</strong> editada correctamente")
+            return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id}))
+
+        return render(request, 'backlog/edit.html', context)

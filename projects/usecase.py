@@ -194,6 +194,29 @@ class ProjectUseCase:
             ProjectUseCase.create_user_story_type(
                 project_id=project_id, name=name, columns=user_story_type.columns)
 
+    def get_user_story_by_id(id):
+        """
+        Crea un tipo de historia de usuario para el proyecto dado
+        """
+        return UserStory.objects.get(id=id)
+
+    def edit_user_story(id, title, description, business_value,technical_priority,estimation_time,us_type):
+        """
+        Crea un tipo de historia de usuario para el proyecto dado
+        """
+        data = {}
+        if description:
+            data['description'] = description
+        if business_value:
+            data['business_value'] = business_value
+        if technical_priority:
+            data['technical_priority'] = technical_priority
+        if estimation_time:
+            data['estimation_time'] = estimation_time
+        if us_type:
+            data['us_type'] = us_type
+
+        return UserStory.objects.filter(id=id).update(**data)
 
 class RoleUseCase:
     @staticmethod

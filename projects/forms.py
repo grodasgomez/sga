@@ -294,3 +294,21 @@ class ImportRoleForm1(forms.Form):
                 'project', 'El proyecto seleccionado no tiene roles a importar'))
         return cleaned_data
 
+class FormEditUserStory(forms.Form):
+    """
+    Formulario para editar una historia de usuario en un proyecto
+    """
+    def __init__(self, project_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project_id = project_id
+        self.fields['us_type'] = forms.ModelChoiceField(
+            queryset=ProjectUseCase.filter_user_story_type_by_project(project_id), label='Tipo de Historia de Usuario',
+            empty_label='Seleccione un tipo',
+            widget=widgets.SelectInput()
+        )
+        self.fields['title'] = forms.CharField(max_length=100, label='Titulo',widget=widgets.TextInput(attrs={'readonly': 'readonly'}))  # TITULO del US
+        self.fields['description'] = forms.CharField(max_length=100, label='Descripcion',widget=widgets.TextInput())  # descripcion del US
+        self.fields['business_value'] = forms.IntegerField( min_value=1, max_value=100 ,label='Valor de Negocio',widget=widgets.NumberInput())  # Valor de Negocio del US
+        self.fields['technical_priority'] = forms.IntegerField(min_value=1, max_value=100 ,label='Prioridad Tecnica',widget=widgets.NumberInput())  # Prioridad Tecnica del US
+        self.fields['estimation_time'] = forms.IntegerField(min_value=1, max_value=100 , label='Tiempo estimado',widget=widgets.NumberInput())  # Tiempo estimado del US
+
