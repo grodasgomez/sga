@@ -9,7 +9,7 @@ from django.urls import reverse
 #todo arreglar imports
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
     FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole,
-    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1,ImportRoleForm2, FormCreateUserStoryPO)
+    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO)
 from projects.models import Project, UserStoryType
 from projects.usecase import ProjectUseCase, RoleUseCase
 from projects.mixin import ProjectPermissionMixin
@@ -556,6 +556,10 @@ class RoleImportView2(NeverCacheMixin, ProjectPermissionMixin, FormView):
 
     def post(self, request, project_id, from_project_id):
         roles_import = request.POST.getlist("roles")
+        if len(roles_import) == 0:
+            messages.warning(request, "Debe seleccionar al menos un rol")
+            return redirect(reverse('projects:import-role2', kwargs={'project_id': project_id, 'from_project_id': from_project_id}))
+
         roles_actual=RoleUseCase.get_roles_by_project_no_default(project_id)
 
         no_import=""

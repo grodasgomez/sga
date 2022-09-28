@@ -288,15 +288,3 @@ class ImportRoleForm1(forms.Form):
                 'project', 'El proyecto seleccionado no tiene roles a importar'))
         return cleaned_data
 
-class ImportRoleForm2(forms.Form):
-    """
-    Formulario para seleccionar los roles de un proyecto para importar
-    """
-
-    def __init__(self, from_project_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.from_project_id = from_project_id
-        self.fields['roles'] = forms.ModelMultipleChoiceField(
-            queryset=RoleUseCase.get_roles_by_project_no_default(from_project_id),
-            label='Roles', widget=widgets.SelectMultipleInput())
-

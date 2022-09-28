@@ -7,7 +7,7 @@
 {% block content %}
 <b></b>
 	<h1>Importar Rol</h1>
-
+	{% include 'utils/messages.html'%}
 	<form  method="post" class="form row g-3">
 		{% csrf_token %}
 		<table class="table">
