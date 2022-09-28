@@ -1,7 +1,7 @@
 {% extends 'sga/layout/base_generic.html'%}
 {% block content %}
 	{% include 'utils/messages.html' %}
-	<h2> Backlog del Proyecto</h2>
+	<h1> Backlog del Proyecto</h1>
 	<a href="{% url 'projects:project-backlog-create' project_id=project_id %}" class="btn btn-labeled btn-info">
 		<span class="btn-label"><i class="fa fa-plus"></i></span>Crear US
 	</a>
