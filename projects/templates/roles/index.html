@@ -1,11 +1,11 @@
-{% extends 'sga/layout/base_generic.html'%} 
+{% extends 'sga/layout/base_generic.html'%}
 {% block content %}
-  <h2>Roles</h2>
+  <h1>Roles</h1>
   <a href="{% url 'projects:create-role' project_id=project_id %}" class="btn btn-labeled btn-info">
     <span class="btn-label"><i class="fa fa-plus"></i></span>Crear Rol
   </a>
   <a href="{% url 'projects:import-role1' project_id=project_id %}" class="btn btn-labeled btn-info">
-    <span class="btn-label"><i class="fa fa-plus"></i></span>Importar Rol
+    <span class="btn-label"><i class="fa fa-file-import"></i></span>Importar Rol
   </a>
   {% include 'utils/messages.html'%}
   <table class="table">
