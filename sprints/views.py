@@ -30,6 +30,7 @@ class SprintListView(NeverCacheMixin, ProjectPermissionMixin, ListView):
         context = super().get_context_data(**kwargs)
         # Agregamos el id del proyecto en el contexto para ser usado en el template
         context['project_id'] = self.kwargs.get('project_id')
+        context['backpage'] = reverse('projects:project-detail', kwargs={'project_id': context['project_id']})
 
         return context
 
@@ -53,6 +54,13 @@ class SprintCreateView(NeverCacheMixin, ProjectPermissionMixin, FormView):
         kwargs = super().get_form_kwargs()
         kwargs['project_id'] = self.kwargs.get('project_id')
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Agregamos el id del proyecto en el contexto para ser usado en el template
+        context['project_id'] = self.kwargs.get('project_id')
+        context['backpage'] = reverse('projects:sprints:index', kwargs={'project_id': context['project_id']})
+        return context
 
     def form_valid(self, form):
         # Creamos el sprint
@@ -86,6 +94,7 @@ class SprintView(NeverCacheMixin, ProjectPermissionMixin, DetailView):
         context = super().get_context_data(**kwargs)
         # Agregamos el id del proyecto en el contexto para ser usado en el template
         context['project_id'] = self.kwargs.get('project_id')
+        context['backpage'] = reverse('projects:sprints:index', kwargs={'project_id': context['project_id']})
         return context
 
 class SprintMemberCreateView(NeverCacheMixin, ProjectPermissionMixin, FormView):
@@ -99,6 +108,13 @@ class SprintMemberCreateView(NeverCacheMixin, ProjectPermissionMixin, FormView):
         kwargs['project_id'] = self.kwargs.get('project_id')
         kwargs['sprint_id'] = self.kwargs.get('sprint_id')
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Agregamos el id del proyecto en el contexto para ser usado en el template
+        context['project_id'] = self.kwargs.get('project_id')
+        context['backpage'] = reverse('projects:sprints:index', kwargs={'project_id': context['project_id']})
+        return context
 
     def get_success_url(self):
         return reverse('projects:sprints:member-list', kwargs={
@@ -137,7 +153,9 @@ class SprintMemberEditView(NeverCacheMixin, ProjectPermissionMixin, FormView):
         context = super().get_context_data(**kwargs)
         sprint_member = SprintMember.objects.get(id=self.kwargs.get('sprint_member_id'))
         context['sprint_member'] = sprint_member
+        context['backpage'] = reverse('projects:sprints:member-list', kwargs={'project_id': self.kwargs.get('project_id'), 'sprint_id': self.kwargs.get('sprint_id')})
         return context
+
     def get_success_url(self):
         return reverse('projects:sprints:member-list', kwargs={
             'project_id': self.kwargs.get('project_id'),
@@ -165,6 +183,7 @@ class SprintMemberListView(NeverCacheMixin, ProjectPermissionMixin, View):
         objects = SprintUseCase.get_sprint_members(sprint_id)
         sprint = Sprint.objects.get(id=sprint_id)
         context = {
+            "backpage": reverse("projects:sprints:detail", kwargs={"project_id": project_id, "sprint_id": sprint_id}),
             'project_id': project_id,
             'sprint_id': sprint_id,
             'sprint': sprint,
