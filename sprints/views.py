@@ -90,6 +90,9 @@ class SprintView(NeverCacheMixin, ProjectPermissionMixin, DetailView):
     roles = ['Scrum Master', 'Developer', 'Product Owner']
     model = Sprint
     template_name = 'sprints/detail.html'
+    # Indicamos el pk del objeto
+    pk_url_kwarg = 'sprint_id'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Agregamos el id del proyecto en el contexto para ser usado en el template
@@ -183,11 +186,11 @@ class SprintMemberListView(NeverCacheMixin, ProjectPermissionMixin, View):
         objects = SprintUseCase.get_sprint_members(sprint_id)
         sprint = Sprint.objects.get(id=sprint_id)
         context = {
-            "backpage": reverse("projects:sprints:detail", kwargs={"project_id": project_id, "sprint_id": sprint_id}),
             'project_id': project_id,
             'sprint_id': sprint_id,
             'sprint': sprint,
             'objects': objects,
+            'backpage': reverse("projects:sprints:detail", kwargs={"project_id": project_id, "sprint_id": sprint_id}),
         }
         return render(request, 'sprint-members/index.html', context)
 
@@ -228,7 +231,8 @@ class SprintBacklogView(NeverCacheMixin, ProjectPermissionMixin, View):
         context= {
             "user_stories" : user_stories,
             "project_id" : project_id,
-            "sprint_id" : sprint_id
+            "sprint_id" : sprint_id,
+            "backpage": reverse("projects:sprints:detail", kwargs={"project_id": project_id, "sprint_id": sprint_id})
         }
 
         return render(request, 'sprints/backlog.html', context)
