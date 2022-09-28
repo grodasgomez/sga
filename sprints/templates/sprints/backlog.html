@@ -1,10 +1,10 @@
 {% extends 'sga/layout/base_generic.html'%}
 {% block content %}
-	{% include 'utils/messages.html' %}
 	<h2> Backlog del Sprint</h2>
 	<a href="{% url 'projects:sprints:backlog-assign-us' project_id=project_id sprint_id=sprint_id %}" class="btn btn-labeled btn-info">
 		<span class="btn-label"><i class="fa fa-plus"></i></span>Asignar US
 	</a>
+	{% include 'utils/messages.html' %}
 	<table class="table">
 		<thead>
 		<tr>

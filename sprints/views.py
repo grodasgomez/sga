@@ -10,6 +10,7 @@ from users.models import CustomUser
 from sprints.forms import SprintCreateForm, SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm
 from sprints.models import Sprint, SprintMember
 from sprints.usecase import SprintUseCase
+from user_stories.models import UserStory
 from sga.mixin import NeverCacheMixin
 
 class SprintListView(NeverCacheMixin, ProjectPermissionMixin, ListView):
@@ -115,7 +116,7 @@ class SprintMemberCreateView(NeverCacheMixin, ProjectPermissionMixin, FormView):
             sprint_id=sprint_id,
             **data
         )
-        messages.success(self.request, 'Usuario agregado al sprint correctamente')
+        messages.success(self.request, f"Usuario <strong>{data['user']}</strong> agregado al sprint correctamente")
         return super().form_valid(form)
 
 class SprintMemberEditView(NeverCacheMixin, ProjectPermissionMixin, FormView):
@@ -149,11 +150,11 @@ class SprintMemberEditView(NeverCacheMixin, ProjectPermissionMixin, FormView):
         """
         data = form.cleaned_data
         sprint_member_id = self.kwargs.get('sprint_member_id')
-        SprintUseCase.edit_sprint_member(
+        sprint_member_data=SprintUseCase.edit_sprint_member(
             sprint_member_id=sprint_member_id,
             workload=data['workload']
         )
-        messages.success(self.request, 'Miembro editado correctamente')
+        messages.success(self.request, f"Miembro <strong>{sprint_member_data.user.email}</strong> editado correctamente")
         return super().form_valid(form)
 
 class SprintMemberListView(NeverCacheMixin, ProjectPermissionMixin, View):
@@ -236,7 +237,8 @@ class SprintBacklogAssignMemberView(NeverCacheMixin, ProjectPermissionMixin, Vie
         if form.is_valid():
             cleaned_data = form.cleaned_data
             SprintUseCase.assign_us_sprint_member(**cleaned_data, user_story_id=user_story_id)
-            messages.success(request, f"Miembro asignado correctamente")
+            us_data=UserStory.objects.get(id=user_story_id)
+            messages.success(request, f"Miembro <strong>{cleaned_data['sprint_member']}</strong> asignado correctamente al US <strong>{us_data.title}</strong>")
             return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
         return render(request, 'sprints/backlog_assign_member.html', {'form': form})
 
