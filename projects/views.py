@@ -493,7 +493,7 @@ class UserStoryTypeImportView1(NeverCacheMixin, ProjectPermissionMixin, FormView
 
     def get_context_data(self, **kwargs):
         """Use this to add extra context."""
-        context = super(UserStoryTypeImportView1, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['backpage'] = reverse("projects:user-story-type-list", kwargs={"project_id": self.kwargs["project_id"]})
         return context
 

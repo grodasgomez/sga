@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
-from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.shortcuts import render, redirect, reverse
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.views import View
 from users.forms import ProfileForm
@@ -18,10 +18,12 @@ class UsersView(NeverCacheMixin, LoginRequiredMixin, View):
         user: CustomUser = request.user
         if not user.is_admin():
             messages.warning(request, "No eres admin")
-            return HttpResponseRedirect('/')
-        custom_users = CustomUser.objects.all().exclude(id=user.id)
-        users = [user for user in custom_users]
-        context = { "users" :  users }
+            return reverse("index")
+        users = CustomUser.objects.all().exclude(id=user.id)
+        context = {
+            "users" :  users,
+            "backpage": reverse("index")
+        }
         return render(request, 'index.html', context)
 
     def post(self, request):
@@ -44,7 +46,7 @@ class ProfileView(NeverCacheMixin, LoginRequiredMixin, FormView):
     form_class = ProfileForm
 
     # Indicamos el path al cual se redirecciona si el formulario es valido
-    success_url = '/profile'
+    success_url = reverse_lazy("index")
 
     def get_form_kwargs(self):
         """
@@ -68,3 +70,8 @@ class ProfileView(NeverCacheMixin, LoginRequiredMixin, FormView):
         CustomUser.objects.filter(id=user.id).update(**data)
         messages.success(self.request, "Perfil actualizado")
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["backpage"] = reverse("index")
+        return context
