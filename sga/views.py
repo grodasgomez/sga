@@ -12,6 +12,7 @@ def user_logged_in_(request, **kwargs):
     """
     Limpia los mensajes antes de que el usuario inicie sesión
     """
+    list(messages.get_messages(request))
     print("user_logged_in")
 
 @receiver(user_logged_out)
@@ -19,10 +20,10 @@ def user_logged_out(request, **kwargs):
     """
     Limpia los mensajes immediatamente después de que un usuario cierra sesion
     """
-    list(messages.get_messages(request))
     print("user_logged_out")
 
 @login_required()
+@never_cache
 def index(request):
     return render(request, 'sga/index.html')
 
