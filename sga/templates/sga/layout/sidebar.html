@@ -22,7 +22,7 @@
         Home
       </a>
     </li>
-    {% if user.is_user%}
+    {% if user.is_verified %}
       <li>
         <a href="{% url 'projects:index' %}" class="nav-link {% if 'project' in request.path%} active {%else%} link-dark {%endif%}">
           <i class="fa-solid fa-diagram-project"></i>

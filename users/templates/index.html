@@ -25,7 +25,7 @@
 		<td>
 			<form method="post">
 				{% csrf_token %}
-				<input name="user_id" type="hidden" value={{user.id}}>
+				<input name="user_id" type="hidden" value="{{ user.id }}">
 				<input type="submit" name="user" value="user">
 				<input type="submit" name="admin" value="admin">
 			</form>

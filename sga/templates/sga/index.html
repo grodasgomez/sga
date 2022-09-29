@@ -1,7 +1,7 @@
 {% extends 'sga/layout/base_generic.html'%}
 {% block content %}
 {% include 'utils/messages.html'%}
-{%if not user.is_user%}
+{% if not user.is_verified %}
 <div class="alert alert-info" role="alert">
   <h4 class="alert-heading">¡Ya falta poco {{user.first_name}}!</h4>
   <p>Ya estas registrado en SGA 🎉</p>
