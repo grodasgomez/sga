@@ -1,4 +1,5 @@
 from django import template
+from django.urls import resolve, Resolver404
 import re
 
 from projects.models import Project, Role, UserStoryType
@@ -82,13 +83,26 @@ def breadcrumb(context):
         model_url = f'{model_name}/{model_id}'
         previous_path = breadcrumb[-1][1] if breadcrumb else ''
 
-        breadcrumb.append((name, f"{previous_path}/{model_name}"))
-        breadcrumb.append((model_name_id, f"{previous_path}/{model_url}"))
+        model_list_url = f"{previous_path}/{model_name}"
+        model_id_url = f"{previous_path}/{model_url}"
+        breadcrumb.append((name, model_list_url, exists_path(model_list_url)))
+        breadcrumb.append((model_name_id, model_id_url, exists_path(model_id_url)))
     if(path):
         path = path.replace('/', '')
         previous_path = breadcrumb[-1][1] if breadcrumb else ''
         name = names[path] if path in names else path
-        breadcrumb.append((name, f'{previous_path}/{path}'))
+        breadcrumb.append((name, f'{previous_path}/{path}', True))
     return {
         'breadcrumb': breadcrumb,
     }
+
+def exists_path(path):
+    """
+    Retorna True si existe alguna vista que coincida con el path
+    """
+    try:
+        resolve(f"{path}/")
+        return True
+    except Resolver404:
+        return False
+

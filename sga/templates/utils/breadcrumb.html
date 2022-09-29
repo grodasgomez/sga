@@ -1,10 +1,16 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    {%for name, url in breadcrumb  %}
+    {%for name, url, existUrl in breadcrumb  %}
       {%if forloop.last%}
         <li class="breadcrumb-item active" aria-current="page">{{name}}</li>
       {%else%}
-        <li class="breadcrumb-item"><a href="{{url}}">{{name}}</a></li>
+        <li class="breadcrumb-item">
+          {%if existUrl%}
+            <a href="{{url}}">{{name}}</a>
+          {%else%}
+            {{name}}
+          {%endif%}
+        </li>
       {%endif%}
     {% endfor %}
   </ol>
