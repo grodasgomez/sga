@@ -199,83 +199,67 @@
 		}
 	},
 	{
-        "model": "projects.permission",
-        "pk": 1,
-        "fields": {
-            "name": "ABM Roles",
-            "description": "ABM Roles"
-        }
-    },
-    {
-        "model": "projects.permission",
-        "pk": 2,
-        "fields": {
-            "name": "ABM Tipo US",
-            "description": "ABM de tipo US"
-        }
-    },
-    {
-        "model": "projects.permission",
-        "pk": 3,
-        "fields": {
-            "name": "ABM Miembros",
-            "description": "ABM Miembros"
-        }
-    },
-	{
-        "model": "projects.permission",
-        "pk": 4,
-        "fields": {
-            "name": "Iniciar Proyecto",
-            "description": "Iniciar un Proyecto"
-        }
-    },
-	{
-        "model": "projects.permission",
-        "pk": 5,
-        "fields": {
-            "name": "Finalizar Proyecto",
-            "description": "Finalizar un proyecto"
-        }
-    }
-	{
-        "model": "projects.permission",
-        "pk": 6,
-        "fields": {
-            "name": "ABM US Miembro Sprint",
-            "description": "ABM US a un miembro del sprint"
-        }
-    },
-	{
-        "model": "projects.permission",
-        "pk": 7,
-        "fields": {
-            "name": "ABM Sprint",
-            "description": "ABM de Sprint"
-        }
-    },
-	{
-        "model": "projects.permission",
-        "pk": 8,
-        "fields": {
-            "name": "Ver Product Backlog",
-            "description": "Ver Product Backlog"
-        }
-    },
-	{
 		"model": "projects.permission",
-		"pk": 9,
+		"pk": 1,
 		"fields": {
-		    "name": "ABM US Sprint",
-		    "description": "Cargar y borrar US de un Sprint"
+			"name": "ABM Roles",
+			"description": "ABM Roles"
 		}
 	},
 	{
-        "model": "projects.permission",
-        "pk": 10,
-        "fields": {
-            "name": "ABM US Proyecto",
-            "description": "ABM US Proyecto"
-        }
-    }
+		"model": "projects.permission",
+		"pk": 2,
+		"fields": {
+			"name": "ABM Tipo US",
+			"description": "ABM de tipo US"
+		}
+	},
+	{
+		"model": "projects.permission",
+		"pk": 3,
+		"fields": {
+			"name": "ABM Miembros",
+			"description": "ABM Miembros"
+		}
+	},
+	{
+		"model": "projects.permission",
+		"pk": 4,
+		"fields": {
+			"name": "ABM Proyecto",
+			"description": "ABM de Proyecto"
+		}
+	},
+	{
+		"model": "projects.permission",
+		"pk": 5,
+		"fields": {
+			"name": "ABM US Miembro Sprint",
+			"description": "ABM US a un miembro del sprint"
+		}
+	},
+	{
+		"model": "projects.permission",
+		"pk": 6,
+		"fields": {
+			"name": "ABM Sprint",
+			"description": "ABM de Sprint"
+		}
+	},
+	{
+		"model": "projects.permission",
+		"pk": 7,
+		"fields": {
+			"name": "ABM US Sprint",
+			"description": "Cargar y borrar US de un Sprint"
+		}
+	},
+	{
+		"model": "projects.permission",
+		"pk": 8,
+		"fields": {
+			"name": "ABM US Proyecto",
+			"description": "ABM US Proyecto"
+		}
+	}
 ]

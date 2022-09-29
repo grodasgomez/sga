@@ -5,21 +5,18 @@ from django.urls import reverse
 from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect
 
-from projects.mixin import ProjectPermissionMixin
+from projects.mixin import ProjectPermissionMixin, ProjectAccessMixin
 from users.models import CustomUser
 from sprints.forms import SprintCreateForm, SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm
 from sprints.models import Sprint, SprintMember
 from sprints.usecase import SprintUseCase
 from user_stories.models import UserStory
-from sga.mixin import NeverCacheMixin
+from sga.mixin import CustomLoginMixin
 
-class SprintListView(NeverCacheMixin, ProjectPermissionMixin, ListView):
+class SprintListView(CustomLoginMixin, ProjectAccessMixin, ListView):
     """
-    Vista que lista tipos de historias de usuario de un projecto
+    Vista que lista los sprints de un proyecto
     """
-    permissions = ['ABM Sprint']
-    roles = ['Scrum Master', 'Developer']
-
     model = Sprint
     template_name = 'sprints/index.html'
 
@@ -34,7 +31,7 @@ class SprintListView(NeverCacheMixin, ProjectPermissionMixin, ListView):
 
         return context
 
-class SprintCreateView(NeverCacheMixin, ProjectPermissionMixin, FormView):
+class SprintCreateView(CustomLoginMixin, ProjectPermissionMixin, FormView):
     """
     Vista para crear un nuevo sprint
     """
@@ -73,18 +70,10 @@ class SprintCreateView(NeverCacheMixin, ProjectPermissionMixin, FormView):
     def get_success_url(self):
         namespace = 'projects:sprints:index'
         return reverse(namespace, kwargs={'project_id': self.kwargs.get('project_id')})
-    # def post(self, request, project_id):
-    #     if(SprintUseCase.exists_created_sprint(project_id)):
-    #         messages.warning(request, 'Ya existe un sprint planeado')
-    #         return redirect(reverse(self.namespace, kwargs={'project_id': project_id}))
 
-    #     SprintUseCase.create_sprint(project_id)
-    #     messages.success(request, 'Sprint creado correctamente')
-    #     return redirect(reverse(self.namespace, kwargs={'project_id': project_id}))
-
-class SprintView(NeverCacheMixin, ProjectPermissionMixin, DetailView):
+class SprintView(CustomLoginMixin, ProjectPermissionMixin, DetailView):
     """
-    Vista que lista tipos de historias de usuario de un projecto
+    Vista que lista los detalles de un sprint
     """
     permissions = ['ABM Sprint']
     roles = ['Scrum Master', 'Developer', 'Product Owner']
@@ -100,9 +89,13 @@ class SprintView(NeverCacheMixin, ProjectPermissionMixin, DetailView):
         context['backpage'] = reverse('projects:sprints:index', kwargs={'project_id': context['project_id']})
         return context
 
-class SprintMemberCreateView(NeverCacheMixin, ProjectPermissionMixin, FormView):
+class SprintMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, FormView):
+    """
+    Vista para crear miembro de un sprint
+    """
     permissions = ['ABM Miembro Sprint']
     roles = ['Scrum Master']
+
     template_name = 'sprint-members/create.html'
     form_class = SprintMemberCreateForm
 
@@ -138,9 +131,13 @@ class SprintMemberCreateView(NeverCacheMixin, ProjectPermissionMixin, FormView):
         messages.success(self.request, f"Usuario <strong>{data['user']}</strong> agregado al sprint correctamente")
         return super().form_valid(form)
 
-class SprintMemberEditView(NeverCacheMixin, ProjectPermissionMixin, FormView):
+class SprintMemberEditView(CustomLoginMixin, ProjectPermissionMixin, FormView):
+    """
+    Vista para editar miembro de un sprint
+    """
     permissions = ['ABM Miembro Sprint']
     roles = ['Scrum Master']
+
     template_name = 'sprint-members/edit.html'
     form_class = SprintMemberEditForm
 
@@ -178,7 +175,10 @@ class SprintMemberEditView(NeverCacheMixin, ProjectPermissionMixin, FormView):
         messages.success(self.request, f"Miembro <strong>{sprint_member_data.user.email}</strong> editado correctamente")
         return super().form_valid(form)
 
-class SprintMemberListView(NeverCacheMixin, ProjectPermissionMixin, View):
+class SprintMemberListView(CustomLoginMixin, ProjectPermissionMixin, View):
+    """
+    Vista para listar los miembros de un sprint
+    """
     permissions = ['ABM Miembro Sprint']
     roles = ['Scrum Master']
 
@@ -194,7 +194,7 @@ class SprintMemberListView(NeverCacheMixin, ProjectPermissionMixin, View):
         }
         return render(request, 'sprint-members/index.html', context)
 
-class SprintStartView(NeverCacheMixin, ProjectPermissionMixin, FormView):
+class SprintStartView(CustomLoginMixin, ProjectPermissionMixin, FormView):
     """
     Vista para iniciar un sprint
     """
@@ -208,7 +208,7 @@ class SprintStartView(NeverCacheMixin, ProjectPermissionMixin, FormView):
         messages.success(request, 'Proyecto creado correctamente')
         return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
 
-class SprintBacklogView(NeverCacheMixin, ProjectPermissionMixin, View):
+class SprintBacklogView(CustomLoginMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de mostrar el sprint Backlog
     """
@@ -216,15 +216,7 @@ class SprintBacklogView(NeverCacheMixin, ProjectPermissionMixin, View):
     roles = ['Scrum Master', 'Developer']
 
     def get(self, request, project_id, sprint_id):
-        user: CustomUser = request.user
-        if not user.is_user():
-            messages.warning(request, "No eres un usuario verificado")
-            return HttpResponseRedirect('/')
         members = SprintUseCase.get_sprint_members(sprint_id)
-        # if user not in members:
-        #     messages.warning(request, "No eres miembro del Sprint")
-        #     return HttpResponseRedirect('/')
-
         user_stories = SprintUseCase.user_stories_by_sprint(sprint_id)
 
         #creo un Sprintmember
@@ -237,7 +229,7 @@ class SprintBacklogView(NeverCacheMixin, ProjectPermissionMixin, View):
 
         return render(request, 'sprints/backlog.html', context)
 
-class SprintBacklogAssignMemberView(NeverCacheMixin, ProjectPermissionMixin, View):
+class SprintBacklogAssignMemberView(CustomLoginMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de asignar una US a un miembro del sprint
     """
@@ -265,7 +257,7 @@ class SprintBacklogAssignMemberView(NeverCacheMixin, ProjectPermissionMixin, Vie
             return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
         return render(request, 'sprints/backlog_assign_member.html', {'form': form})
 
-class SprintBacklogAssignView(NeverCacheMixin, ProjectPermissionMixin, View):
+class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de asignar una US del product backlog al sprint
     """

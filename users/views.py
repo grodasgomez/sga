@@ -7,18 +7,15 @@ from users.forms import ProfileForm
 from users.usecase import UserUseCase
 from users.models import CustomUser
 from django.views.generic import FormView
-from sga.mixin import NeverCacheMixin
+from sga.mixin import CustomLoginMixin, AdminMixin
 
 # Create your views here.
-class UsersView(NeverCacheMixin, LoginRequiredMixin, View):
+class UsersView(AdminMixin, View):
     """
     Clase encargada de mostrar los usuarios y cambiar el rol de sistema
     """
     def get(self, request):
         user: CustomUser = request.user
-        if not user.is_admin():
-            messages.warning(request, "No eres admin")
-            return reverse("index")
         users = CustomUser.objects.all().exclude(id=user.id)
         context = {
             "users" :  users,
@@ -27,7 +24,7 @@ class UsersView(NeverCacheMixin, LoginRequiredMixin, View):
         return render(request, 'index.html', context)
 
     def post(self, request):
-        #trae el value del boton con name user
+        #trae el user_id del boton presionado
         user_id = request.POST.get('user_id')
         if "user" in request.POST:
             UserUseCase.update_system_role(user_id, "user")
@@ -35,16 +32,14 @@ class UsersView(NeverCacheMixin, LoginRequiredMixin, View):
             UserUseCase.update_system_role(user_id, "admin")
         return redirect(request.META['HTTP_REFERER'])
 
-class ProfileView(NeverCacheMixin, LoginRequiredMixin, FormView):
+class ProfileView(CustomLoginMixin, FormView):
     """
     Vista para mostrar el perfil del usuario, asi como tambien para editar el perfil
     """
     # Nombre del template a renderizar
     template_name = 'profile.html'
-
     #Clase del formulario a utilizar
     form_class = ProfileForm
-
     # Indicamos el path al cual se redirecciona si el formulario es valido
     success_url = reverse_lazy("index")
 

@@ -25,7 +25,10 @@ class CustomUser(AbstractBaseUser):
         return self.role_system == 'admin'
 
     def is_user(self):
-        return self.is_admin() or self.role_system == 'user'
+        return self.role_system == 'user'
+
+    def is_verified(self):
+        return not self.role_system == None
 
     @property
     def name(self):
