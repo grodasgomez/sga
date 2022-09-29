@@ -1,6 +1,9 @@
 {% extends 'sga/layout/base_generic.html'%}
 {% block content %}
 	<h1>Miembros del proyecto</h1>
+	<a href="{% url 'projects:create-member' project_id=project_id %}" class="btn btn-info" role="button">
+		<span class="btn-label"><i class="fa fa-plus"></i></span>Agregar Miembro
+	</a>
 	{% include 'utils/messages.html' %}
 	<table class="table">
 		<thead>
