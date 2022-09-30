@@ -540,8 +540,8 @@ class UserStoryTypeImportView2(CustomLoginMixin, ProjectPermissionMixin, View):
             ProjectUseCase.import_user_story_types(project_id, from_project_id, user_story_types)
 
             get_name = lambda list: [x.name for x in list]
-            imported_name = ",".join(get_name(user_story_types))
-            not_imported_name = ",".join(get_name(not_imported))
+            imported_name = ", ".join(get_name(user_story_types))
+            not_imported_name = ", ".join(get_name(not_imported))
 
             if imported_name:
                 messages.success(request, f"Tipo/s de Historias de Usuario importado/s correctamente: {imported_name}")

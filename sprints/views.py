@@ -276,6 +276,10 @@ class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, View):
 
     def post(self, request, project_id, sprint_id):
         user_stories = request.POST.getlist("us")
+        assigned_names = []
         for us in user_stories:
-            SprintUseCase.assign_us_sprint(sprint_id, us)
+            us = SprintUseCase.assign_us_sprint(sprint_id, us)
+            assigned_names.append(us.code)
+        message = ', '.join(assigned_names)
+        messages.success(request, f"Historia/s de Usuario asignada/s correctamente: {message}")
         return redirect(reverse("projects:sprints:backlog", kwargs={'project_id': project_id, 'sprint_id': sprint_id}))

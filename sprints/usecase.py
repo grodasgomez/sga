@@ -119,10 +119,10 @@ class SprintUseCase:
         """
         Asigna una historia de usuario a un sprint
         """
-        data = {
-            'sprint': sprint_id
-        }
-        return UserStory.objects.filter(id=user_story_id).update(**data)
+        us = UserStory.objects.get(id=user_story_id)
+        us.sprint = Sprint.objects.get(id=sprint_id)
+        us.save()
+        return us
 
     @staticmethod #todo, verificacion, esta bien esto?
     def assign_us_sprint_member(sprint_member, user_story_id):

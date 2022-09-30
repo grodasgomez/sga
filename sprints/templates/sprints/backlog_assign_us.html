@@ -1,13 +1,45 @@
 {% extends 'sga/layout/base_generic.html'%}
+{% load static %}
+{% block head %}
+  <script src="{% static 'sga/js/checkAll.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 <b></b>
 	<h1>Asignar US</h1>
-	<form method="post">
+  <p>Seleccione las US que desea asignar al Sprint</p>
+	<form  method="post" class="form row g-3">
 		{% csrf_token %}
-		{% for us in user_stories %}
-			<td><input type="checkbox" id="{{ us.title }}" name="us" value="{{ us.id }}">
-			<label>{{ us.code }}: {{ us.title }}</label><br>
-		{% endfor  %}
-		<input type="submit" value="Asignar">
+		<table class="table-custom">
+			<thead>
+				<tr>
+					<th scope="col" style="width: 5%;"><input type="checkbox" id="check-all"></th>
+					<th scope="col" style="width: 10%;">Codigo</th>
+					<th scope="col" style="width: 10%;">Titulo</th>
+					<th scope="col" style="width: 10%;">Descripcion</th>
+					<th scope="col" style="width: 10%;">Valor de negocio</th>
+					<th scope="col" style="width: 10%;">Prioridad Tecnica</th>
+					<th scope="col" style="width: 10%;">Tiempo Estimado (Hs)</th>
+					<th scope="col" style="width: 10%;">Tipo</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for user_story in user_stories %}
+				<tr height="60px">
+					<td>
+					<input type="checkbox" name="us" value="{{user_story.id}}">
+					</td>
+					<td>{{ user_story.code }}</td>
+					<td>{{ user_story.title }}</td>
+					<td>{{ user_story.description }}</td>
+					<td>{{ user_story.business_value }}</td>
+					<td>{{ user_story.technical_priority }}</td>
+					<td>{{ user_story.estimation_time }}</td>
+					<td>{{ user_story.us_type.name }}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		<input type="submit" value="Guardar">
 	</form>
 {% endblock %}
