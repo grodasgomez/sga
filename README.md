@@ -45,6 +45,10 @@ $ docker-compose stop
 ```
 $ docker-compose exec web python django_pydoc.py -p 1234 -n 0.0.0.0
 ```
+## Generar HTML
+```
+$ python django_pydoc.py -w <module>
+```
 ## Realizar pruebas unitarias ##
 ```
 $ docker-compose exec web python manage.py test
