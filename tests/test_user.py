@@ -47,3 +47,36 @@ class TestUser(TestCase):
         user2 = UserUseCase.update_system_role(user2.id, "user")
         self.assertEqual(user1.role_system, "admin", "Actualización de rol fallida")
         self.assertEqual(user2.role_system, "user", "Actualización de rol fallida")
+
+    def test_users_by_filter(self):
+        '''
+        Prueba para buscar usuarios por nombre, apellido, correo o rol de sistema
+        '''
+        user1 = CustomUser()
+        user1.first_name = "name1"
+        user1.last_name = "lastname1"
+        user1.email = "1@gmail.com"
+        user1.role_system = "user"
+        user1.save()
+        user2 = CustomUser()
+        user2.first_name = "name2"
+        user2.last_name = "lastname2"
+        user2.email = "2@gmail.com"
+        user2.role_system = "admin"
+        user2.save()
+
+        found_users = UserUseCase.users_by_filter("name1")
+        self.assertEqual(len(found_users), 1, "No se encontró el usuario")
+
+        found_users = UserUseCase.users_by_filter("lastname2")
+        self.assertEqual(len(found_users), 1, "No se encontró el usuario")
+
+        found_users = UserUseCase.users_by_filter("1@gmail.com")
+        self.assertEqual(len(found_users), 1, "No se encontró el usuario")
+
+        found_users = UserUseCase.users_by_filter("user")
+        self.assertEqual(len(found_users), 1, "No se encontró el usuario")
+
+        #deberia traer 2
+        found_users = UserUseCase.users_by_filter("name")
+        self.assertEqual(len(found_users), 2, "No se encontraron los usuarios")

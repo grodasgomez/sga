@@ -234,4 +234,52 @@ class ProjectUseCaseTest(TestCase):
         user_story = ProjectUseCase.create_user_story(**data)
         self.assertNotEqual(ProjectUseCase.count_user_stories_by_project(project.id), 0, "NO hay historias de usuario")
 
+    def test_user_stories_by_project_filter(self):
+        data1 = {
+            'name': 'Proyecto 1',
+            'description': 'Descripcion del proyecto 1',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+        project = ProjectUseCase.create_project(**data1)
+        us_type=ProjectUseCase.create_user_story_type("Tipo de user story de prueba",['Por hacer', 'En progreso', 'Hecho'],project.id)
+        data = {
+            'code':str(project.id)+"-"+str(ProjectUseCase.count_user_stories_by_project(project.id)+1),
+            'title': 'User Story 1',
+            'description': 'Descripcion del user story 1',
+            'technical_priority': 1,
+            'business_value': 2,
+            'estimation_time': 1,
+            'us_type': us_type,
+            'project_id': project.id,
+        }
+        user_story1 = ProjectUseCase.create_user_story(**data)
+        data = {
+            'code':str(project.id)+"-"+str(ProjectUseCase.count_user_stories_by_project(project.id)+1),
+            'title': 'User Story 2',
+            'description': 'Descripcion del user story 2',
+            'technical_priority': 1,
+            'business_value': 2,
+            'estimation_time': 1,
+            'us_type': us_type,
+            'project_id': project.id,
+        }
+        user_story2 = ProjectUseCase.create_user_story(**data)
 
+        busqueda = "User Story 1"
+        found_us = ProjectUseCase.user_stories_by_project_filter(project.id,us_type.id,busqueda)
+        self.assertEqual(len(found_us), 1, "No se encontro la cantidad debida de historias de usuario")
+
+        busqueda = "Descripcion del user story 1"
+        found_us = ProjectUseCase.user_stories_by_project_filter(project.id,us_type.id,busqueda)
+        self.assertEqual(len(found_us), 1, "No se encontro la cantidad debida de historias de usuario")
+
+        busqueda = "Descripcion del user story"
+        found_us = ProjectUseCase.user_stories_by_project_filter(project.id,us_type.id,busqueda)
+        self.assertEqual(len(found_us), 2, "No se encontro la cantidad debida de historias de usuario")
+
+        #filtro encontrara las dos ya que tienen mismo tipo
+        filtro = us_type.id
+        busqueda = ""
+        found_us = ProjectUseCase.user_stories_by_project_filter(project.id,filtro,busqueda)
+        self.assertEqual(len(found_us), 2, "No se encontro la cantidad debida de historias de usuario")
