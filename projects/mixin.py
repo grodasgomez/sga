@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from projects.usecase import ProjectUseCase
 from projects.models import Project
+from django.urls import reverse
 
 class ProjectAccessMixin(AccessMixin):
     """
@@ -21,6 +22,9 @@ class ProjectAccessMixin(AccessMixin):
     def handle_no_permission(self):
         if self.raise_exception:
             messages.warning(self.request, "No eres miembro")
+            # en el caso en que el error te redirija a la misma pagina, bucle infinito
+            if self.request.build_absolute_uri() == self.request.META.get('HTTP_REFERER'):
+                return redirect(reverse('index'))
             return redirect(self.request.META.get('HTTP_REFERER', '/'))
         return super().handle_no_permission()
 
@@ -56,5 +60,8 @@ class ProjectPermissionMixin(AccessMixin):
         """
         if self.raise_exception:
             messages.warning(self.request, 'No tienes permisos para realizar esta accion')
+            # en el caso en que el error te redirija a la misma pagina, bucle infinito
+            if self.request.build_absolute_uri() == self.request.META.get('HTTP_REFERER'):
+                return redirect(reverse('index'))
             return redirect(self.request.META.get('HTTP_REFERER', '/'))
         return super().handle_no_permission()
