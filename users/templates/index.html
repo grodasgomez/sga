@@ -1,6 +1,15 @@
 {% extends 'sga/layout/base_generic.html'%}
 {% block content %}
-{% include 'utils/messages.html'%}
+{% include 'utils/messages.html'%}	
+<form method="post">
+	{% csrf_token %}
+	<input type="text" placeholder="Buscar.." name="search" value={{search}}>
+	<button class="btn btn-labeled btn-info" type="submit"><i class="fa fa-search"></i></button>
+	&nbsp
+	<a href="{% url 'users:index' %}" class="btn btn-labeled btn-info">
+		<span class="btn-label"><i class="fa fa-eraser"></i></span>Limpiar
+	</a>
+</form>
 <table class="table">
 	<thead>
 	<tr>

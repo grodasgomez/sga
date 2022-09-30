@@ -16,21 +16,38 @@ class UsersView(AdminMixin, View):
     """
     def get(self, request):
         user: CustomUser = request.user
-        users = CustomUser.objects.all().exclude(id=user.id)
+
+        search = request.GET.get("search","")
+        if search != "":
+            users = UserUseCase.users_by_filter(search).exclude(id=user.id)
+        else:
+            users = CustomUser.objects.all().exclude(id=user.id)
+
         context = {
+            "search" : search,
             "users" :  users,
             "backpage": reverse("index")
         }
         return render(request, 'index.html', context)
 
     def post(self, request):
-        #trae el user_id del boton presionado
+        #se eligio cambiar el rol de sistema de un usuario
         user_id = request.POST.get('user_id')
-        if "user" in request.POST:
-            UserUseCase.update_system_role(user_id, "user")
-        if "admin" in request.POST:
-            UserUseCase.update_system_role(user_id, "admin")
-        return redirect(request.META['HTTP_REFERER'])
+        if user_id:
+            if "user" in request.POST:
+                UserUseCase.update_system_role(user_id, "user")
+            elif "admin" in request.POST:
+                UserUseCase.update_system_role(user_id, "admin")
+            search = request.GET.get("search","")
+            if search != "":
+                return redirect(reverse("users:index")+'?search='+search)
+            return redirect(reverse("users:index"))
+
+        #se eligio buscar algo
+        search = request.POST.get("search")
+        if search != "":
+            return redirect(reverse("users:index")+'?search='+search)
+        return redirect(reverse("users:index"))
 
 class ProfileView(CustomLoginMixin, FormView):
     """
