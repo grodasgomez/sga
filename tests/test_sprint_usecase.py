@@ -9,6 +9,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sga.settings")
 setup()
 from projects.models import Permission, Project, ProjectMember, Role, UserStoryType
 from users.models import CustomUser
+from user_stories.models import UserStory
 
 class SprintUseCaseTest(TestCase):
     def setUp(self):
@@ -26,6 +27,7 @@ class SprintUseCaseTest(TestCase):
             name='Scrum Master',
             description='Scrum Master',
         )
+        self.user_story_type = ProjectUseCase.create_default_user_story_type(project_id=self.project.id)
 
 
     def test_create_sprint(self):
@@ -152,6 +154,19 @@ class SprintUseCaseTest(TestCase):
         members = SprintUseCase.get_sprint_members(sprint.id)
         self.assertEqual(len(members), 1, 'Deberia existir un miembro en el sprint')
 
-
-
-
+    def test_get_assignable_us_to_sprint(self):
+        sprint = SprintUseCase.create_sprint(self.project.id, duration=14)
+        us_list = SprintUseCase.assignable_us_to_sprint(self.project.id, sprint.id)
+        self.assertEqual(us_list.count(), 0, 'No deberia existir user stories asignables al sprint')
+        us = ProjectUseCase.create_user_story(
+            code="US-1",
+            title='User Story 1',
+            description='User Story 1',
+            business_value=1,
+            technical_priority=1,
+            estimation_time=1,
+            us_type=self.user_story_type,
+            project_id=self.project.id,
+        )
+        us_list = SprintUseCase.assignable_us_to_sprint(self.project.id, sprint.id)
+        self.assertEqual(us_list.count(), 1, 'Deberia existir un user story asignable al sprint')
