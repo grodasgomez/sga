@@ -285,13 +285,25 @@ class ProjectRoleEditView(CustomLoginMixin, ProjectPermissionMixin, View):
 
     def post(self, request, project_id, role_id):
         form = FormCreateRole(project_id,role_id,request.POST)
-        if form.is_valid():
+        if form.is_valid() and not RoleUseCase.role_is_in_use(role_id):
             cleaned_data = form.cleaned_data
             RoleUseCase.edit_role(role_id, **cleaned_data)
             messages.success(request, f"Rol <strong>{cleaned_data['name']}</strong> editado correctamente")
             return HttpResponseRedirect(f"/projects/{project_id}/roles")
 
-        return render(request, 'roles/edit.html', {'form': form, 'project_id':project_id, 'role_id':role_id})
+        role = RoleUseCase.get_role_by_id(role_id)
+        data = role.__dict__ #convertimos los datos del rol a un diccionario
+        permissions= role.permissions.all()
+        data['permissions']=permissions
+        form = FormCreateRole(project_id,role_id,initial=data)
+        context= {
+            "form" : form,
+            'role_id':role_id,
+            'project_id':project_id,
+            "backpage": reverse("projects:index-roles", kwargs={"project_id": project_id})
+        }
+        messages.warning(request, f"El rol no se puede editar porque esta en uso")
+        return render(request, 'roles/edit.html', context)
 
 class ProjectRoleDeleteView(CustomLoginMixin, ProjectPermissionMixin, View):
     """
@@ -308,16 +320,31 @@ class ProjectRoleDeleteView(CustomLoginMixin, ProjectPermissionMixin, View):
         form = FormCreateRole(project_id,role_id,initial=data)
         context= {
             "form" : form,
-            'role_id':role_id,
-            'project_id':project_id,
+            "role_id":role_id,
+            "project_id":project_id,
             "backpage": reverse("projects:index-roles", kwargs={"project_id": project_id})
         }
         return render(request, 'roles/delete.html', context)
 
     def post(self, request, project_id, role_id):
-        delete_role=RoleUseCase.delete_role(role_id)
-        messages.success(request, f"Rol <strong>{delete_role.name}</strong> borrado correctamente")
-        return HttpResponseRedirect(f"/projects/{project_id}/roles")
+        role = RoleUseCase.get_role_by_id(role_id)
+        data = role.__dict__ #convertimos los datos del rol a un diccionario
+        permissions= role.permissions.all()
+        data['permissions']=permissions
+        form = FormCreateRole(project_id,role_id,initial=data)
+        context= {
+            "form" : form,
+            "role_id":role_id,
+            "project_id":project_id,
+            "backpage": reverse("projects:index-roles", kwargs={"project_id": project_id})
+        }
+        if not RoleUseCase.role_is_in_use(role_id):
+            delete_role=RoleUseCase.delete_role(role_id)
+            messages.success(request, f"Rol <strong>{delete_role.name}</strong> borrado correctamente")
+            return HttpResponseRedirect(f"/projects/{project_id}/roles")
+
+        messages.warning(request, f"El rol no se puede borrar porque esta en uso")
+        return render(request, 'roles/delete.html', context)
 
 class ProjectMemberEditView(CustomLoginMixin, ProjectPermissionMixin, View):
     """
