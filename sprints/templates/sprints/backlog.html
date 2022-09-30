@@ -5,7 +5,7 @@
 		<span class="btn-label"><i class="fa fa-plus"></i></span>Asignar US
 	</a>
 	{% include 'utils/messages.html' %}
-	<table class="table">
+	<table class="table-custom">
 		<thead>
 		<tr>
 			<th scope="col">Codigo</th>
@@ -20,7 +20,7 @@
 		</thead>
 		<tbody>
 		{% for user_story in user_stories %}
-		<tr>
+		<tr height="60px">
 			<td>{{ user_story.code }}</td>
 			<td>{{ user_story.title }}</td>
 			<td>{{ user_story.description }}</td>

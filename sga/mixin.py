@@ -6,6 +6,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
 class CustomLoginMixin(LoginRequiredMixin):
+	"""
+	Clase que permite verificar si el usuario esta logueado e implementa never_cache
+	"""
 	@method_decorator(never_cache)
 	def dispatch(self, request, *args, **kwargs):
 		return super().dispatch(request, *args, **kwargs)

@@ -22,13 +22,9 @@
 			<td>{{ member.project_member.first_name }}</td>
 			<td>{{ member.project_member.email }}</td>
 			<td>
-			{% for role in member.roles %}
-				{% if forloop.last %}
-					{{ role }}
-				{% else %}
-					{{ role }},
-				{% endif %}
-			{% endfor %}
+				{% for role in member.roles %}
+					<p>{{ role }}</p>
+				{% endfor %}
 			</td>
 			<td>
 				{% if not member.scrum_master %}

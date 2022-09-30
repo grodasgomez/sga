@@ -1,8 +1,11 @@
-{% extends 'sga/layout/base_generic.html'%} 
+{% extends 'sga/layout/base_generic.html'%}
 {% block content %}
   <h1>Miembros del {{ sprint.name }}</h1>
+  <a href="{% url 'projects:sprints:member-create' project_id=project_id sprint_id=sprint.id %}" class="btn btn-info">
+		<span class="btn-label"><i class="fa fa-user-plus"></i></span>Agregar Miembro
+	</a>
   {% include 'utils/messages.html'%}
-  <table class="table">
+  <table class="table-custom">
     <thead>
       <tr>
         <th scope="col">Nombre</th>
@@ -12,7 +15,7 @@
     </thead>
     <tbody>
       {% for object in objects %}
-      <tr>
+      <tr height="60px">
         <td>{{ object.user.name }}</td>
         <td>{{ object.workload }}</td>
         <td>

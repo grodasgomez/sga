@@ -11,11 +11,9 @@
     <a href="{% url 'projects:project-members' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
       <span class="btn-label"><i class="fa-solid fa-users"></i></span>Ver Miembros
     </a>
-    {% if object.status == "IN_PROGRESS" %}
-      <a href="{% url 'projects:sprints:index' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
-        <span class="btn-label"><i class="fa-solid fa-arrows-spin"></i></i></span>Ver Sprints
-      </a>
-    {% endif %}
+    <a href="{% url 'projects:sprints:index' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
+      <span class="btn-label"><i class="fa-solid fa-arrows-spin"></i></i></span>Ver Sprints
+    </a>
     <a href="{% url 'projects:project-backlog' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
       <span class="btn-label"><i class="fa-solid fa-layer-group"></i></i></i></span>Backlog
     </a>

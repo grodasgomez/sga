@@ -1,11 +1,11 @@
-{% extends 'sga/layout/base_generic.html'%} 
+{% extends 'sga/layout/base_generic.html'%}
 {% block content %}
   <h1>Sprints</h1>
   <a href="{% url 'projects:sprints:create' project_id=project_id %}" class="btn btn-labeled btn-info">
     <span class="btn-label"><i class="fa fa-plus"></i></span>Crear sprint
   </a>
   {% include 'utils/messages.html'%}
-  <table class="table">
+  <table class="table-custom">
     <thead>
       <tr>
         <th scope="col">Nombre</th>
@@ -19,7 +19,7 @@
     </thead>
     <tbody>
       {% for object in object_list %}
-      <tr>
+      <tr height="60px">
         <td>
           <a href="{% url 'projects:sprints:detail' project_id=project_id sprint_id=object.id %}" class="btn-custom">
             <span class="btn-label">{{ object.name }}</span>

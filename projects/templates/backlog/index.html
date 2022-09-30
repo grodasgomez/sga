@@ -30,7 +30,7 @@
 		</a>
 	</form>
 	{% include 'utils/messages.html' %}
-	<table class="table">
+	<table class="table-custom">
 		<thead>
 		<tr>
 			<th scope="col">Codigo</th>
@@ -45,14 +45,14 @@
 		</thead>
 		<tbody>
 		{% for user_story in user_stories %}
-		<tr>
+		<tr height="60px">
 			<td>{{ user_story.code }}</td>
 			<td>{{ user_story.title }}</td>
 			<td>{{ user_story.description }}</td>
             	<td>{{ user_story.business_value }}</td>
 			<td>{{ user_story.technical_priority }}</td>
 			<td>{{ user_story.estimation_time }}</td>
-            <td>{{ user_story.us_type.name }}</td>
+            	<td>{{ user_story.us_type.name }}</td>
 			<td>
 				<a href="{% url 'projects:project-backlog-edit' project_id=project_id us_id=user_story.id %}" class="btn">
 				  <span class="btn-label"><i class="fa fa-pencil"></i></span>

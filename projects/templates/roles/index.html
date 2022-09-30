@@ -8,7 +8,7 @@
     <span class="btn-label"><i class="fa fa-file-import"></i></span>Importar Rol
   </a>
   {% include 'utils/messages.html'%}
-  <table class="table">
+  <table class="table-custom">
     <thead>
       <tr>
         <th scope="col">Nombre</th>
@@ -18,7 +18,7 @@
     </thead>
     <tbody>
       {% for role in roles %}
-      <tr>
+      <tr height="60px">
         <td>{{ role.name }}</td>
         <td>{{ role.description }}</td>
         <td>
