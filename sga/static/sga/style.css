@@ -29,6 +29,7 @@ span.btn-label {
 }
 
 .btn-custom {
+  min-width: 100%;
   padding: 6px 12px;
   text-align: center;
   text-decoration: none;
