@@ -54,7 +54,8 @@ class FormCreateRole(forms.Form):
     name = forms.CharField(max_length=100, label='Nombre',widget=widgets.TextInput())  # nombre del rol
     description = forms.CharField(max_length=100, label='Descripcion',widget=widgets.TextInput())  # descripcion del rol
     permissions = forms.ModelMultipleChoiceField(
-        queryset=Permission.objects.all(), widget=forms.CheckboxSelectMultiple(), label='Permisos')
+        queryset=Permission.objects.all(),
+        widget=forms.CheckboxSelectMultiple(attrs={'class':'with_select_all'}), label='Permisos')
 
     def __init__(self, project_id, id=None, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -1,6 +1,14 @@
 <div class="col-md-6">
-  <label for="{{ field.id_for_label}}" class="form-label">{{field.label}}</label>
-  {{ field }}
+  {% if field.field.widget.attrs.class == 'with_select_all' %}
+    <label for="{{ field.id_for_label}}" class="form-label">{{field.label}}</label>
+    <div >
+    <label for="check-all" class="form-label"><input type="checkbox" name="select_all" id="check-all" class="checkbox-left" > Seleccionar todos</label>
+    </div>
+    {{ field }}
+  {% else %}
+    <label for="{{ field.id_for_label}}" class="form-label">{{field.label}}</label>
+    {{ field }}
+  {% endif %}
   {% if field.errors %}
     <div class="invalid-feedback" style="display:block">
       {% for error in field.errors %}

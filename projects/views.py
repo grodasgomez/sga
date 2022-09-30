@@ -418,8 +418,6 @@ class ProductBacklogView(CustomLoginMixin, ProjectAccessMixin, View):
         search_exists = search != ""
         filter_exists = user_story_type_id != "empty"
 
-        print("ustype viejo: ",request.GET.get("type_us",""))
-
         if search_exists and filter_exists:
             return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id})+'?type_us='+user_story_type_id+'&search='+search)
         elif search_exists:

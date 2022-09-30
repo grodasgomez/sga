@@ -1,4 +1,8 @@
 {% extends 'sga/layout/base_generic.html'%}
+{% load static %}
+{% block head %}
+  <script src="{% static 'sga/js/checkAll.js' %}"></script>
+{% endblock %}
 {% block content %}
 <b></b>
 	<h1>Crear Rol</h1>
