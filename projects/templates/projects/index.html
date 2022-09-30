@@ -8,23 +8,23 @@
   {% endif %}
   {% include 'utils/messages.html'%}
   {% if projects %}
-    <table class="table">
+    <table class="table-custom">
       <thead>
         <tr>
-          <th scope="col">Nombre</th>
-          <th scope="col">Prefijo</th>
-          <th scope="col">Fecha inicio</th>
-          <th scope="col">Fecha fin</th>
-          <th scope="col">Estado</th>
-          <th scope="col">Acciones</th>
+          <th scope="col" style="width: 15%;">Nombre</th>
+          <th scope="col" style="width: 15%;">Prefijo</th>
+          <th scope="col" style="width: 15%;">Fecha inicio</th>
+          <th scope="col" style="width: 15%;">Fecha fin</th>
+          <th scope="col" style="width: 15%;">Estado</th>
+          <th scope="col" style="width: 15%;">Acciones</th>
         </tr>
       </thead>
       <tbody>
         {% for project in projects %}
-        <tr>
+        <tr height="60px">
           <td>
-            <a href="{% url 'projects:project-detail' project_id=project.id %}" class="btn">
-              <span class="btn-label">{{ project.name }}</span>
+            <a href="{% url 'projects:project-detail' project_id=project.id %}" class="btn-custom">
+              <i class="fa-solid fa-diagram-project"></i>&nbsp{{ project.name }}
             </a>
           </td>
           <td>{{ project.prefix }}</td>
@@ -49,6 +49,10 @@
       </tbody>
     </table>
   {% else %}
-    No tiene proyectos
+    {% if admin %}
+      <div>No existen proyectos</div>
+    {% else %}
+      <div>No tiene proyectos</div>
+    {% endif %}
   {% endif %}
 {% endblock %}

@@ -1,6 +1,6 @@
 {% extends 'sga/layout/base_generic.html'%}
 {% block content %}
-{% include 'utils/messages.html'%}	
+{% include 'utils/messages.html'%}
 <form method="post">
 	{% csrf_token %}
 	<input type="text" placeholder="Buscar.." name="search" value={{search}}>
@@ -10,19 +10,19 @@
 		<span class="btn-label"><i class="fa fa-eraser"></i></span>Limpiar
 	</a>
 </form>
-<table class="table">
+<table class="table-custom">
 	<thead>
 	<tr>
-		<th scope="col">Apellido</th>
-		<th scope="col">Nombre</th>
-		<th scope="col">Correo</th>
-		<th scope="col">Rol del Sistema</th>
-		<th scope="col">Acciones</th>
+		<th scope="col" style="width: 15%;">Apellido</th>
+		<th scope="col" style="width: 15%;">Nombre</th>
+		<th scope="col" style="width: 15%;">Correo</th>
+		<th scope="col" style="width: 15%;">Rol del Sistema</th>
+		<th scope="col" style="width: 15%;">Acciones</th>
 	</tr>
 	</thead>
 	<tbody>
 	{% for user in users %}
-	<tr>
+	<tr height="60px">
 		<td>{{ user.last_name }}</td>
 		<td>{{ user.first_name }}</td>
 		<td>{{ user.email }}</td>

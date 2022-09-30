@@ -21,7 +21,7 @@
       {% for object in object_list %}
       <tr>
         <td>
-          <a href="{% url 'projects:sprints:detail' project_id=project_id sprint_id=object.id %}" class="btn">
+          <a href="{% url 'projects:sprints:detail' project_id=project_id sprint_id=object.id %}" class="btn-custom">
             <span class="btn-label">{{ object.name }}</span>
           </a>
         </td>

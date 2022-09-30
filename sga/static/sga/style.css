@@ -28,6 +28,40 @@ span.btn-label {
   margin-right: 0.3rem;
 }
 
+.btn-custom {
+  padding: 6px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  background-color: white;
+  color: black;
+  border: 2px solid #e7e7e7;
+  border-radius: 7px;
+}
+
+.btn-custom:hover {background-color: #e7e7e7;}
+
+.table-custom{
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.table-custom th{
+  border: none;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.table-custom tr{
+  /* height: 20%; */
+  border-bottom: 1px solid rgb(212, 212, 212);
+}
+
 .btn-toggle-nav a {
   display: inline-flex;
   padding-block: .1875rem;

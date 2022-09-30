@@ -10,17 +10,17 @@
   <p>Seleccione los tipos de usuario que desea importar</p>
 	<form  method="post" class="form row g-3">
 		{% csrf_token %}
-    <table class="table">
+    <table class="table-custom">
         <thead>
             <tr>
-                <th scope="col"><input type="checkbox" id="check-all"></th>
-                <th scope="col">Nombre</th>
-                <th scope="col">Columnas</th>
+                <th scope="col" style="width: 10%;"><input type="checkbox" id="check-all"></th>
+                <th scope="col" style="width: 30%;">Nombre</th>
+                <th scope="col" style="width: 30%;">Columnas</th>
             </tr>
         </thead>
         <tbody>
             {% for us_type in user_story_types %}
-            <tr>
+            <tr height="60px">
                 <td>
                   <input type="checkbox" name="user_story_types" value="{{us_type.id}}"
                   {%if us_type.id in checked%} checked {%endif%}>

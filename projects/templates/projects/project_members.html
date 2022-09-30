@@ -5,19 +5,19 @@
 		<span class="btn-label"><i class="fa fa-plus"></i></span>Agregar Miembro
 	</a>
 	{% include 'utils/messages.html' %}
-	<table class="table">
+	<table class="table-custom">
 		<thead>
 		<tr>
-			<th scope="col">Apellido</th>
-			<th scope="col">Nombre</th>
-			<th scope="col">Correo</th>
-			<th scope="col">Roles</th>
-			<th scope="col">Acciones</th>
+			<th scope="col" style="width: 15%;">Apellido</th>
+			<th scope="col" style="width: 15%;">Nombre</th>
+			<th scope="col" style="width: 15%;">Correo</th>
+			<th scope="col" style="width: 15%;">Roles</th>
+			<th scope="col" style="width: 15%;">Acciones</th>
 		</tr>
 		</thead>
 		<tbody>
 		{% for member in members %}
-		<tr>
+		<tr height="60px">
 			<td>{{ member.project_member.last_name }}</td>
 			<td>{{ member.project_member.first_name }}</td>
 			<td>{{ member.project_member.email }}</td>
