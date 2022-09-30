@@ -358,31 +358,49 @@ class ProductBacklogView(CustomLoginMixin, ProjectAccessMixin, View):
     """
     Clase encargada de mostrar el product Backlog de un proyecto
     """
+    permissions = ['Ver Product Backlog']
+    roles = ['Scrum Master', 'Developer', 'Product Owner']
+
     def get(self, request, project_id):
         user: CustomUser = request.user
         user_stories = []
         us_type_filter_id = request.GET.get("type_us","")
-        if us_type_filter_id != "":
-            us_type_filter_id = int(us_type_filter_id)
-            user_stories = ProjectUseCase.user_stories_by_project_and_us_type(project_id,us_type_filter_id)
+        search = request.GET.get("search","")
+        if us_type_filter_id != "" or search != "":
+            us_type_filter_id = int(us_type_filter_id) if us_type_filter_id != "" else None
+            user_stories = ProjectUseCase.user_stories_by_project_filter(project_id,us_type_filter_id,search)
         else:
             user_stories = ProjectUseCase.user_stories_by_project(project_id)
 
         user_story_types = ProjectUseCase.filter_user_story_type_by_project(project_id)
         context= {
+            "search" : search,
             "us_type_filter_id" : us_type_filter_id,
+            "user_story_types" : user_story_types,
+
             "user_stories" : user_stories,
             "project_id" : project_id,
-            "user_story_types" : user_story_types,
             "backpage": reverse("projects:project-detail", kwargs={"project_id": project_id})
         }
         return render(request, 'backlog/index.html', context)
 
     def post(self, request, project_id):
-        user_story_type_id = request.POST.get("filtro","")
-        if user_story_type_id == "empty":
-            return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id}))
-        return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id})+'?type_us='+user_story_type_id)
+        user_story_type_id = request.POST.get("filter","")
+        search = request.POST.get("search","")
+
+        search_exists = search != ""
+        filter_exists = user_story_type_id != "empty"
+
+        print("ustype viejo: ",request.GET.get("type_us",""))
+
+        if search_exists and filter_exists:
+            return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id})+'?type_us='+user_story_type_id+'&search='+search)
+        elif search_exists:
+            return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id})+'?search='+search)
+        elif filter_exists:
+            return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id})+'?type_us='+user_story_type_id)
+
+        return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id}))
 
 class ProductBacklogCreateView(CustomLoginMixin, ProjectPermissionMixin, View):
     """

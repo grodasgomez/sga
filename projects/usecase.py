@@ -154,11 +154,21 @@ class ProjectUseCase:
         return UserStory.objects.filter(project_id=project_id)
 
     @staticmethod
-    def user_stories_by_project_and_us_type(project_id,user_story_type_id):
+    def user_stories_by_project_filter(project_id, user_story_type_id, busqueda):
         """
-        Retorna las historias de usuario de un proyecto
+        Retorna las historias de usuario de un proyecto filtradas
         """
-        return UserStory.objects.filter(project_id=project_id,us_type=user_story_type_id)
+        lista = UserStory.objects.filter(project_id=project_id)
+
+        if user_story_type_id:
+            lista = lista.filter(us_type=user_story_type_id)
+
+        return lista.filter(
+            Q(title__icontains=busqueda) |
+            Q(description__icontains=busqueda) |
+            Q(code__icontains=busqueda) |
+            Q(us_type__name__icontains=busqueda)
+        )
 
     @staticmethod
     def count_user_stories_by_project(project_id):
