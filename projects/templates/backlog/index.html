@@ -24,10 +24,11 @@
 			{% endfor %}
 		</select>
 		<button class="btn btn-labeled btn-info" type="submit"><i class="fa fa-search"></i></button>
+		&nbsp
+		<a href="{% url 'projects:project-backlog' project_id=project_id %}" class="btn btn-labeled btn-info">
+			<span class="btn-label"><i class="fa fa-eraser"></i></span>Limpiar
+		</a>
 	</form>
-	<a href="{% url 'projects:project-backlog' project_id=project_id %}" class="btn btn-labeled btn-info">
-		<span class="btn-label"><i class="fa fa-eraser"></i></span>Limpiar
-	</a>
 	{% include 'utils/messages.html' %}
 	<table class="table">
 		<thead>
