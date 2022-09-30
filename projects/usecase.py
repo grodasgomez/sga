@@ -363,3 +363,6 @@ class RoleUseCase:
                     member.roles.remove(role)
 
         return True
+
+    def role_is_in_use(role_id):
+        return ProjectMember.objects.filter(roles__id=role_id).count() > 0
