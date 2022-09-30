@@ -29,6 +29,7 @@ services:
       - POSTGRES_NAME=${POSTGRES_NAME}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    command: sh -c "python manage.py collectstatic --noinput && gunicorn sga.wsgi:application --bind 0.0.0.0:8000"
     depends_on:
       - db
   nginx:
