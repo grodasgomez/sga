@@ -1,0 +1,52 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% load static %}
+{% block head %}
+  <link rel="stylesheet" href="{% static 'sga/jkanban.min.css' %}">
+  <script src="{% static 'sga/js/jkanban.min.js' %}"></script>
+  <script defer>
+    window.onload = initialize;
+    console.log('window.onload');
+    function initialize() {
+      const mydata = JSON.parse(document.getElementById('user_stories').textContent);
+      console.log("initialize");
+      console.log(mydata);
+      const items = mydata.map(({id, title})=>({
+        id,
+        title,
+      }))
+      const kanban = new jKanban({
+        element: '#myKanban',
+        gutter: '20px',
+        widthBoard: '260px',
+        boards: [
+          {
+            id: '_backlog',
+            title: 'Backlog',
+            item: items,
+          },
+          {
+            id: '_inprogress',
+            title: 'In Progress',
+          },
+          {
+            id: '_done',
+            title: 'Done',
+          },
+        ],
+        dropEl: function(el, target, source, sibling) {
+          console.log(el);
+          console.log(target);
+          console.log(source);
+          console.log(sibling);
+        },
+      });
+    }
+    
+  </script>
+{% endblock %}
+{% block content %}
+<b></b>
+	<h1>Tablero</h1>
+  {{us|json_script:"user_stories"}}
+	<div id="myKanban"></div>
+{% endblock %}

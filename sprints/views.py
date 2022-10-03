@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect
+from django.forms.models import model_to_dict
 
 from projects.mixin import ProjectPermissionMixin, ProjectAccessMixin
 from users.models import CustomUser
@@ -283,3 +284,14 @@ class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, View):
         message = ', '.join(assigned_names)
         messages.success(request, f"Historia/s de Usuario asignada/s correctamente: {message}")
         return redirect(reverse("projects:sprints:backlog", kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
+
+
+class SprintBoardView(View):
+    def get(self, request, project_id):
+        sprint = Sprint.objects.filter(project_id=project_id).first()
+        user_stories = UserStory.objects.filter(sprint_id=sprint.id).all()
+        context = {
+            'project_id': project_id,
+            'us': [model_to_dict(us) for us in user_stories],
+        }
+        return render(request, 'sprints/board.html', context)
