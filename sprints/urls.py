@@ -12,7 +12,4 @@ urlpatterns = [
     path('<int:sprint_id>/backlog/', views.SprintBacklogView.as_view(), name='backlog'),
     path('<int:sprint_id>/backlog/assign/', views.SprintBacklogAssignView.as_view(), name='backlog-assign-us'),
     path('<int:sprint_id>/backlog/<int:user_story_id>/assign/', views.SprintBacklogAssignMemberView.as_view(), name='backlog-assign-member'),
-
-    #Active sprint board
-    path('board/', views.SprintBoardView.as_view(), name='board'),
 ]

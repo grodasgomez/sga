@@ -29,4 +29,7 @@ urlpatterns = [
 
     #Sprint
     path('<int:project_id>/sprints/', include(('sprints.urls', 'sprints'))),
+
+    # Active board
+    path('<int:project_id>/board/', include(('sprints.urls_board', 'board'))),
 ]
