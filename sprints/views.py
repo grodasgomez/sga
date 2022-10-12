@@ -299,5 +299,4 @@ class SprintBoardView(View):
             'user_stories': [model_to_dict(us) for us in user_stories],
             'us_types': [model_to_dict(us_type) for us_type in us_types],
         }
-        print(context)
         return render(request, 'sprints/board.html', context)

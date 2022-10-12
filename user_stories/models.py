@@ -11,6 +11,7 @@ class UserStory(models.Model):
     technical_priority= models.IntegerField()
     estimation_time= models.IntegerField()
     us_type= models.ForeignKey(UserStoryType, on_delete=models.CASCADE)
+    column = models.IntegerField(default=0)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     sprint = models.ForeignKey(Sprint, on_delete=models.CASCADE, null=True)
     sprint_member = models.ForeignKey(SprintMember, on_delete=models.CASCADE, null=True)

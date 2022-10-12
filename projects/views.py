@@ -1,11 +1,14 @@
+import json
 from django.views.generic import ListView, FormView
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
-from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.contrib import messages
 from django.views import View
 from django.db.models.query import QuerySet
 from django.urls import reverse
+from django.http import JsonResponse
+from django.forms.models import model_to_dict
+
 
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
     FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole,
@@ -677,3 +680,15 @@ class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, View):
             return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id}))
 
         return render(request, 'backlog/edit.html', context)
+
+class UserStoryEditApiView(CustomLoginMixin, ProjectPermissionMixin, View):
+    """
+    Clase encargada de editar los tipos de us
+    """
+    permissions = ['ABM US Proyecto']
+    roles = ['Scrum Master']
+
+    def put(self, request, project_id, us_id):
+        data = json.loads(request.body)
+        user_story = model_to_dict(ProjectUseCase.edit_user_story(us_id, **data))
+        return JsonResponse({"data": user_story}, status=200)

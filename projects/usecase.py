@@ -210,7 +210,7 @@ class ProjectUseCase:
         """
         return UserStory.objects.get(id=id)
 
-    def edit_user_story(id, title, description, business_value,technical_priority,estimation_time,us_type):
+    def edit_user_story(id, title=None, description=None, business_value=None,technical_priority=None,estimation_time=None,us_type=None, column=None):
         """
         Crea un tipo de historia de usuario para el proyecto dado
         """
@@ -225,8 +225,12 @@ class ProjectUseCase:
             data['estimation_time'] = estimation_time
         if us_type:
             data['us_type'] = us_type
+        # Se cambio a None, para que column pueda valer 0
+        if column is not None:
+            data['column'] = column
 
-        return UserStory.objects.filter(id=id).update(**data)
+        UserStory.objects.filter(pk=id).update(**data)
+        return UserStory.objects.get(pk=id)
 
 class RoleUseCase:
     @staticmethod

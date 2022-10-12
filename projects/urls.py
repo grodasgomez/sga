@@ -32,4 +32,7 @@ urlpatterns = [
 
     # Active board
     path('<int:project_id>/board/', include(('sprints.urls_board', 'board'))),
+
+    # API
+    path('<int:project_id>/user-stories/<int:us_id>/', views.UserStoryEditApiView.as_view()),
 ]
