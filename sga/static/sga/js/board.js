@@ -80,7 +80,11 @@ function filterUs() {
 
 async function updateUsColumn(usId, column) {
   const url = `/projects/1/user-stories/${usId}/`;
-  const { value: csrftoken } = await cookieStore.get("csrftoken");
+  const csrftoken = document.cookie
+    .split(";")
+    .find((row) => row.trim().startsWith("csrftoken="))
+    .split("=")[1].trim();
+
   fetch(url, {
     method: "PUT",
     headers: {
