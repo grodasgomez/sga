@@ -338,6 +338,11 @@ class RoleUseCase:
         return project.project_members.get(id=member_id)
 
     @staticmethod
+    def get_project_member_by_user(user,project_id):
+        project=Project.objects.get(id=project_id)
+        return ProjectMember.objects.get(user=user, project=project)
+
+    @staticmethod
     def edit_project_member(id, project_id, email, roles):
         """
         Edita un miembro de un proyecto

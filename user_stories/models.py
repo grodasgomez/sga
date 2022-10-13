@@ -1,6 +1,6 @@
 from django.db import models
 
-from projects.models import Project,UserStoryType
+from projects.models import Project,UserStoryType,ProjectMember
 from sprints.models import Sprint, SprintMember
 
 class UserStory(models.Model):
@@ -23,3 +23,18 @@ class UserStory(models.Model):
 
     class Meta:
         ordering = ['id']
+
+class UserStoryHistory(models.Model):
+    user_story = models.ForeignKey(UserStory, on_delete=models.CASCADE)
+    project_member = models.ForeignKey(ProjectMember, on_delete=models.CASCADE)
+    description = models.CharField(max_length=100)
+    dataJson= models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return self.user_story.code
+
+    class Meta:
+        ordering = ['-created_at']

@@ -12,6 +12,7 @@ from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEdit
     ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory)
 from projects.models import Project, UserStoryType
 from projects.usecase import ProjectUseCase, RoleUseCase
+from user_stories.usecase import UserStoriesUseCase
 from projects.mixin import *
 from sga.mixin import *
 from users.models import CustomUser
@@ -672,7 +673,13 @@ class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, View):
         }
         if form.is_valid():
             cleaned_data = form.cleaned_data
+            old_user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
+
             ProjectUseCase.edit_user_story(us_id, **cleaned_data)
+
+            new_user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
+            UserStoriesUseCase.create_user_story_history(old_user_story, new_user_story, request.user, project_id)
+
             messages.success(request, f"Historia de usuario <strong>{cleaned_data['title']}</strong> editada correctamente")
             return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id}))
 
