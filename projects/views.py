@@ -681,12 +681,10 @@ class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, View):
 
         return render(request, 'backlog/edit.html', context)
 
-class UserStoryEditApiView(CustomLoginMixin, ProjectPermissionMixin, View):
+class UserStoryEditApiView(CustomLoginMixin, ProjectAccessMixin, View):
     """
     Clase encargada de editar los tipos de us
     """
-    permissions = ['ABM US Proyecto']
-    roles = ['Scrum Master']
 
     def put(self, request, project_id, us_id):
         data = json.loads(request.body)

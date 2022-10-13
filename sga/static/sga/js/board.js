@@ -11,7 +11,7 @@ const items = user_stories.map(({ id, title }) => ({
 
 const activeUsType = us_types[0];
 
-const currentBoards = activeUsType.columns.map((column, index) => ({
+let currentBoards = activeUsType.columns.map((column, index) => ({
   id: `board-${column}`,
   title: column,
   item: getUsByType(activeUsType.id, index),
