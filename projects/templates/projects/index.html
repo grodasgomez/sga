@@ -24,7 +24,7 @@
         <tr height="60px">
           <td>
             <a href="{% url 'projects:project-detail' project_id=project.id %}" class="btn-custom">
-              <i class="fa-solid fa-diagram-project"></i>&nbsp{{ project.name }}
+              {{ project.name }}
             </a>
           </td>
           <td>{{ project.prefix }}</td>
