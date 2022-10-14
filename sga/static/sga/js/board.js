@@ -9,7 +9,7 @@ const items = user_stories.map(({ id, title }) => ({
   title,
 }));
 
-const activeUsType = us_types[0];
+let activeUsType = us_types[0];
 
 let currentBoards = activeUsType.columns.map((column, index) => ({
   id: `board-${column}`,
@@ -56,14 +56,14 @@ function getUsByType(usTypeId, indexColumn) {
 function filterUs() {
   // Obtener el tipo de US seleccionado
   const usType = document.getElementById("us_type").value;
-  const usTypeObj = us_types.find((us) => us.id === parseInt(usType));
+  activeUsType = us_types.find((us) => us.id === parseInt(usType));
 
   // Actualizar el tablero
-  const boards = usTypeObj.columns.map((column, index) => ({
+  const boards = activeUsType.columns.map((column, index) => ({
     id: `board-${column}`,
     title: column,
-    item: getUsByType(usTypeObj.id, index),
-    dragTo: usTypeObj.columns
+    item: getUsByType(activeUsType.id, index),
+    dragTo: activeUsType.columns
       .filter((c) => c !== column)
       .map((column) => `board-${column}`),
   }));
