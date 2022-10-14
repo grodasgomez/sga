@@ -180,8 +180,9 @@ class ProjectUseCase:
     @staticmethod
     def create_user_story(code, title, description, business_value,technical_priority,estimation_time,us_type, project_id):
         """
-        Crea un tipo de historia de usuario para el proyecto dado
+        Crea un us para el proyecto dado
         """
+        sprint_priority = round(0.6 * business_value + 0.4 * technical_priority)
         project = Project.objects.get(id=project_id)
         return UserStory.objects.create(
             code=code,
@@ -189,6 +190,7 @@ class ProjectUseCase:
             description=description,
             business_value=business_value,
             technical_priority=technical_priority,
+            sprint_priority=sprint_priority,
             estimation_time=estimation_time,
             us_type=us_type,
             project=project)
@@ -206,13 +208,13 @@ class ProjectUseCase:
 
     def get_user_story_by_id(id):
         """
-        Crea un tipo de historia de usuario para el proyecto dado
+        Obtener us por id
         """
         return UserStory.objects.get(id=id)
 
     def edit_user_story(id, title=None, description=None, business_value=None,technical_priority=None,estimation_time=None,us_type=None, column=None):
         """
-        Crea un tipo de historia de usuario para el proyecto dado
+        editar una us
         """
         data = {}
         if description:
@@ -221,11 +223,13 @@ class ProjectUseCase:
             data['business_value'] = business_value
         if technical_priority:
             data['technical_priority'] = technical_priority
+        if business_value or technical_priority:
+            data['sprint_priority'] = round(0.6 * business_value + 0.4 * technical_priority)
         if estimation_time:
             data['estimation_time'] = estimation_time
         if us_type:
             data['us_type'] = us_type
-        # Se cambio a None, para que column pueda valer 0
+        # Column es None por default, puede valer 0...
         if column is not None:
             data['column'] = column
 

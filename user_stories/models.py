@@ -10,6 +10,7 @@ class UserStory(models.Model):
     business_value= models.IntegerField()
     technical_priority= models.IntegerField()
     estimation_time= models.IntegerField()
+    sprint_priority = models.IntegerField()
     us_type= models.ForeignKey(UserStoryType, on_delete=models.CASCADE)
     column = models.IntegerField(default=0)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)

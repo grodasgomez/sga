@@ -267,12 +267,13 @@ class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, View):
     roles = ['Scrum Master']
 
     def get(self, request, project_id, sprint_id):
-        user_stories = SprintUseCase.assignable_us_to_sprint(project_id, sprint_id)
+        user_stories = SprintUseCase.assignable_us_to_sprint(project_id, sprint_id).order_by('-sprint_priority')
         if not user_stories:
             messages.warning(request, "No hay US disponibles para asignar")
             return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
         context = {
-            "user_stories": user_stories
+            "user_stories": user_stories,
+            "backpage": reverse("projects:sprints:backlog", kwargs={"project_id": project_id, "sprint_id": sprint_id})
         }
         return render(request, 'sprints/backlog_assign_us.html', context)
 
