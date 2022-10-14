@@ -20,6 +20,17 @@ class FormCreateProject(forms.Form):
         queryset=CustomUser.objects.filter(role_system='user'), label='Scrum Master', empty_label='Seleccione un usuario',
         widget=widgets.SelectInput())
 
+class FormDeleteProject(forms.Form):
+
+    name = forms.CharField(max_length=100, label='Nombre',
+                           widget=widgets.TextInput())
+    description = forms.CharField(
+        max_length=100, label='Descripción', widget=widgets.TextInput())
+    prefix = forms.CharField(
+        max_length=5, label='Prefijo', widget=widgets.TextInput())
+    scrum_master = forms.CharField(
+        max_length=100, label='Scrum Master', widget=widgets.TextInput())
+
 class FormCreateProjectMember(forms.Form):
     """
     Formulario para crear un miembro de un proyecto

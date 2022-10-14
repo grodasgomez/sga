@@ -1,0 +1,19 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% load static %}
+{% block head %}
+  <link rel="stylesheet" href="{% static 'sga/jkanban.min.css' %}">
+  <script src="{% static 'sga/js/jkanban.min.js' %}"></script>
+  <script defer src="{% static 'sga/js/board.js' %}"></script>
+{% endblock %}
+{% block content %}
+<b></b>
+	<h1> {{sprint.name}} - Tablero</h1>
+  <select id="us_type" class="form-select" onchange="filterUs()">
+    {% for us_type in us_types%}
+      <option value="{{us_type.id}}">{{us_type.name}}</option>
+    {% endfor %}
+  </select>
+  {{user_stories|json_script:"user_stories"}}
+  {{us_types|json_script:"us_types"}}
+	<div id="myKanban"></div>
+{% endblock %}

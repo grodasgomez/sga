@@ -24,7 +24,7 @@
         <tr height="60px">
           <td>
             <a href="{% url 'projects:project-detail' project_id=project.id %}" class="btn-custom">
-              <i class="fa-solid fa-diagram-project"></i>&nbsp{{ project.name }}
+              {{ project.name }}
             </a>
           </td>
           <td>{{ project.prefix }}</td>
@@ -36,12 +36,12 @@
             <a class="btn">
               <span class="btn-label"><i class="fa fa-pencil"></i></span>
             </a>
-            <a class="btn">
-              <span class="btn-label"><i class="fa fa-trash"></i></span>
-            </a>
             {% endcomment %}
-            <a href="{% url 'projects:create-member' project_id=project.id %}" class="btn">
+            <a href="{% url 'projects:create-member' project_id=project.id %}" class="btn" title="Añadir miembro">
               <span class="btn-label"><i class="fa fa-user-plus"></i></span>
+            </a>
+            <a href="{% url 'projects:delete' project_id=project.id %}" class="btn" title="Cancelar Proyecto">
+              <span class="btn-label"><i class="fa fa-trash"></i></span>
             </a>
           </td>
         </tr>

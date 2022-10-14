@@ -55,6 +55,7 @@ def breadcrumb(context):
         'create': 'Creación',
         'edit': 'Edición',
         'import': 'Importación',
+        'board': 'Tablero',
     }
     get_name = {
         'projects': lambda x: Project.objects.get(pk=x).name,
@@ -75,7 +76,7 @@ def breadcrumb(context):
         model_id = match.group('model_id')
 
         name = names[model_name] if model_name in names else model_name
-        if model_id in ['create', 'edit', 'import']:
+        if model_id in ['create', 'edit', 'import', 'board']:
             model_name_id = names[model_id]
         else:
             model_name_id = get_name[model_name](model_id) if model_name in get_name else model_id

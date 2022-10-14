@@ -1,20 +1,24 @@
+import json
 from django.views.generic import ListView, FormView
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
-from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.contrib import messages
 from django.views import View
 from django.db.models.query import QuerySet
 from django.urls import reverse
+from django.http import JsonResponse
+from django.forms.models import model_to_dict
+
 
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
     FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole,
-    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory)
+    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory, FormDeleteProject)
 from projects.models import Project, UserStoryType
 from projects.usecase import ProjectUseCase, RoleUseCase
 from user_stories.usecase import UserStoriesUseCase
 from projects.mixin import *
 from sga.mixin import *
+from projects.models import ProjectMember
 from users.models import CustomUser
 
 # Create your views here.
@@ -71,7 +75,6 @@ class ProjectMembersView(CustomLoginMixin, ProjectPermissionMixin, View):
     roles = ['Scrum Master']
 
     def get(self, request, project_id):
-        user: CustomUser = request.user
         data: Project = Project.objects.get(id=project_id)
         members: QuerySet = data.project_members.all()
         context= {
@@ -115,6 +118,32 @@ class ProjectCreateView(AdminMixin, View):
             return HttpResponseRedirect('/projects')
         return render(request, 'projects/create.html', {'form': form})
 
+class ProjectDeleteView(ProjectPermissionMixin, View):
+    """
+    Clase encargada de manejar la cancelación de un proyecto
+    """
+    form_class = FormDeleteProject
+
+    permissions = ['ABM Proyecto']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id):
+        project = Project.objects.get(id=project_id)
+        data = vars(project)
+        scrum_master = ProjectMember.objects.get(project=project, roles__name="Scrum Master")
+        data['scrum_master']=scrum_master.user.email
+        form = self.form_class(initial=data)
+        context={
+            "form": form,
+            "backpage": reverse("projects:index")
+        }
+        return render(request, 'projects/delete.html', context)
+
+    def post(self, request, project_id):
+        project = ProjectUseCase.cancel_project(project_id)
+        messages.success(request, f"Proyecto <strong>{project.name}</strong> cancelado correctamente")
+        return redirect(reverse("projects:index"))
+
 class ProjectMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de manejar la asignacion de miembros a un proyecto
@@ -128,7 +157,7 @@ class ProjectMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, View):
         form = self.form_class(project_id=project_id)
         context={
             "form": form,
-            "backpage": reverse("projects:index")
+            "backpage": reverse("projects:project-members", kwargs={"project_id": project_id})
         }
         return render(request, 'project_member/create.html', context)
 
@@ -684,3 +713,13 @@ class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, View):
             return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id}))
 
         return render(request, 'backlog/edit.html', context)
+
+class UserStoryEditApiView(CustomLoginMixin, ProjectAccessMixin, View):
+    """
+    Clase encargada de editar los tipos de us
+    """
+
+    def put(self, request, project_id, us_id):
+        data = json.loads(request.body)
+        user_story = model_to_dict(ProjectUseCase.edit_user_story(us_id, **data))
+        return JsonResponse({"data": user_story}, status=200)

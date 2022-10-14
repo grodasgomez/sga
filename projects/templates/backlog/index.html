@@ -38,8 +38,9 @@
 			<th scope="col">Descripcion</th>
 			<th scope="col">Valor de negocio</th>
 			<th scope="col">Prioridad Tecnica</th>
-            <th scope="col">Tiempo Estimado (Hs)</th>
-            <th scope="col">Tipo</th>
+			<th scope="col">Tiempo Estimado (Hs)</th>
+			<th scope="col">Prioridad para sprint</th>
+			<th scope="col">Tipo</th>
 			<th scope="col">Acciones</th>
 		</tr>
 		</thead>
@@ -52,9 +53,10 @@
             	<td>{{ user_story.business_value }}</td>
 			<td>{{ user_story.technical_priority }}</td>
 			<td>{{ user_story.estimation_time }}</td>
+			<td>{{ user_story.sprint_priority }}</td>
             	<td>{{ user_story.us_type.name }}</td>
 			<td>
-				<a href="{% url 'projects:project-backlog-edit' project_id=project_id us_id=user_story.id %}" class="btn">
+				<a href="{% url 'projects:project-backlog-edit' project_id=project_id us_id=user_story.id %}" class="btn" title="Editar Historia de Usuario">
 				  <span class="btn-label"><i class="fa fa-pencil"></i></span>
 				</a>
 			</td>

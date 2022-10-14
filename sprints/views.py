@@ -4,8 +4,10 @@ from django.contrib import messages
 from django.urls import reverse
 from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect
-
+from django.forms.models import model_to_dict
+import itertools
 from projects.mixin import ProjectPermissionMixin, ProjectAccessMixin
+from projects.models import UserStoryType
 from users.models import CustomUser
 from sprints.forms import SprintCreateForm, SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm
 from sprints.models import Sprint, SprintMember
@@ -265,12 +267,13 @@ class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, View):
     roles = ['Scrum Master']
 
     def get(self, request, project_id, sprint_id):
-        user_stories = SprintUseCase.assignable_us_to_sprint(project_id, sprint_id)
+        user_stories = SprintUseCase.assignable_us_to_sprint(project_id, sprint_id).order_by('-sprint_priority')
         if not user_stories:
             messages.warning(request, "No hay US disponibles para asignar")
             return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
         context = {
-            "user_stories": user_stories
+            "user_stories": user_stories,
+            "backpage": reverse("projects:sprints:backlog", kwargs={"project_id": project_id, "sprint_id": sprint_id})
         }
         return render(request, 'sprints/backlog_assign_us.html', context)
 
@@ -283,3 +286,18 @@ class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, View):
         message = ', '.join(assigned_names)
         messages.success(request, f"Historia/s de Usuario asignada/s correctamente: {message}")
         return redirect(reverse("projects:sprints:backlog", kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
+
+
+class SprintBoardView(View):
+    def get(self, request, project_id):
+        sprint = Sprint.objects.filter(project_id=project_id).first()
+        user_stories = UserStory.objects.filter(sprint_id=sprint.id).all()
+        us_types = UserStoryType.objects.filter(project_id=project_id).all()
+
+        context = {
+            'project_id': project_id,
+            'sprint': sprint,
+            'user_stories': [model_to_dict(us) for us in user_stories],
+            'us_types': [model_to_dict(us_type) for us_type in us_types],
+        }
+        return render(request, 'sprints/board.html', context)

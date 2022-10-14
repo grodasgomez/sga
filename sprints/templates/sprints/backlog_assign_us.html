@@ -13,14 +13,15 @@
 		<table class="table-custom">
 			<thead>
 				<tr>
-					<th scope="col" style="width: 5%;"><input type="checkbox" id="check-all"></th>
-					<th scope="col" style="width: 10%;">Codigo</th>
-					<th scope="col" style="width: 10%;">Titulo</th>
-					<th scope="col" style="width: 10%;">Descripcion</th>
-					<th scope="col" style="width: 10%;">Valor de negocio</th>
-					<th scope="col" style="width: 10%;">Prioridad Tecnica</th>
-					<th scope="col" style="width: 10%;">Tiempo Estimado (Hs)</th>
-					<th scope="col" style="width: 10%;">Tipo</th>
+					<th scope="col"><input type="checkbox" id="check-all"></th>
+					<th scope="col">Codigo</th>
+					<th scope="col">Titulo</th>
+					<th scope="col">Descripcion</th>
+					<th scope="col">Valor de negocio</th>
+					<th scope="col">Prioridad Tecnica</th>
+					<th scope="col">Tiempo Estimado (Hs)</th>
+					<th scope="col">Prioridad para sprint</th>
+					<th scope="col">Tipo</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -35,6 +36,7 @@
 					<td>{{ user_story.business_value }}</td>
 					<td>{{ user_story.technical_priority }}</td>
 					<td>{{ user_story.estimation_time }}</td>
+					<td>{{ user_story.sprint_priority }}</td>
 					<td>{{ user_story.us_type.name }}</td>
 				</tr>
 				{% endfor %}
