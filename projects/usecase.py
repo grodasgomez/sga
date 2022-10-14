@@ -30,6 +30,18 @@ class ProjectUseCase:
         return project
 
     @staticmethod
+    def cancel_project(project_id):
+        """
+        Cancelar un Proyecto
+        """
+        project = Project.objects.get(id=project_id)
+        project.status = ProjectStatus.CANCELLED
+        #todo verificar esta bien end date?
+        project.end_date = date.today()
+        project.save()
+        return project
+
+    @staticmethod
     def start_project(project_id):
         """
         Inicia un proyecto

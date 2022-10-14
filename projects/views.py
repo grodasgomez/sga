@@ -12,11 +12,12 @@ from django.forms.models import model_to_dict
 
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
     FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole,
-    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory)
+    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory, FormDeleteProject)
 from projects.models import Project, UserStoryType
 from projects.usecase import ProjectUseCase, RoleUseCase
 from projects.mixin import *
 from sga.mixin import *
+from projects.models import ProjectMember
 from users.models import CustomUser
 
 # Create your views here.
@@ -115,6 +116,32 @@ class ProjectCreateView(AdminMixin, View):
             messages.success(request, 'Proyecto creado correctamente')
             return HttpResponseRedirect('/projects')
         return render(request, 'projects/create.html', {'form': form})
+
+class ProjectDeleteView(ProjectPermissionMixin, View):
+    """
+    Clase encargada de manejar la cancelación de un proyecto
+    """
+    form_class = FormDeleteProject
+
+    permissions = ['ABM Proyecto']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id):
+        project = Project.objects.get(id=project_id)
+        data = vars(project)
+        scrum_master = ProjectMember.objects.get(project=project, roles__name="Scrum Master")
+        data['scrum_master']=scrum_master.user.email
+        form = self.form_class(initial=data)
+        context={
+            "form": form,
+            "backpage": reverse("projects:index")
+        }
+        return render(request, 'projects/delete.html', context)
+
+    def post(self, request, project_id):
+        project = ProjectUseCase.cancel_project(project_id)
+        messages.success(request, f"Proyecto <strong>{project.name}</strong> cancelado correctamente")
+        return redirect(reverse("projects:index"))
 
 class ProjectMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, View):
     """
