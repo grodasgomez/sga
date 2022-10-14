@@ -57,7 +57,7 @@ class SprintUseCase:
         user_ids = ProjectMember.objects.filter(
             project_id=project_id,
         ).exclude(
-            roles__name__in=['Scrum Master', 'Product Owner']
+            roles__name=['Developer'],
         ).exclude(
             user__sprints__id=sprint_id
         ).values_list('user', flat=True)

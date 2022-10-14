@@ -1,7 +1,9 @@
 from django.db import models
+from django.forms.models import model_to_dict
 
 from projects.models import Project,UserStoryType
 from sprints.models import Sprint, SprintMember
+from users.models import CustomUser
 
 class UserStory(models.Model):
     code = models.CharField(max_length=100)
@@ -23,5 +25,15 @@ class UserStory(models.Model):
     def __str__(self):
         return self.code
 
+    def to_kanban_item(self):
+        data = model_to_dict(self)
+        if(self.sprint_member):
+            user = self.sprint_member.user
+            data['user'] = {
+                'id': user.id,
+                'name': user.name,
+                'picture': user.picture
+            }
+        return data
     class Meta:
         ordering = ['id']
