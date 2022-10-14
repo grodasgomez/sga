@@ -73,7 +73,6 @@ class ProjectMembersView(CustomLoginMixin, ProjectPermissionMixin, View):
     roles = ['Scrum Master']
 
     def get(self, request, project_id):
-        user: CustomUser = request.user
         data: Project = Project.objects.get(id=project_id)
         members: QuerySet = data.project_members.all()
         context= {
@@ -130,7 +129,7 @@ class ProjectMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, View):
         form = self.form_class(project_id=project_id)
         context={
             "form": form,
-            "backpage": reverse("projects:index")
+            "backpage": reverse("projects:project-members", kwargs={"project_id": project_id})
         }
         return render(request, 'project_member/create.html', context)
 
