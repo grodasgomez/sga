@@ -34,6 +34,13 @@ class CustomUser(AbstractBaseUser):
     def name(self):
         return f"{self.first_name} {self.last_name}"
 
+    @property
+    def picture(self):
+        social_account_data = self.socialaccount_set.first()
+        if social_account_data:
+            return social_account_data.get_avatar_url()
+        return f"https://ui-avatars.com/api/?name={self.name}"
+
     class Meta:
         db_table = 'sga_user'
         ordering = ['last_name']

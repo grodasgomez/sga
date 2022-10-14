@@ -296,7 +296,7 @@ class SprintBoardView(View):
         context = {
             'project_id': project_id,
             'sprint': sprint,
-            'user_stories': [model_to_dict(us) for us in user_stories],
+            'user_stories': [us.to_kanban_item() for us in user_stories],
             'us_types': [model_to_dict(us_type) for us_type in us_types],
         }
         return render(request, 'sprints/board.html', context)

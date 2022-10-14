@@ -87,3 +87,28 @@ span.btn-label {
 .btn-toggle-nav a:focus {
   background-color: #d2f4ea;
 }
+
+/* Kanban style*/
+
+.kanban-item{
+  display: flex;
+  flex-direction: column;
+}
+
+.kanban-item-title {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.kanban-item-footer {
+  display: flex;
+  justify-content: space-between;
+  justify-items: center;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.kanban-item-code {
+  font-size: 0.8rem;
+  margin:0;
+}
