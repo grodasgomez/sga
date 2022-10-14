@@ -22,7 +22,7 @@
         <td>{{ object.name }}</td>
         <td>{{ object.columns }}</td>
         <td>
-          <a href="{% url 'projects:user-story-type-edit' project_id=project_id id=object.id %}" class="btn">
+          <a href="{% url 'projects:user-story-type-edit' project_id=project_id id=object.id %}" class="btn" title="Editar tipo de Historia de Usuario">
             <span class="btn-label"><i class="fa fa-pencil"></i></span>
           </a>
         </td>

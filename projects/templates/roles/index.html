@@ -22,10 +22,10 @@
         <td>{{ role.name }}</td>
         <td>{{ role.description }}</td>
         <td>
-          <a href="{% url 'projects:edit-role' project_id=project_id role_id=role.id %}" class="btn">
+          <a href="{% url 'projects:edit-role' project_id=project_id role_id=role.id %}" class="btn" title="Editar rol">
             <span class="btn-label"><i class="fa fa-pencil"></i></span>
           </a>
-          <a href="{% url 'projects:delete-role' project_id=project_id role_id=role.id %}" class="btn">
+          <a href="{% url 'projects:delete-role' project_id=project_id role_id=role.id %}" class="btn" title="Eliminar rol">
             <span class="btn-label"><i class="fa fa-trash"></i></span>
           </a>
         </td>
