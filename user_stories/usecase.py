@@ -19,6 +19,7 @@ class UserStoriesUseCase:
             "technical_priority": old_user_story.technical_priority,
             "estimation_time": old_user_story.estimation_time,
             "us_type": old_user_story.us_type.id,
+            "column": old_user_story.column,
             "project": old_user_story.project.id,
             "sprint": 0,
             "sprint_member": 0
@@ -29,10 +30,10 @@ class UserStoriesUseCase:
         if old_user_story.sprint_member:
             data["sprint_member"]=old_user_story.sprint_member.id
 
-        keys=["title", "description", "business_value", "technical_priority", "estimation_time", "sprint", "sprint_member"]
+        keys=["title", "description", "business_value", "technical_priority", "estimation_time", "column", "sprint", "sprint_member"]
         keys_esp={
             "title": "Título", "description": "Descripción", "business_value": "Valor de negocio",
-            "technical_priority": "Prioridad técnica", "estimation_time": "Tiempo de estimación",
+            "technical_priority": "Prioridad técnica", "column": "Columna","estimation_time": "Tiempo de estimación",
             "sprint_id": "Sprint", "sprint_member_id": "Miembro del sprint"}
 
         old_user_story_dic=vars(old_user_story)
