@@ -11,6 +11,7 @@ from users.models import CustomUser
 from sprints.forms import SprintCreateForm, SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm
 from sprints.models import Sprint, SprintMember
 from sprints.usecase import SprintUseCase
+from user_stories.usecase import UserStoriesUseCase
 from user_stories.models import UserStory
 from sga.mixin import CustomLoginMixin
 
@@ -317,7 +318,9 @@ class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, View):
         user_stories = request.POST.getlist("us")
         assigned_names = []
         for us in user_stories:
+            old_us=ProjectUseCase.get_user_story_by_id(us)
             us = SprintUseCase.assign_us_sprint(sprint_id, us)
+            UserStoriesUseCase.create_user_story_history(old_us, us, request.user, project_id)
             assigned_names.append(us.code)
         message = ', '.join(assigned_names)
         messages.success(request, f"Historia/s de Usuario asignada/s correctamente: {message}")

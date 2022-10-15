@@ -2,7 +2,6 @@ from django.db import models
 from django.forms.models import model_to_dict
 
 from projects.models import Project,UserStoryType, ProjectMember
-from sprints.models import Sprint, SprintMember
 from users.models import CustomUser
 
 class UserStory(models.Model):

@@ -10,7 +10,7 @@ from sga.mixin import CustomLoginMixin
 
 class UserStoryHistoryView(CustomLoginMixin, ProjectPermissionMixin, View):
     """
-    Clase encargada de mostrar los roles de un proyecto
+    Clase encargada de mostrar el historial de cambios de una historia de usuario
     """
     permissions = ['Historial']
     roles = ['Scrum Master']
