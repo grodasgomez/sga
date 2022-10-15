@@ -1,24 +1,11 @@
 const user_stories = JSON.parse(
   document.getElementById("user_stories").textContent
 );
-
 const us_types = JSON.parse(document.getElementById("us_types").textContent);
-
-const items = user_stories.map(({ id, title }) => ({
-  id,
-  title,
-}));
 
 let activeUsType = us_types[0];
 
-let currentBoards = activeUsType.columns.map((column, index) => ({
-  id: `board-${column}`,
-  title: column,
-  item: getUsByType(activeUsType.id, index),
-  dragTo: activeUsType.columns
-    .filter((c) => c !== column)
-    .map((column) => `board-${column}`),
-}));
+let currentBoards = createBoard(activeUsType);
 
 const kanban = new jKanban({
   element: "#myKanban",
@@ -26,7 +13,7 @@ const kanban = new jKanban({
   widthBoard: "260px",
   dragBoards: false,
   boards: currentBoards,
-  dropEl: function (el, target, source, sibling) {
+  dropEl: function (el, target) {
     const usId = el.getAttribute("data-eid").split("-")[1];
     const usTypeColumn = target.parentElement
       .getAttribute("data-id")
@@ -44,12 +31,36 @@ const kanban = new jKanban({
 function getUsByType(usTypeId, indexColumn) {
   return user_stories
     .filter((us) => us.us_type === usTypeId && us.column === indexColumn)
-    .map(({ id, title }) => ({
+    .map(({ id, ...usData }) => ({
       id: `us-${id}`,
-      title,
+      title: getUsTemplate(usData),
     }));
 }
 
+function getUsTemplate(us) {
+  const htmlTemplate = `
+    <div class="kanban-item-title">
+      ${us.title}
+    </div>
+    <div class="kanban-item-footer">
+      <p class="kanban-item-code">${us.code}</p>
+      ${us.user ? ` <img src="${us.user.picture}" alt="" width="24" height="24" class="rounded-circle">` : ""}
+    </div>`;
+
+  return htmlTemplate;
+
+}
+
+function createBoard(usType){
+  return usType.columns.map((column, index) => ({
+    id: `board-${column}`,
+    title: column,
+    item: getUsByType(usType.id, index),
+    dragTo: usType.columns
+      .filter((c) => c !== column)
+      .map((column) => `board-${column}`)
+  }));
+}
 /**
  * Funcion que se ejecuta al seleccionar un tipo de US, actualiza el tablero
  */
@@ -59,14 +70,8 @@ function filterUs() {
   activeUsType = us_types.find((us) => us.id === parseInt(usType));
 
   // Actualizar el tablero
-  const boards = activeUsType.columns.map((column, index) => ({
-    id: `board-${column}`,
-    title: column,
-    item: getUsByType(activeUsType.id, index),
-    dragTo: activeUsType.columns
-      .filter((c) => c !== column)
-      .map((column) => `board-${column}`),
-  }));
+  const boards = createBoard(activeUsType);
+
   // Eliminar las columnas del tablero actual
   const currentBoardIds = currentBoards.map((board) => board.id);
   currentBoardIds.forEach((boardId) => {

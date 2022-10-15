@@ -3,11 +3,10 @@ from django.views import View
 from django.contrib import messages
 from django.urls import reverse
 from django.shortcuts import redirect, render
-from django.http import HttpResponseRedirect
 from django.forms.models import model_to_dict
-import itertools
 from projects.mixin import ProjectPermissionMixin, ProjectAccessMixin
-from projects.models import UserStoryType
+from projects.models import UserStoryType, ProjectStatus
+from projects.usecase import ProjectUseCase
 from users.models import CustomUser
 from sprints.forms import SprintCreateForm, SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm
 from sprints.models import Sprint, SprintMember
@@ -44,7 +43,12 @@ class SprintCreateView(CustomLoginMixin, ProjectPermissionMixin, FormView):
     template_name = 'sprints/create.html'
 
     def get(self, request, project_id, **kwargs):
-        if(SprintUseCase.exists_created_sprint(project_id)):
+        # Si el proyecto no esta en planeacion, no se puede crear un sprint
+        if not ProjectUseCase.get_project_status(project_id) == ProjectStatus.IN_PROGRESS:
+            messages.warning(request, 'El proyecto aun no fue iniciado')
+            return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
+        # Si ya existe un sprint en planeacion, no se puede crear otro
+        if SprintUseCase.exists_created_sprint(project_id):
             messages.warning(request, 'Ya existe un sprint en planeación')
             return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
         return super().get(request, project_id, **kwargs)
@@ -90,6 +94,24 @@ class SprintView(CustomLoginMixin, ProjectPermissionMixin, DetailView):
         context['project_id'] = self.kwargs.get('project_id')
         context['backpage'] = reverse('projects:sprints:index', kwargs={'project_id': context['project_id']})
         return context
+
+    def post(self, request, project_id, sprint_id):
+        sprint = Sprint.objects.get(id=sprint_id)
+        print(sprint.status)
+        if sprint.status == "PLANNED":
+            sprint.status
+        elif sprint.status == "IN_PROGRESS":
+            print("b")
+        try:
+            if sprint.status == "PLANNED":
+                SprintUseCase.start_sprint(sprint_id)
+                messages.success(request, f"Sprint iniciado correctamente")
+            elif sprint.status == "IN_PROGRESS":
+                SprintUseCase.finish_sprint(sprint_id)
+                messages.success(request, f"Sprint finalizado correctamente")
+        except Exception as e:
+            messages.warning(request, e)
+        return redirect(reverse('projects:sprints:detail', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
 
 class SprintMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, FormView):
     """
@@ -196,19 +218,21 @@ class SprintMemberListView(CustomLoginMixin, ProjectPermissionMixin, View):
         }
         return render(request, 'sprint-members/index.html', context)
 
-class SprintStartView(CustomLoginMixin, ProjectPermissionMixin, FormView):
+class SprintStartView(CustomLoginMixin, ProjectPermissionMixin, View):
     """
     Vista para iniciar un sprint
     """
     permissions = ['ABM Sprint']
     roles = ['Scrum Master']
-    template_name = 'sprints/start.html'
-    form_class = SprintStartForm
 
-    def post(self, request, project_id):
-        # SprintUseCase.create_sprint(project_id)
-        messages.success(request, 'Proyecto creado correctamente')
-        return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
+    def get(self, request, project_id, sprint_id):
+        try:
+            SprintUseCase.start_sprint(sprint_id)
+            messages.success(request, f"Sprint iniciado correctamente")
+            return redirect(reverse('projects:sprints:detail', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
+        except Exception as e:
+            messages.warning(request, e)
+            return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
 
 class SprintBacklogView(CustomLoginMixin, ProjectPermissionMixin, View):
     """
@@ -246,8 +270,16 @@ class SprintBacklogAssignMemberView(CustomLoginMixin, ProjectPermissionMixin, Vi
         except SprintMember.DoesNotExist:
             sprint_member = None
         form = self.form_class(sprint_id=sprint_id,initial={'sprint_member': sprint_member})
-
-        return render(request, 'sprints/backlog_assign_member.html', {'form': form})
+        assignable_members = SprintUseCase.get_assignable_sprint_members(sprint_id)
+        assignable_members = [ member.to_assignable_data() for member in assignable_members]
+        us_estimation = UserStory.objects.get(id=user_story_id).estimation_time
+        context = {
+            'form': form,
+            'us_estimation': us_estimation,
+            'assignable_members': assignable_members,
+            'backpage': reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}),
+        }
+        return render(request, 'sprints/backlog_assign_member.html', context)
 
     def post(self, request, project_id, sprint_id, user_story_id):
         form = self.form_class(sprint_id, request.POST)
@@ -271,7 +303,11 @@ class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, View):
         if not user_stories:
             messages.warning(request, "No hay US disponibles para asignar")
             return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
+        sprint = Sprint.objects.get(id=sprint_id)
+        available_capacity = sprint.capacity - sprint.used_capacity
         context = {
+            "sprint": sprint,
+            "available_capacity": available_capacity,
             "user_stories": user_stories,
             "backpage": reverse("projects:sprints:backlog", kwargs={"project_id": project_id, "sprint_id": sprint_id})
         }
@@ -288,16 +324,20 @@ class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, View):
         return redirect(reverse("projects:sprints:backlog", kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
 
 
-class SprintBoardView(View):
+class SprintBoardView(CustomLoginMixin, ProjectAccessMixin, View):
     def get(self, request, project_id):
-        sprint = Sprint.objects.filter(project_id=project_id).first()
+        sprint = SprintUseCase.get_current_sprint(project_id)
+        if not sprint:
+            messages.warning(request, "No hay sprint en progreso para este proyecto")
+            return redirect(reverse("projects:project-detail", kwargs={"project_id": project_id}))
+
         user_stories = UserStory.objects.filter(sprint_id=sprint.id).all()
         us_types = UserStoryType.objects.filter(project_id=project_id).all()
 
         context = {
             'project_id': project_id,
             'sprint': sprint,
-            'user_stories': [model_to_dict(us) for us in user_stories],
+            'user_stories': [us.to_kanban_item() for us in user_stories],
             'us_types': [model_to_dict(us_type) for us_type in us_types],
         }
         return render(request, 'sprints/board.html', context)

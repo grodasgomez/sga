@@ -218,12 +218,14 @@ class ProjectUseCase:
             ProjectUseCase.create_user_story_type(
                 project_id=project_id, name=name, columns=user_story_type.columns)
 
+    @staticmethod
     def get_user_story_by_id(id):
         """
         Obtener us por id
         """
         return UserStory.objects.get(id=id)
 
+    @staticmethod
     def edit_user_story(id, title=None, description=None, business_value=None,technical_priority=None,estimation_time=None,us_type=None, column=None):
         """
         editar una us
@@ -247,6 +249,13 @@ class ProjectUseCase:
 
         UserStory.objects.filter(pk=id).update(**data)
         return UserStory.objects.get(pk=id)
+
+    @staticmethod
+    def get_project_status(project_id):
+        """
+        Obtiene el estado de un proyecto
+        """
+        return Project.objects.get(id=project_id).status
 
 class RoleUseCase:
     @staticmethod
@@ -292,6 +301,7 @@ class RoleUseCase:
         """
         return Role.objects.filter(project_id=project_id)
 
+    @staticmethod
     def count_roles_by_project_no_default(project_id):
         """
         Retorna los roles custom de un proyecto
@@ -353,6 +363,7 @@ class RoleUseCase:
         member=project.project_members.get(id=member_id)
         return RoleUseCase.get_roles_from_member(member,project)
 
+    @staticmethod
     def get_project_member_by_id(member_id,project_id):
         project=Project.objects.get(id=project_id)
         return project.project_members.get(id=member_id)
@@ -389,5 +400,6 @@ class RoleUseCase:
 
         return True
 
+    @staticmethod
     def role_is_in_use(role_id):
         return ProjectMember.objects.filter(roles__id=role_id).count() > 0

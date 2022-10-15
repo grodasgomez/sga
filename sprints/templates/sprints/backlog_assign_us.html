@@ -8,6 +8,9 @@
 <b></b>
 	<h1>Asignar US</h1>
   <p>Seleccione las US que desea asignar al Sprint</p>
+  <p>Capacidad del sprint: {{sprint.capacity}} Hs</p>
+  <p>Capacidad utilizada: {{sprint.used_capacity}} Hs</p>
+  <p>Capacidad restante del sprint: {{available_capacity}} Hs</p>
 	<form  method="post" class="form row g-3">
 		{% csrf_token %}
 		<table class="table-custom">

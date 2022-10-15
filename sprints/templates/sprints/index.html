@@ -11,6 +11,7 @@
         <th scope="col">Nombre</th>
         <th scope="col">Estado</th>
         <th scope="col">Capacidad en horas</th>
+        <th scope="col">Capacidad utilizada en horas</th>
         <th scope="col">Duración en dias</th>
         <th scope="col">Fecha inicio</th>
         <th scope="col">Fecha fin</th>
@@ -27,6 +28,7 @@
         </td>
         <td>{{ object.get_status_display }}</td>
         <td>{{ object.capacity }}</td>
+        <td>{{ object.used_capacity }}</td>
         <td>{{ object.duration }}</td>
         <td>{{ object.start_date }}</td>
         <td>{{ object.end_date }}</td>

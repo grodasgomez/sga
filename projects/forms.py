@@ -43,7 +43,7 @@ class FormCreateProjectMember(forms.Form):
             widget=widgets.SelectInput()
         )
         self.fields['roles'] = forms.ModelMultipleChoiceField(
-            queryset=RoleUseCase.get_roles_by_project(project_id),
+            queryset=RoleUseCase.get_roles_by_project(project_id).exclude(name='Scrum Master'),
             label='Roles', widget=widgets.SelectMultipleInput())
 
 class FormEditProjectMember(forms.Form):
