@@ -5,7 +5,8 @@ from django.urls import reverse
 from django.shortcuts import redirect, render
 from django.forms.models import model_to_dict
 from projects.mixin import ProjectPermissionMixin, ProjectAccessMixin
-from projects.models import UserStoryType
+from projects.models import UserStoryType, ProjectStatus
+from projects.usecase import ProjectUseCase
 from users.models import CustomUser
 from sprints.forms import SprintCreateForm, SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm
 from sprints.models import Sprint, SprintMember
@@ -42,7 +43,12 @@ class SprintCreateView(CustomLoginMixin, ProjectPermissionMixin, FormView):
     template_name = 'sprints/create.html'
 
     def get(self, request, project_id, **kwargs):
-        if(SprintUseCase.exists_created_sprint(project_id)):
+        # Si el proyecto no esta en planeacion, no se puede crear un sprint
+        if not ProjectUseCase.get_project_status(project_id) == ProjectStatus.IN_PROGRESS:
+            messages.warning(request, 'El proyecto aun no fue iniciado')
+            return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
+        # Si ya existe un sprint en planeacion, no se puede crear otro
+        if SprintUseCase.exists_created_sprint(project_id):
             messages.warning(request, 'Ya existe un sprint en planeación')
             return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
         return super().get(request, project_id, **kwargs)
