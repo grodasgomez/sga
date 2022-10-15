@@ -722,5 +722,8 @@ class UserStoryEditApiView(CustomLoginMixin, ProjectAccessMixin, View):
 
     def put(self, request, project_id, us_id):
         data = json.loads(request.body)
-        user_story = model_to_dict(ProjectUseCase.edit_user_story(us_id, **data))
+        old_us = ProjectUseCase.get_user_story_by_id(id=us_id)
+        new_us =ProjectUseCase.edit_user_story(us_id, **data)
+        UserStoriesUseCase.create_user_story_history(old_us, new_us, request.user, project_id)
+        user_story = model_to_dict(new_us)
         return JsonResponse({"data": user_story}, status=200)
