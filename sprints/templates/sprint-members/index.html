@@ -10,6 +10,8 @@
       <tr>
         <th scope="col">Nombre</th>
         <th scope="col">Carga horaria</th>
+        <th scope="col">Capacidad</th>
+        <th scope="col">Capacidad asignada</th>
         <th scope="col">Acciones</th>
       </tr>
     </thead>
@@ -18,6 +20,8 @@
       <tr height="60px">
         <td>{{ object.user.name }}</td>
         <td>{{ object.workload }}</td>
+        <td>{{ object.capacity }}</td>
+        <td>{{ object.used_capacity }}</td>
         <td>
           <a href="{% url 'projects:sprints:member-edit' project_id=project_id sprint_id=sprint.id sprint_member_id=object.id %}" class="btn" title="Editar miembro">
 						<span class="btn-label"><i class="fa fa-pencil"></i></span>

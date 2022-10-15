@@ -3,9 +3,7 @@ from django.views import View
 from django.contrib import messages
 from django.urls import reverse
 from django.shortcuts import redirect, render
-from django.http import HttpResponseRedirect
 from django.forms.models import model_to_dict
-import itertools
 from projects.mixin import ProjectPermissionMixin, ProjectAccessMixin
 from projects.models import UserStoryType
 from users.models import CustomUser
@@ -248,8 +246,16 @@ class SprintBacklogAssignMemberView(CustomLoginMixin, ProjectPermissionMixin, Vi
         except SprintMember.DoesNotExist:
             sprint_member = None
         form = self.form_class(sprint_id=sprint_id,initial={'sprint_member': sprint_member})
-
-        return render(request, 'sprints/backlog_assign_member.html', {'form': form})
+        assignable_members = SprintUseCase.get_assignable_sprint_members(sprint_id)
+        assignable_members = [ member.to_assignable_data() for member in assignable_members]
+        us_estimation = UserStory.objects.get(id=user_story_id).estimation_time
+        context = {
+            'form': form,
+            'us_estimation': us_estimation,
+            'assignable_members': assignable_members,
+            'backpage': reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}),
+        }
+        return render(request, 'sprints/backlog_assign_member.html', context)
 
     def post(self, request, project_id, sprint_id, user_story_id):
         form = self.form_class(sprint_id, request.POST)
@@ -273,7 +279,11 @@ class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, View):
         if not user_stories:
             messages.warning(request, "No hay US disponibles para asignar")
             return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
+        sprint = Sprint.objects.get(id=sprint_id)
+        available_capacity = sprint.capacity - sprint.used_capacity
         context = {
+            "sprint": sprint,
+            "available_capacity": available_capacity,
             "user_stories": user_stories,
             "backpage": reverse("projects:sprints:backlog", kwargs={"project_id": project_id, "sprint_id": sprint_id})
         }

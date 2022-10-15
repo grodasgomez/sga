@@ -1,4 +1,7 @@
+from functools import cached_property
 from django.db import models
+
+from user_stories.models import UserStory
 
 
 class SprintStatus(models.TextChoices):
@@ -23,6 +26,18 @@ class Sprint(models.Model):
     def name(self):
         return f"Sprint {self.number}"
 
+    @cached_property
+    def used_capacity(self):
+        """
+        Retorna la capacidad usada en el sprint
+        @cached_property: permite que el valor se calcule una vez y se guarde en memoria
+        mientras el objeto exista.
+        """
+        return UserStory.objects.filter(sprint_id=self.id).aggregate(
+            models.Sum('estimation_time')
+            )['estimation_time__sum'] or 0
+
+
     def __str__(self):
         return f"Sprint {self.number} - {self.project.name}"
 
@@ -34,5 +49,27 @@ class SprintMember(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
 
+    @property
+    def capacity(self):
+        return self.workload * self.sprint.duration
+
+    @cached_property
+    def used_capacity(self):
+        """
+        Retorna la capacidad asignada al miembro del sprint.
+        @cached_property: permite que el valor se calcule una vez y se guarde en memoria
+        mientras el objeto exista.
+        """
+        return UserStory.objects.filter(sprint_member_id=self.id).aggregate(
+            models.Sum('estimation_time')
+            )['estimation_time__sum'] or 0
+
+    def to_assignable_data(self):
+        return {
+            'id': self.id,
+            'workload': self.workload,
+            'capacity': self.capacity,
+            'used_capacity': self.used_capacity
+        }
     def __str__(self):
         return f"{self.user.name}"
