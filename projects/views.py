@@ -81,6 +81,7 @@ class ProjectMembersView(CustomLoginMixin, ProjectPermissionMixin, View):
             "project_id" : project_id,
             "backpage": reverse("projects:project-detail", kwargs={"project_id": project_id})
         }
+        #TODO: realizar un usecase get_project_members_with_roles()
         for member in members:
             scrum_master = False
             roles = RoleUseCase.get_roles_from_member(member, data)
@@ -468,7 +469,7 @@ class ProductBacklogCreateView(CustomLoginMixin, ProjectPermissionMixin, View):
         has_perm = ProjectUseCase.member_has_permissions(user.id, project_id, self.permissions)
         has_role_SM = ProjectUseCase.member_has_roles(user.id, project_id, ['Scrum Master'])
         has_role_PO = ProjectUseCase.member_has_roles(user.id, project_id, ['Product Owner'])
-
+        #TODO: solo se necesita preguntar si es PO, cualquier otro rol tiene formulario completo
         form = FormCreateUserStory(project_id)
         if has_perm or has_role_SM:
             form = FormCreateUserStory(project_id)

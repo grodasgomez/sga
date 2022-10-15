@@ -34,6 +34,11 @@ def login(request):
         return redirect("/")
     return render(request, 'account/login.html')
 
+#TODO: realizar html 404, no hay que redireccionar
+def custom_404(request, exception):
+    messages.warning(request, "Página no encontrada")
+    return redirect("/")
+
 ### SOLO PARA LOGEAR CON USUARIOS DE PRUEBA ###
 from django.shortcuts import reverse
 from django.contrib.auth import authenticate

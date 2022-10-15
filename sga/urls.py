@@ -19,6 +19,8 @@ from django.urls import include
 from . import views
 from users import views as views_users
 
+handler404 = 'sga.views.custom_404'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/login/', views.login, name='login'),
