@@ -1,0 +1,29 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+  <h1>Historial de Historia de Usuario</h1>
+  {% include 'utils/messages.html'%}
+  <table class="table-custom">
+    <thead>
+      <tr>
+        <th scope="col">Nombre</th>
+        <th scope="col">Cambios</th>
+        <th scope="col">Autor</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for history in us_history %}
+      <tr height="60px">
+        <td>{{ history.user_story.title }}</td>
+        <td>{{ history.description }}</td>
+        <td>{{ history.project_member.user.email }}</td>
+        <td>
+          <a href="" class="btn" title="Restaurar">
+            <span class="btn-label"><i class="fa fa-undo"></i></span>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

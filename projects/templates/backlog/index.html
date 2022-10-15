@@ -59,6 +59,9 @@
 				<a href="{% url 'projects:project-backlog-edit' project_id=project_id us_id=user_story.id %}" class="btn" title="Editar Historia de Usuario">
 				  <span class="btn-label"><i class="fa fa-pencil"></i></span>
 				</a>
+				<a href="{% url 'user_stories:user-story-history' project_id=project_id user_story_id=user_story.id %}" class="btn" title="Historial de Historia de Usuario">
+					<span class="btn-label"><i class="fa fa-history"></i></span>
+				</a>
 			</td>
 		</tr>
 		{% endfor %}

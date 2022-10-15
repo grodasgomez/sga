@@ -48,4 +48,11 @@ class UserStoriesUseCase:
             return UserStoryHistory.objects.create(user_story=new_user_story, project_member=RoleUseCase.get_project_member_by_user(user,project_id), description=description, dataJson=data)
 
         return None
+    
+    @staticmethod
+    def user_story_history_by_us_id(user_story_id):
+        """
+        Retorna el historial de cambios de una historia de usuario
+        """
+        return UserStoryHistory.objects.filter(user_story_id=user_story_id).order_by('-created_at')
 
