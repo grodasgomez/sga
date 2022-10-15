@@ -196,19 +196,21 @@ class SprintMemberListView(CustomLoginMixin, ProjectPermissionMixin, View):
         }
         return render(request, 'sprint-members/index.html', context)
 
-class SprintStartView(CustomLoginMixin, ProjectPermissionMixin, FormView):
+class SprintStartView(CustomLoginMixin, ProjectPermissionMixin, View):
     """
     Vista para iniciar un sprint
     """
     permissions = ['ABM Sprint']
     roles = ['Scrum Master']
-    template_name = 'sprints/start.html'
-    form_class = SprintStartForm
 
-    def post(self, request, project_id):
-        # SprintUseCase.create_sprint(project_id)
-        messages.success(request, 'Proyecto creado correctamente')
-        return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
+    def get(self, request, project_id, sprint_id):
+        try:
+            SprintUseCase.start_sprint(sprint_id)
+            messages.success(request, f"Sprint iniciado correctamente")
+            return redirect(reverse('projects:sprints:detail', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
+        except Exception as e:
+            messages.warning(request, e)
+            return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
 
 class SprintBacklogView(CustomLoginMixin, ProjectPermissionMixin, View):
     """
@@ -288,9 +290,13 @@ class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, View):
         return redirect(reverse("projects:sprints:backlog", kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
 
 
-class SprintBoardView(View):
+class SprintBoardView(CustomLoginMixin, ProjectAccessMixin, View):
     def get(self, request, project_id):
-        sprint = Sprint.objects.filter(project_id=project_id).first()
+        sprint = SprintUseCase.get_current_sprint(project_id)
+        if not sprint:
+            messages.warning(request, "No hay sprint en progreso para este proyecto")
+            return redirect(reverse("projects:project-detail", kwargs={"project_id": project_id}))
+
         user_stories = UserStory.objects.filter(sprint_id=sprint.id).all()
         us_types = UserStoryType.objects.filter(project_id=project_id).all()
 

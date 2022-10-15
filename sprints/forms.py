@@ -36,7 +36,7 @@ class SprintMemberCreateForm(forms.Form):
     def __init__(self, project_id, sprint_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['workload'] = forms.IntegerField(label='Carga de trabajo', min_value=1,
-                                                     max_value=8, widget=widgets.TextInput(attrs={'type': 'number'}))
+                                                     max_value=12, widget=widgets.TextInput(attrs={'type': 'number'}))
         self.fields['user'] = forms.ModelChoiceField(
             queryset=SprintUseCase.get_addable_users(project_id, sprint_id),
             empty_label='Seleccione un usuario',
