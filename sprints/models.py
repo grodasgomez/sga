@@ -26,6 +26,22 @@ class Sprint(models.Model):
     def name(self):
         return f"Sprint {self.number}"
 
+    @property
+    def get_button_icon(self):
+        if self.status == SprintStatus.CREATED:
+            return 'fa-solid fa-rocket'
+        elif self.status == SprintStatus.IN_PROGRESS:
+            return 'fa fa-flag'
+        return None
+
+    @property
+    def get_button_text(self):
+        if self.status == SprintStatus.CREATED:
+            return 'Iniciar Sprint'
+        elif self.status == SprintStatus.IN_PROGRESS:
+            return 'Finalizar Sprint'
+        return None
+
     @cached_property
     def used_capacity(self):
         """

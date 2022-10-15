@@ -95,6 +95,24 @@ class SprintView(CustomLoginMixin, ProjectPermissionMixin, DetailView):
         context['backpage'] = reverse('projects:sprints:index', kwargs={'project_id': context['project_id']})
         return context
 
+    def post(self, request, project_id, sprint_id):
+        sprint = Sprint.objects.get(id=sprint_id)
+        print(sprint.status)
+        if sprint.status == "PLANNED":
+            sprint.status
+        elif sprint.status == "IN_PROGRESS":
+            print("b")
+        try:
+            if sprint.status == "PLANNED":
+                SprintUseCase.start_sprint(sprint_id)
+                messages.success(request, f"Sprint iniciado correctamente")
+            elif sprint.status == "IN_PROGRESS":
+                SprintUseCase.finish_sprint(sprint_id)
+                messages.success(request, f"Sprint finalizado correctamente")
+        except Exception as e:
+            messages.warning(request, e)
+        return redirect(reverse('projects:sprints:detail', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
+
 class SprintMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, FormView):
     """
     Vista para crear miembro de un sprint

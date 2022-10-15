@@ -6,7 +6,6 @@ from users.models import CustomUser
 from user_stories.models import UserStory
 
 class SprintUseCase:
-
     @staticmethod
     def create_sprint(project_id, duration):
         """
@@ -177,6 +176,17 @@ class SprintUseCase:
 
         sprint.status = SprintStatus.IN_PROGRESS
         sprint.start_date = datetime.now()
+        sprint.save()
+        return sprint
+
+    @staticmethod
+    def finish_sprint(sprint_id):
+        """
+        Finaliza un sprint
+        """
+        sprint = Sprint.objects.get(id=sprint_id)
+        sprint.status = SprintStatus.FINISHED
+        sprint.end_date = datetime.now()
         sprint.save()
         return sprint
 
