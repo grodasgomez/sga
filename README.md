@@ -85,3 +85,10 @@ $ docker-compose exec web python manage.py loaddata data.json
 ```
 $ docker-compose exec web python manage.py flush --noinput
 ```
+- Para produccion:
+```
+$ docker-compose -f docker-compose.prod.yml --env-file=.prod.env exec web python manage.py loaddata data.json
+```
+```
+$ docker-compose -f docker-compose.prod.yml --env-file=.prod.env exec web python manage.py flush --noinput
+```
