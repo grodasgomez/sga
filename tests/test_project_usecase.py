@@ -54,6 +54,18 @@ class ProjectUseCaseTest(TestCase):
         self.assertIn(self.scrum_master, project.project_members.all(), "El Scrum Master debe estar en la lista de miembros")
         self.assertEqual(len(user_story_types), 1, "No se crearon los tipos de historia de usuario por defecto")
 
+    def test_cancel_project(self):
+        data = {
+            'name': 'Proyecto 1',
+            'description': 'Descripcion del proyecto 1',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+        project = ProjectUseCase.create_project(**data)
+        ProjectUseCase.cancel_project(project.id)
+        project = Project.objects.get(id=project.id)
+        self.assertTrue(project.status=='CANCELLED', "El proyecto no fue cancelado")
+
     def test_get_non_members(self):
         data = {
             'name': 'Proyecto 1',
