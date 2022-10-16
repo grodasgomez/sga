@@ -54,14 +54,13 @@ class SprintUseCase:
         """
         Método para obtener los usuarios que pueden ser agregados a un sprint
         """
-        user_ids = ProjectMember.objects.filter(
+        users = ProjectMember.objects.filter(
             project_id=project_id,
         ).exclude(
-            roles__name=['Developer'],
-        ).exclude(
             user__sprints__id=sprint_id
-        ).values_list('user', flat=True)
-        users = CustomUser.objects.filter(id__in=user_ids)
+        )
+        users = [ user.user.id for user in users if not (user.roles.count() == 1 and user.roles.all().first().name == 'Product Owner') ]
+        users = CustomUser.objects.filter(id__in=users)
         return users
 
     @staticmethod

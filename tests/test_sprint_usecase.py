@@ -100,7 +100,7 @@ class SprintUseCaseTest(TestCase):
         sprint = SprintUseCase.create_sprint(self.project.id, duration=14)
         addable_users = SprintUseCase.get_addable_users(self.project.id, sprint.id)
 
-        self.assertEqual(len(addable_users), 1, 'No se obtuvieron los usuarios esperados')
+        self.assertEqual(len(addable_users), 2, 'No se obtuvieron los usuarios esperados')
 
     def test_add_sprint_member(self):
         sprint = SprintUseCase.create_sprint(self.project.id, duration=14)
