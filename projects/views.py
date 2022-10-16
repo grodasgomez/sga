@@ -119,7 +119,7 @@ class ProjectCreateView(AdminMixin, View):
             return HttpResponseRedirect('/projects')
         return render(request, 'projects/create.html', {'form': form})
 
-class ProjectDeleteView(ProjectPermissionMixin, View):
+class ProjectDeleteView(ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Clase encargada de manejar la cancelación de un proyecto
     """
@@ -145,7 +145,7 @@ class ProjectDeleteView(ProjectPermissionMixin, View):
         messages.success(request, f"Proyecto <strong>{project.name}</strong> cancelado correctamente")
         return redirect(reverse("projects:index"))
 
-class ProjectMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, View):
+class ProjectMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Clase encargada de manejar la asignacion de miembros a un proyecto
     """
@@ -171,7 +171,7 @@ class ProjectMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, View):
             return redirect(reverse("projects:project-members", kwargs={"project_id": project_id}))
         return render(request, 'project_member/create.html', {'form': form})
 
-class ProjectRoleCreateView(CustomLoginMixin, ProjectPermissionMixin, View):
+class ProjectRoleCreateView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Clase encargada de manejar la creacion de roles
     """
@@ -218,7 +218,7 @@ class ProjectRoleView(CustomLoginMixin, ProjectPermissionMixin, View):
         return render(request, 'roles/index.html', context) #le pasamos a la vista
 
 #User Story
-class UserStoryTypeCreateView(CustomLoginMixin, ProjectPermissionMixin, View):
+class UserStoryTypeCreateView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Vista para crear un tipo de historia de usuario en un proyecto
     """
@@ -243,7 +243,7 @@ class UserStoryTypeCreateView(CustomLoginMixin, ProjectPermissionMixin, View):
             return HttpResponseRedirect(f"/projects/{project_id}/user-story-type")
         return render(request, 'user_story_type/create.html', {'form': form})
 
-class UserStoryTypeEditView(CustomLoginMixin, ProjectPermissionMixin, View):
+class UserStoryTypeEditView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Vista para editar un tipo de historia de usuario de un proyecto
     """
@@ -293,7 +293,7 @@ class UserStoryTypeListView(CustomLoginMixin, ProjectPermissionMixin, ListView):
         context['backpage'] = reverse('projects:project-detail', kwargs={'project_id': context['project_id']})
         return context
 
-class ProjectRoleEditView(CustomLoginMixin, ProjectPermissionMixin, View):
+class ProjectRoleEditView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Clase encargada de manejar la edicion de roles
     """
@@ -336,7 +336,7 @@ class ProjectRoleEditView(CustomLoginMixin, ProjectPermissionMixin, View):
         messages.warning(request, f"El rol no se puede editar porque esta en uso")
         return render(request, 'roles/edit.html', context)
 
-class ProjectRoleDeleteView(CustomLoginMixin, ProjectPermissionMixin, View):
+class ProjectRoleDeleteView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Clase encargada de manejar el borrado de roles
     """
@@ -377,7 +377,7 @@ class ProjectRoleDeleteView(CustomLoginMixin, ProjectPermissionMixin, View):
         messages.warning(request, f"El rol no se puede borrar porque esta en uso")
         return render(request, 'roles/delete.html', context)
 
-class ProjectMemberEditView(CustomLoginMixin, ProjectPermissionMixin, View):
+class ProjectMemberEditView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Clase encargada de manejar la edicion de Miembro de proyecto
     """
@@ -458,7 +458,7 @@ class ProductBacklogView(CustomLoginMixin, ProjectAccessMixin, View):
 
         return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id}))
 
-class ProductBacklogCreateView(CustomLoginMixin, ProjectPermissionMixin, View):
+class ProductBacklogCreateView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Clase encargada de cargar el product Backlog de un proyecto
     """
@@ -509,7 +509,7 @@ class ProductBacklogCreateView(CustomLoginMixin, ProjectPermissionMixin, View):
 
         return render(request, 'backlog/create.html', {'form': form})
 
-class UserStoryTypeImportView1(CustomLoginMixin, ProjectPermissionMixin, FormView):
+class UserStoryTypeImportView1(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, FormView):
     """
     Clase encargada de manejar la primera parte de la importacion de tipos de historias de usuario,
     seleccionando el proyecto de donde se importaran los tipos de historias de usuario
@@ -541,7 +541,7 @@ class UserStoryTypeImportView1(CustomLoginMixin, ProjectPermissionMixin, FormVie
     def get_success_url(self):
         return reverse('projects:user-story-type-import2', kwargs={'project_id': self.project_id, 'from_project_id': self.from_project_id})
 
-class UserStoryTypeImportView2(CustomLoginMixin, ProjectPermissionMixin, View):
+class UserStoryTypeImportView2(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Clase encargada de manejar la segunda parte de la importacion de tipos de historias de usuario,
     seleccionando los tipos de historias de usuario a importar
@@ -591,7 +591,7 @@ class UserStoryTypeImportView2(CustomLoginMixin, ProjectPermissionMixin, View):
         }
         return render(request, self.template_name, context)
 
-class RoleImportView1(CustomLoginMixin, ProjectPermissionMixin, FormView):
+class RoleImportView1(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, FormView):
     """
     Clase encargada de manejar la primera parte de la importacion de roles,
     seleccionando el proyecto de donde se importaran los roles
@@ -620,7 +620,7 @@ class RoleImportView1(CustomLoginMixin, ProjectPermissionMixin, FormView):
             return HttpResponseRedirect(f"/projects/{project_id}/roles/import/{from_project_id}")
         return render(request, 'roles/import1.html', context)
 
-class RoleImportView2(CustomLoginMixin, ProjectPermissionMixin, FormView):
+class RoleImportView2(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, FormView):
     """
     Clase encargada de manejar la segunda parte de la importacion de roles,
     seleccionando los roles a importar
@@ -676,7 +676,7 @@ class RoleImportView2(CustomLoginMixin, ProjectPermissionMixin, FormView):
 
         return redirect(reverse('projects:index-roles', kwargs={'project_id': project_id}))
 
-class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, View):
+class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Clase encargada de editar us en el product Backlog de un proyecto
     """

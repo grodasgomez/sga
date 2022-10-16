@@ -4,13 +4,14 @@ from django.contrib import messages
 from django.urls import reverse
 from django.shortcuts import redirect, render
 from django.forms.models import model_to_dict
-from projects.mixin import ProjectPermissionMixin, ProjectAccessMixin
+from projects.mixin import *
 from projects.models import UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase
 from users.models import CustomUser
 from sprints.forms import SprintCreateForm, SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm
 from sprints.models import Sprint, SprintMember
 from sprints.usecase import SprintUseCase
+from sprints.mixin import *
 from user_stories.usecase import UserStoriesUseCase
 from user_stories.models import UserStory
 from sga.mixin import CustomLoginMixin
@@ -33,7 +34,7 @@ class SprintListView(CustomLoginMixin, ProjectAccessMixin, ListView):
 
         return context
 
-class SprintCreateView(CustomLoginMixin, ProjectPermissionMixin, FormView):
+class SprintCreateView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, FormView):
     """
     Vista para crear un nuevo sprint
     """
@@ -114,7 +115,7 @@ class SprintView(CustomLoginMixin, ProjectPermissionMixin, DetailView):
             messages.warning(request, e)
         return redirect(reverse('projects:sprints:detail', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
 
-class SprintMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, FormView):
+class SprintMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, SprintStatusMixin, FormView):
     """
     Vista para crear miembro de un sprint
     """
@@ -156,7 +157,7 @@ class SprintMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, FormView)
         messages.success(self.request, f"Usuario <strong>{data['user']}</strong> agregado al sprint correctamente")
         return super().form_valid(form)
 
-class SprintMemberEditView(CustomLoginMixin, ProjectPermissionMixin, FormView):
+class SprintMemberEditView(CustomLoginMixin, ProjectPermissionMixin, SprintStatusMixin, FormView):
     """
     Vista para editar miembro de un sprint
     """
@@ -256,7 +257,7 @@ class SprintBacklogView(CustomLoginMixin, ProjectPermissionMixin, View):
 
         return render(request, 'sprints/backlog.html', context)
 
-class SprintBacklogAssignMemberView(CustomLoginMixin, ProjectPermissionMixin, View):
+class SprintBacklogAssignMemberView(CustomLoginMixin, ProjectPermissionMixin, SprintStatusMixin, View):
     """
     Clase encargada de asignar una US a un miembro del sprint
     """
@@ -294,7 +295,7 @@ class SprintBacklogAssignMemberView(CustomLoginMixin, ProjectPermissionMixin, Vi
             return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
         return render(request, 'sprints/backlog_assign_member.html', {'form': form})
 
-class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, View):
+class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, SprintStatusMixin, View):
     """
     Clase encargada de asignar una US del product backlog al sprint
     """
