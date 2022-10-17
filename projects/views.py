@@ -686,6 +686,7 @@ class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, View):
     def get(self, request, project_id, us_id):
         user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
         data=user_story.__dict__
+        print (data)
         data['us_type']=user_story.us_type
         form = FormEditUserStory(project_id,initial=data)
         context= {
