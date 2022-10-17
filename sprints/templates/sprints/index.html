@@ -33,10 +33,6 @@
         <td>{{ object.start_date }}</td>
         <td>{{ object.end_date }}</td>
         <td>
-          <a href="{% url 'projects:sprints:start' project_id=project_id sprint_id=object.id %}" class="btn" title="Iniciar sprint">
-            <span class="btn-label"><i class="fa fa-rocket"></i></span>
-          </a>
-
           <a href="{% url 'projects:sprints:member-create' project_id=project_id sprint_id=object.id %}" class="btn" title="Añadir miembro">
             <span class="btn-label"><i class="fa fa-user-plus"></i></span>
           </a>

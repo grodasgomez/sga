@@ -146,17 +146,18 @@ class ProjectUseCase:
             user_id=user_id,project_id=project_id, roles__name__in=roles
         ).exists()
 
+    #TODO: modify_sprint_method
     @staticmethod
     def can_start_project(user_id, project_id):
         """
-        Verifica si un miembro de proyecto puede tiene permisos para iniciar el proyecto
+        Verifica si un miembro de proyecto tiene permisos para iniciar el proyecto
         """
         permissions = ['Iniciar Proyecto']
         roles = ['Scrum Master']
-        tiene_permisos = ProjectUseCase.member_has_permissions(user_id, project_id, permissions)
-        es_scrum_master = ProjectUseCase.member_has_roles(user_id, project_id, roles)
+        has_perm = ProjectUseCase.member_has_permissions(user_id, project_id, permissions)
+        is_scrum_master = ProjectUseCase.member_has_roles(user_id, project_id, roles)
 
-        return es_scrum_master or tiene_permisos
+        return is_scrum_master or has_perm
 
     @staticmethod
     def user_stories_by_project(project_id):
@@ -243,7 +244,7 @@ class ProjectUseCase:
             data['estimation_time'] = estimation_time
         if us_type:
             data['us_type'] = us_type
-        # Column es None por default, puede valer 0...
+        # TODO: RODAS EXPLICAME ESTO Column es None por default, puede valer 0...
         if column is not None:
             data['column'] = column
 

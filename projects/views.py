@@ -53,10 +53,11 @@ class ProjectView(CustomLoginMixin, ProjectAccessMixin, View):
         user = request.user
         project: Project = Project.objects.get(id=project_id)
         members: QuerySet = project.project_members.all()
+        #TODO: modify_sprint_method
         can_start_project = ProjectUseCase.can_start_project(user.id, project_id)
         context= {
             "object" : project,
-            "members" : members,
+            "members" : members, #TODO: NO SE USA QUE HACE ESTO
             "can_start_project" : can_start_project,
             "backpage": reverse("projects:index")
         }
@@ -704,7 +705,7 @@ class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, ProjectSt
         if form.is_valid():
             cleaned_data = form.cleaned_data
             old_user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
-
+            #TODO: este retorna la us cambiada
             ProjectUseCase.edit_user_story(us_id, **cleaned_data)
 
             new_user_story = ProjectUseCase.get_user_story_by_id(id=us_id)

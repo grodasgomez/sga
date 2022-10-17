@@ -4,6 +4,8 @@ from sprints.models import Sprint, SprintMember, SprintStatus
 from projects.usecase import ProjectUseCase
 from users.models import CustomUser
 from user_stories.models import UserStory
+from user_stories.usecase import UserStoriesUseCase
+import copy
 
 class SprintUseCase:
     @staticmethod
@@ -153,25 +155,21 @@ class SprintUseCase:
         """
         return ProjectUseCase.user_stories_by_project(project_id).exclude(sprint=sprint_id)
 
-    @staticmethod
-    def start_sprint(sprint_id):
+    def start_sprint(sprint):
         """
         Inicia un sprint
         """
-        sprint = Sprint.objects.get(id=sprint_id)
-
         project_has_active_sprint = SprintUseCase.exists_active_sprint(sprint.project_id)
         if project_has_active_sprint:
-            raise Exception('Ya existe un sprint activo en el proyecto')
+            raise CustomError('Ya existe un sprint activo en el proyecto')
 
-        has_us = SprintUseCase.user_stories_by_sprint(sprint_id).exists()
+        has_us = SprintUseCase.user_stories_by_sprint(sprint.id).exists()
         if not has_us:
-            raise Exception('No se puede iniciar un sprint sin historias de usuario asignadas')
+            raise CustomError('No se puede iniciar un sprint sin historias de usuario asignadas')
 
-        has_members = SprintUseCase.get_sprint_members(sprint_id).exists()
+        has_members = SprintUseCase.get_sprint_members(sprint.id).exists()
         if not has_members:
-            raise Exception('No se puede iniciar un sprint sin miembros asignados')
-
+            raise CustomError('No se puede iniciar un sprint sin miembros asignados')
 
         sprint.status = SprintStatus.IN_PROGRESS
         sprint.start_date = datetime.now()
@@ -179,14 +177,22 @@ class SprintUseCase:
         return sprint
 
     @staticmethod
-    def finish_sprint(sprint_id):
+    def finish_sprint(sprint, user, project_id):
         """
         Finaliza un sprint
         """
-        sprint = Sprint.objects.get(id=sprint_id)
         sprint.status = SprintStatus.FINISHED
         sprint.end_date = datetime.now()
         sprint.save()
+        user_stories = UserStory.objects.filter(sprint=sprint)
+        for us in user_stories:
+            #realizamos una copia de la us para el historial
+            old_user_story = copy.copy(us)
+            us.sprint = None
+            us.column = 0
+            us.sprint_member = None
+            us.save()
+            UserStoriesUseCase.create_user_story_history(old_user_story, us, user, project_id)
         return sprint
 
     @staticmethod
@@ -195,3 +201,6 @@ class SprintUseCase:
         Retorna el sprint activo de un proyecto
         """
         return Sprint.objects.filter(project_id=project_id, status=SprintStatus.IN_PROGRESS).first()
+
+class CustomError(Exception):
+    pass

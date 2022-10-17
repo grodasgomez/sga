@@ -10,7 +10,7 @@ from projects.usecase import ProjectUseCase
 from users.models import CustomUser
 from sprints.forms import SprintCreateForm, SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm
 from sprints.models import Sprint, SprintMember
-from sprints.usecase import SprintUseCase
+from sprints.usecase import *
 from sprints.mixin import *
 from user_stories.usecase import UserStoriesUseCase
 from user_stories.models import UserStory
@@ -79,12 +79,10 @@ class SprintCreateView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMi
         namespace = 'projects:sprints:index'
         return reverse(namespace, kwargs={'project_id': self.kwargs.get('project_id')})
 
-class SprintView(CustomLoginMixin, ProjectPermissionMixin, DetailView):
+class SprintView(CustomLoginMixin, SprintAccessMixin, DetailView):
     """
     Vista que lista los detalles de un sprint
     """
-    permissions = ['ABM Sprint']
-    roles = ['Scrum Master', 'Developer', 'Product Owner']
     model = Sprint
     template_name = 'sprints/detail.html'
     # Indicamos el pk del objeto
@@ -93,25 +91,25 @@ class SprintView(CustomLoginMixin, ProjectPermissionMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Agregamos el id del proyecto en el contexto para ser usado en el template
-        context['project_id'] = self.kwargs.get('project_id')
+        project_id = self.kwargs.get('project_id')
+        context['project_id'] = project_id
         context['backpage'] = reverse('projects:sprints:index', kwargs={'project_id': context['project_id']})
+        if self.is_scrum_master:
+            context['modify_sprint_status'] = True
+        else:
+            context['modify_sprint_status'] = ProjectUseCase.member_has_permissions(self.request.user.id, project_id, ["ABM Sprint"])
         return context
 
     def post(self, request, project_id, sprint_id):
-        sprint = Sprint.objects.get(id=sprint_id)
-        print(sprint.status)
-        if sprint.status == "PLANNED":
-            sprint.status
-        elif sprint.status == "IN_PROGRESS":
-            print("b")
+        sprint = super().get_object()
         try:
             if sprint.status == "PLANNED":
-                SprintUseCase.start_sprint(sprint_id)
+                SprintUseCase.start_sprint(sprint)
                 messages.success(request, f"Sprint iniciado correctamente")
             elif sprint.status == "IN_PROGRESS":
-                SprintUseCase.finish_sprint(sprint_id)
+                SprintUseCase.finish_sprint(sprint, request.user, self.kwargs.get('project_id'))
                 messages.success(request, f"Sprint finalizado correctamente")
-        except Exception as e:
+        except CustomError as e:
             messages.warning(request, e)
         return redirect(reverse('projects:sprints:detail', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
 
@@ -219,22 +217,6 @@ class SprintMemberListView(CustomLoginMixin, ProjectPermissionMixin, View):
             'backpage': reverse("projects:sprints:detail", kwargs={"project_id": project_id, "sprint_id": sprint_id}),
         }
         return render(request, 'sprint-members/index.html', context)
-
-class SprintStartView(CustomLoginMixin, ProjectPermissionMixin, View):
-    """
-    Vista para iniciar un sprint
-    """
-    permissions = ['ABM Sprint']
-    roles = ['Scrum Master']
-
-    def get(self, request, project_id, sprint_id):
-        try:
-            SprintUseCase.start_sprint(sprint_id)
-            messages.success(request, f"Sprint iniciado correctamente")
-            return redirect(reverse('projects:sprints:detail', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
-        except Exception as e:
-            messages.warning(request, e)
-            return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
 
 class SprintBacklogView(CustomLoginMixin, ProjectPermissionMixin, View):
     """

@@ -33,7 +33,7 @@ class UserStoriesUseCase:
             new_user_story_dic["sprint_id"]=0
         #si la nueva historia de usuario no tiene un miembro asignado
         if not new_user_story.sprint_member:
-            new_user_story_dic["sprint_member_id"]=0    
+            new_user_story_dic["sprint_member_id"]=0
         #si la vieja historia de usuario no pertenece a un proyecto
         if old_user_story.sprint:
             data["sprint"]=old_user_story.sprint.id
@@ -51,23 +51,21 @@ class UserStoriesUseCase:
             "technical_priority": "Prioridad técnica", "column": "Columna","estimation_time": "Tiempo de estimación",
             "sprint_id": "Sprint", "sprint_member_id": "Miembro del sprint"}
 
-        
+
         for key in old_user_story_dic:
             if key in keys:
                 if old_user_story_dic[key]!=new_user_story_dic[key]:
                     description=description+keys_esp[key]+","
 
-        print (description)
         if description!="":
             description=description[:-1]
             return UserStoryHistory.objects.create(user_story=new_user_story, project_member=RoleUseCase.get_project_member_by_user(user,project_id), description=description, dataJson=data)
 
         return None
-    
+
     @staticmethod
     def user_story_history_by_us_id(user_story_id):
         """
         Retorna el historial de cambios de una historia de usuario
         """
         return UserStoryHistory.objects.filter(user_story_id=user_story_id).order_by('-created_at')
-

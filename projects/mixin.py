@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from projects.usecase import ProjectUseCase
-from projects.models import Project
+from projects.models import Project, ProjectMember
 
 class ProjectAccessMixin(AccessMixin):
     """
@@ -12,16 +12,15 @@ class ProjectAccessMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         user = request.user
         project_id = self.kwargs['project_id']
-        project = Project.objects.get(id=project_id)
-        members = project.project_members.all()
-        if user not in members:
+        member = ProjectMember.objects.filter(project=project_id, user=user).exists()
+        if not member:
             self.raise_exception = True
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 
     def handle_no_permission(self):
         if self.raise_exception:
-            messages.warning(self.request, "No eres miembro")
+            messages.warning(self.request, "No eres miembro del proyecto")
             # en el caso en que el error te redirija a la misma pagina, bucle infinito
             if self.request.build_absolute_uri() == self.request.META.get('HTTP_REFERER'):
                 return redirect(reverse('index'))
