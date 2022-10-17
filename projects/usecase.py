@@ -5,6 +5,7 @@ from projects.models import Project, ProjectMember, ProjectStatus
 from projects.models import Role, UserStoryType
 from users.models import CustomUser
 from user_stories.models import UserStory
+from sprints.models import Sprint, SprintStatus
 
 class ProjectUseCase:
     @staticmethod
@@ -36,8 +37,20 @@ class ProjectUseCase:
         """
         project = Project.objects.get(id=project_id)
         project.status = ProjectStatus.CANCELLED
-        #todo verificar esta bien end date?
         project.end_date = date.today()
+        user_stories = UserStory.objects.filter(project=project)
+        for us in user_stories:
+            us.sprint = None
+            us.column = 0
+            us.sprint_member = None
+            us.estimation_time = -1
+            us.save()
+        sprints = Sprint.objects.filter(project=project)
+        for sprint in sprints:
+            sprint.status = SprintStatus.CANCELLED
+            sprint.end_date = date.today()
+            sprint.save()
+
         project.save()
         return project
 
