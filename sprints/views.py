@@ -199,13 +199,10 @@ class SprintMemberEditView(CustomLoginMixin, ProjectPermissionMixin, SprintStatu
         messages.success(self.request, f"Miembro <strong>{sprint_member_data.user.email}</strong> editado correctamente")
         return super().form_valid(form)
 
-class SprintMemberListView(CustomLoginMixin, ProjectPermissionMixin, View):
+class SprintMemberListView(CustomLoginMixin, SprintAccessMixin, View):
     """
     Vista para listar los miembros de un sprint
     """
-    permissions = ['ABM Miembro Sprint']
-    roles = ['Scrum Master']
-
     def get(self, request, project_id, sprint_id):
         objects = SprintUseCase.get_sprint_members(sprint_id)
         sprint = Sprint.objects.get(id=sprint_id)
@@ -218,13 +215,10 @@ class SprintMemberListView(CustomLoginMixin, ProjectPermissionMixin, View):
         }
         return render(request, 'sprint-members/index.html', context)
 
-class SprintBacklogView(CustomLoginMixin, ProjectPermissionMixin, View):
+class SprintBacklogView(CustomLoginMixin, SprintAccessMixin, View):
     """
     Clase encargada de mostrar el sprint Backlog
     """
-    permissions = ['ABM US']#todo
-    roles = ['Scrum Master', 'Developer']
-
     def get(self, request, project_id, sprint_id):
         members = SprintUseCase.get_sprint_members(sprint_id)
         user_stories = SprintUseCase.user_stories_by_sprint(sprint_id)

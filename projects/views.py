@@ -68,13 +68,10 @@ class ProjectView(CustomLoginMixin, ProjectAccessMixin, View):
         messages.success(request, 'Proyecto iniciado correctamente')
         return redirect(request.META['HTTP_REFERER'])
 
-class ProjectMembersView(CustomLoginMixin, ProjectPermissionMixin, View):
+class ProjectMembersView(CustomLoginMixin, ProjectAccessMixin, View):
     """
     Clase encargada de mostrar los miembros de un proyecto
     """
-    permissions = ['ABM Miembros']
-    roles = ['Scrum Master']
-
     def get(self, request, project_id):
         data: Project = Project.objects.get(id=project_id)
         members: QuerySet = data.project_members.all()
@@ -201,13 +198,10 @@ class ProjectRoleCreateView(CustomLoginMixin, ProjectPermissionMixin, ProjectSta
         #si el form no es valido retorna a la misma pagina
         return render(request, 'roles/create.html', {'form': form, 'project_id':project_id})
 
-class ProjectRoleView(CustomLoginMixin, ProjectPermissionMixin, View):
+class ProjectRoleView(CustomLoginMixin, ProjectAccessMixin, View):
     """
     Clase encargada de mostrar los roles de un proyecto
     """
-    permissions = ['ABM Roles']
-    roles = ['Scrum Master']
-
     def get(self, request, project_id):
         #tomamos todos los roles del proyecto
         data = RoleUseCase.get_roles_by_project_no_default(project_id)
@@ -271,13 +265,10 @@ class UserStoryTypeEditView(CustomLoginMixin, ProjectPermissionMixin, ProjectSta
 
         return render(request, 'user_story_type/edit.html', {'form': form})
 
-class UserStoryTypeListView(CustomLoginMixin, ProjectPermissionMixin, ListView):
+class UserStoryTypeListView(CustomLoginMixin, ProjectAccessMixin, ListView):
     """
     Vista que lista tipos de historias de usuario de un projecto
     """
-    permissions = ['ABM Tipo US']
-    roles = ['Scrum Master', 'Product Owner']
-
     model = UserStoryType
     template_name = 'user_story_type/index.html'
 
@@ -417,9 +408,6 @@ class ProductBacklogView(CustomLoginMixin, ProjectAccessMixin, View):
     """
     Clase encargada de mostrar el product Backlog de un proyecto
     """
-    permissions = ['Ver Product Backlog']
-    roles = ['Scrum Master', 'Developer', 'Product Owner']
-
     def get(self, request, project_id):
         user: CustomUser = request.user
         user_stories = []
