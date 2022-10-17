@@ -29,7 +29,6 @@ class SprintUseCaseTest(TestCase):
         )
         self.user_story_type = ProjectUseCase.create_default_user_story_type(project_id=self.project.id)
 
-
     def test_create_sprint(self):
         project_id = self.project.id
         expected_sprint = {
@@ -58,8 +57,6 @@ class SprintUseCaseTest(TestCase):
         sprint.status = SprintStatus.IN_PROGRESS.value
         sprint.save()
         self.assertFalse(SprintUseCase.exists_created_sprint(project_id), 'No deberia existir un sprint creado')
-
-
 
     def test_exists_active_sprint(self):
         project_id = self.project.id
@@ -170,3 +167,15 @@ class SprintUseCaseTest(TestCase):
         )
         us_list = SprintUseCase.assignable_us_to_sprint(self.project.id, sprint.id)
         self.assertEqual(us_list.count(), 1, 'Deberia existir un user story asignable al sprint')
+
+    def test_finish_sprint(self):
+        sprint = SprintUseCase.create_sprint(self.project.id, duration=14)
+        sprint.status = SprintStatus.IN_PROGRESS.value
+        sprint.save()
+
+        user = CustomUser()
+        user.role_system = "user"
+        user.email = "user1@gmail.com"
+
+        SprintUseCase.finish_sprint(sprint, user, self.project.id)
+        self.assertEqual(sprint.status, SprintStatus.FINISHED, 'El sprint no se finalizo')

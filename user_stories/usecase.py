@@ -108,9 +108,6 @@ class UserStoriesUseCase:
                 data['column'] = 0
                 data['sprint'] = None
                 data['sprint_member'] = None
-                
-        print (data)
-        
 
         UserStory.objects.filter(pk=id).update(**data)
         return UserStory.objects.get(pk=id)
