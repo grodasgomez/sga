@@ -58,7 +58,6 @@ class UserStoriesUseCase:
                 if old_user_story_dic[key]!=new_user_story_dic[key]:
                     description=description+keys_esp[key]+","
 
-        print (description)
         if description!="":
             description=description[:-1]
             return UserStoryHistory.objects.create(user_story=new_user_story, project_member=RoleUseCase.get_project_member_by_user(user,project_id), description=description, dataJson=data)
