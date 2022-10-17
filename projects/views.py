@@ -13,12 +13,11 @@ from django.forms.models import model_to_dict
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
     FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole,
     ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory, FormDeleteProject)
-from projects.models import Project, UserStoryType
+from projects.models import Project, UserStoryType, ProjectMember, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
 from user_stories.usecase import UserStoriesUseCase
 from projects.mixin import *
 from sga.mixin import *
-from projects.models import ProjectMember
 from users.models import CustomUser
 
 # Create your views here.
@@ -28,7 +27,7 @@ class ProjectListView(VerifiedMixin, View):
     """
     def get(self, request):
         user: CustomUser = request.user
-        projects: Project = Project.objects.all()
+        projects: Project = Project.objects.all().order_by('-end_date','-start_date')
         if user.is_admin():
             context = {
                 'admin': True,
