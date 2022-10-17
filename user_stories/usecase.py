@@ -18,6 +18,7 @@ class UserStoriesUseCase:
             "business_value": old_user_story.business_value,
             "technical_priority": old_user_story.technical_priority,
             "estimation_time": old_user_story.estimation_time,
+            "sprint_priority": old_user_story.sprint_priority,
             "us_type": old_user_story.us_type.id,
             "column": old_user_story.column,
             "project": old_user_story.project.id,
@@ -70,4 +71,40 @@ class UserStoriesUseCase:
         Retorna el historial de cambios de una historia de usuario
         """
         return UserStoryHistory.objects.filter(user_story_id=user_story_id).order_by('-created_at')
+    
+    @staticmethod
+    def user_story_history_by_id(user_story_history_id):
+        """
+        Retorna una version de historia de usuario
+        """
+        return UserStoryHistory.objects.get(id=user_story_history_id)
+    
+    @staticmethod
+    def restore_user_story(id, code=None, title=None, description=None, business_value=None,technical_priority=None,estimation_time=None,sprint_priority=None,us_type=None, column=None,project=None, sprint=None, sprint_member=None):
+        """
+        restaura una version de una us
+        """
+        data = {}
+        if description:
+            data['description'] = description
+        if business_value:
+            data['business_value'] = business_value
+        if technical_priority:
+            data['technical_priority'] = technical_priority
+        if business_value or technical_priority:
+            data['sprint_priority'] = round(0.6 * business_value + 0.4 * technical_priority)
+        if estimation_time:
+            data['estimation_time'] = estimation_time
+        if sprint_priority:
+            data['sprint_priority'] = sprint_priority
+        if us_type:
+            data['us_type'] = us_type
+            
+        data['column'] = column
+        data['sprint'] = sprint
+        data['sprint_member'] = sprint_member
+        
+
+        UserStory.objects.filter(pk=id).update(**data)
+        return UserStory.objects.get(pk=id)
 

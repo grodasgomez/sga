@@ -8,6 +8,7 @@
         <th scope="col">Nombre</th>
         <th scope="col">Cambios</th>
         <th scope="col">Autor</th>
+        <th scope="col">Fecha</th>
         <th scope="col">Acciones</th>
       </tr>
     </thead>
@@ -17,8 +18,9 @@
         <td>{{ history.user_story.title }}</td>
         <td>{{ history.description }}</td>
         <td>{{ history.project_member.user.email }}</td>
+        <td>{{ history.created_at }}</td>
         <td>
-          <a href="" class="btn" title="Restaurar">
+          <a href="{% url 'projects:history:restore' project_id=project_id user_story_id=user_story_id user_story_history_id=history.id %}" class="btn" title="Restaurar">
             <span class="btn-label"><i class="fa fa-undo"></i></span>
           </a>
         </td>

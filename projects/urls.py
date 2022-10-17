@@ -38,5 +38,5 @@ urlpatterns = [
     path('<int:project_id>/user-stories/<int:us_id>/', views.UserStoryEditApiView.as_view()),
 
     # User Stories
-    path('<int:project_id>/backlog/<int:user_story_id>/history', include(('user_stories.urls', 'history'))),
+    path('<int:project_id>/backlog/<int:user_story_id>/history/', include(('user_stories.urls', 'history'))),
 ]

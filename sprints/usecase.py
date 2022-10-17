@@ -195,3 +195,16 @@ class SprintUseCase:
         Retorna el sprint activo de un proyecto
         """
         return Sprint.objects.filter(project_id=project_id, status=SprintStatus.IN_PROGRESS).first()
+    
+    @staticmethod
+    def get_sprint_by_id(sprint_id):
+        """
+        Retorna el sprint por id
+        """
+        return Sprint.objects.get(id=sprint_id)
+
+    def get_sprint_member_by_id(sprint_member_id):
+        """
+        Retorna el sprint member por id
+        """
+        return SprintMember.objects.get(id=sprint_member_id)
