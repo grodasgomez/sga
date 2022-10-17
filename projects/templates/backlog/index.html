@@ -50,9 +50,15 @@
 			<td>{{ user_story.code }}</td>
 			<td>{{ user_story.title }}</td>
 			<td>{{ user_story.description }}</td>
-            	<td>{{ user_story.business_value }}</td>
+            <td>{{ user_story.business_value }}</td>
 			<td>{{ user_story.technical_priority }}</td>
-			<td>{{ user_story.estimation_time }}</td>
+			{% if user_story.estimation_time == 0 %}
+				<td> Finalizado </td>
+			{% elif user_story.estimation_time == -1 %}
+				<td> Cancelado </td>
+			{% else %}
+				<td>{{ user_story.estimation_time }}</td>
+			{% endif %}
 			<td>{{ user_story.sprint_priority }}</td>
             	<td>{{ user_story.us_type.name }}</td>
 			<td>

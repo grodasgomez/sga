@@ -23,7 +23,7 @@ class FormRestoreUserStoryHistory(forms.Form):
         self.fields['business_value'] = forms.IntegerField( min_value=1, max_value=100 ,label='Valor de Negocio',widget=widgets.NumberInput())  # Valor de Negocio del US
         self.fields['technical_priority'] = forms.IntegerField(min_value=1, max_value=100 ,label='Prioridad Tecnica',widget=widgets.NumberInput())  # Prioridad Tecnica del US
         self.fields['estimation_time'] = forms.IntegerField(min_value=1, max_value=100 , label='Tiempo estimado',widget=widgets.NumberInput())  # Tiempo estimado del US
-        self.fields['sprint_priority'] = forms.IntegerField(min_value=1, max_value=100 , label='Prioridad en Sprint',widget=widgets.NumberInput())  # Prioridad en Sprint
+        self.fields['sprint_priority'] = forms.IntegerField(min_value=1, max_value=100 , label='Prioridad para Sprint',widget=widgets.NumberInput())  # Prioridad para Sprint
         self.fields['us_type'] = forms.ModelChoiceField(
             queryset=ProjectUseCase.filter_user_story_type_by_project(project_id), label='Tipo de Historia de Usuario',
             empty_label='Seleccione un tipo',

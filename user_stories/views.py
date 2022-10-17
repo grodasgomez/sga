@@ -13,8 +13,6 @@ from user_stories.forms import FormRestoreUserStoryHistory
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 
-# Create your views here.
-
 class UserStoryHistoryView(CustomLoginMixin, ProjectPermissionMixin, View):
     """
     Clase encargada de mostrar el historial de cambios de una historia de usuario
@@ -57,7 +55,7 @@ class UserStoryHistoryRestoreView(CustomLoginMixin, ProjectPermissionMixin, View
             "backpage": reverse("projects:history:index", kwargs={"project_id": project_id, "user_story_id": user_story_id})
         }
         return render(request, 'history/restore.html', context)
-    
+
     def post(self, request, project_id, user_story_id, user_story_history_id):
         user_story_history = UserStoriesUseCase.user_story_history_by_id(user_story_history_id)
         data=user_story_history.dataJson

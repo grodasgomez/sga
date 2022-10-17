@@ -3,7 +3,6 @@ from users.models import CustomUser
 from user_stories.models import UserStory, UserStoryHistory
 from projects.usecase import ProjectUseCase, RoleUseCase
 
-
 class UserStoriesUseCase:
     @staticmethod
     def create_user_story_history(old_user_story, new_user_story, user, project_id):
@@ -24,7 +23,7 @@ class UserStoriesUseCase:
             "project": old_user_story.project.id,
             "sprint": 0,
             "sprint_member": 0
-            }
+        }
 
         old_user_story_dic=vars(old_user_story)
         new_user_story_dic=vars(new_user_story)
@@ -34,7 +33,7 @@ class UserStoriesUseCase:
             new_user_story_dic["sprint_id"]=0
         #si la nueva historia de usuario no tiene un miembro asignado
         if not new_user_story.sprint_member:
-            new_user_story_dic["sprint_member_id"]=0    
+            new_user_story_dic["sprint_member_id"]=0
         #si la vieja historia de usuario no pertenece a un proyecto
         if old_user_story.sprint:
             data["sprint"]=old_user_story.sprint.id
@@ -52,7 +51,6 @@ class UserStoriesUseCase:
             "technical_priority": "Prioridad técnica", "column": "Columna","estimation_time": "Tiempo de estimación",
             "sprint_id": "Sprint", "sprint_member_id": "Miembro del sprint"}
 
-        
         for key in old_user_story_dic:
             if key in keys:
                 if old_user_story_dic[key]!=new_user_story_dic[key]:
@@ -63,21 +61,21 @@ class UserStoriesUseCase:
             return UserStoryHistory.objects.create(user_story=new_user_story, project_member=RoleUseCase.get_project_member_by_user(user,project_id), description=description, dataJson=data)
 
         return None
-    
+
     @staticmethod
     def user_story_history_by_us_id(user_story_id):
         """
         Retorna el historial de cambios de una historia de usuario
         """
         return UserStoryHistory.objects.filter(user_story_id=user_story_id).order_by('-created_at')
-    
+
     @staticmethod
     def user_story_history_by_id(user_story_history_id):
         """
         Retorna una version de historia de usuario
         """
         return UserStoryHistory.objects.get(id=user_story_history_id)
-    
+
     @staticmethod
     def restore_user_story(id, code=None, title=None, description=None, business_value=None,technical_priority=None,estimation_time=None,sprint_priority=None,us_type=None, column=None,project=None, sprint=None, sprint_member=None):
         """
@@ -98,12 +96,10 @@ class UserStoriesUseCase:
             data['sprint_priority'] = sprint_priority
         if us_type:
             data['us_type'] = us_type
-            
+
         data['column'] = column
         data['sprint'] = sprint
         data['sprint_member'] = sprint_member
-        
 
         UserStory.objects.filter(pk=id).update(**data)
         return UserStory.objects.get(pk=id)
-

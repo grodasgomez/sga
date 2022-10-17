@@ -1,9 +1,9 @@
 from django.contrib.auth.mixins import AccessMixin
 from django.contrib import messages
 from django.shortcuts import redirect
-from projects.usecase import ProjectUseCase
-from projects.models import Project
 from django.urls import reverse
+from projects.usecase import ProjectUseCase
+from projects.models import Project, ProjectMember
 
 class ProjectAccessMixin(AccessMixin):
     """
@@ -12,16 +12,15 @@ class ProjectAccessMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         user = request.user
         project_id = self.kwargs['project_id']
-        project = Project.objects.get(id=project_id)
-        members = project.project_members.all()
-        if user not in members:
+        member = ProjectMember.objects.filter(project=project_id, user=user).exists()
+        if not member:
             self.raise_exception = True
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 
     def handle_no_permission(self):
         if self.raise_exception:
-            messages.warning(self.request, "No eres miembro")
+            messages.warning(self.request, "No eres miembro del proyecto")
             # en el caso en que el error te redirija a la misma pagina, bucle infinito
             if self.request.build_absolute_uri() == self.request.META.get('HTTP_REFERER'):
                 return redirect(reverse('index'))
@@ -65,3 +64,23 @@ class ProjectPermissionMixin(AccessMixin):
                 return redirect(reverse('index'))
             return redirect(self.request.META.get('HTTP_REFERER', '/'))
         return super().handle_no_permission()
+
+class ProjectStatusMixin(AccessMixin):
+    """
+    Clase que verifica si el proyecto esta en estado de progreso,
+    si no lo esta, no se pueden realizar modificaciones
+    """
+    def dispatch(self, request, *args, **kwargs):
+        # Se obtiene el project_id de la url
+        project_id = self.kwargs['project_id']
+        project = Project.objects.get(id=project_id)
+        if project.status == 'CANCELLED' or project.status == 'CANCELLED':
+            return self.handle_no_status()
+        return super().dispatch(request, *args, **kwargs)
+
+    def handle_no_status(self):
+        messages.warning(self.request, 'El proyecto no se puede modificar')
+        # en el caso en que el error te redirija a la misma pagina, bucle infinito
+        if self.request.build_absolute_uri() == self.request.META.get('HTTP_REFERER'):
+            return redirect(reverse('index'))
+        return redirect(self.request.META.get('HTTP_REFERER', '/'))

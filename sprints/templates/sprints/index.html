@@ -11,7 +11,7 @@
         <th scope="col">Nombre</th>
         <th scope="col">Estado</th>
         <th scope="col">Capacidad en horas</th>
-        <th scope="col">Capacidad utilizada en horas</th>
+        <th scope="col" style="width:10%;">Capacidad utilizada en horas</th>
         <th scope="col">Duración en dias</th>
         <th scope="col">Fecha inicio</th>
         <th scope="col">Fecha fin</th>
@@ -30,13 +30,9 @@
         <td>{{ object.capacity }}</td>
         <td>{{ object.used_capacity }}</td>
         <td>{{ object.duration }}</td>
-        <td>{{ object.start_date }}</td>
-        <td>{{ object.end_date }}</td>
+        <td>{{ object.start_date|date:"d/m/Y" }}</td>
+        <td>{{ object.end_date|date:"d/m/Y" }}</td>
         <td>
-          <a href="{% url 'projects:sprints:start' project_id=project_id sprint_id=object.id %}" class="btn" title="Iniciar sprint">
-            <span class="btn-label"><i class="fa fa-rocket"></i></span>
-          </a>
-
           <a href="{% url 'projects:sprints:member-create' project_id=project_id sprint_id=object.id %}" class="btn" title="Añadir miembro">
             <span class="btn-label"><i class="fa fa-user-plus"></i></span>
           </a>

@@ -5,6 +5,7 @@ from projects.models import Project, ProjectMember, ProjectStatus
 from projects.models import Role, UserStoryType
 from users.models import CustomUser
 from user_stories.models import UserStory
+from sprints.models import Sprint, SprintStatus
 
 class ProjectUseCase:
     @staticmethod
@@ -36,8 +37,20 @@ class ProjectUseCase:
         """
         project = Project.objects.get(id=project_id)
         project.status = ProjectStatus.CANCELLED
-        #todo verificar esta bien end date?
         project.end_date = date.today()
+        user_stories = UserStory.objects.filter(project=project)
+        for us in user_stories:
+            us.sprint = None
+            us.column = 0
+            us.sprint_member = None
+            us.estimation_time = -1
+            us.save()
+        sprints = Sprint.objects.filter(project=project)
+        for sprint in sprints:
+            sprint.status = SprintStatus.CANCELLED
+            sprint.end_date = date.today()
+            sprint.save()
+
         project.save()
         return project
 
@@ -146,17 +159,18 @@ class ProjectUseCase:
             user_id=user_id,project_id=project_id, roles__name__in=roles
         ).exists()
 
+    #TODO: modify_sprint_method
     @staticmethod
     def can_start_project(user_id, project_id):
         """
-        Verifica si un miembro de proyecto puede tiene permisos para iniciar el proyecto
+        Verifica si un miembro de proyecto tiene permisos para iniciar el proyecto
         """
         permissions = ['Iniciar Proyecto']
         roles = ['Scrum Master']
-        tiene_permisos = ProjectUseCase.member_has_permissions(user_id, project_id, permissions)
-        es_scrum_master = ProjectUseCase.member_has_roles(user_id, project_id, roles)
+        has_perm = ProjectUseCase.member_has_permissions(user_id, project_id, permissions)
+        is_scrum_master = ProjectUseCase.member_has_roles(user_id, project_id, roles)
 
-        return es_scrum_master or tiene_permisos
+        return is_scrum_master or has_perm
 
     @staticmethod
     def user_stories_by_project(project_id):
@@ -243,7 +257,7 @@ class ProjectUseCase:
             data['estimation_time'] = estimation_time
         if us_type:
             data['us_type'] = us_type
-        # Column es None por default, puede valer 0...
+        # si hubo un cambio en la columna
         if column is not None:
             data['column'] = column
 

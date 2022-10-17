@@ -27,20 +27,17 @@ class Sprint(models.Model):
         return f"Sprint {self.number}"
 
     @property
-    def get_button_icon(self):
+    def get_status_button(self):
+        button = {}
         if self.status == SprintStatus.CREATED:
-            return 'fa-solid fa-rocket'
+            button["icon"] = "fa-solid fa-rocket"
+            button["text"] = "Iniciar Sprint"
         elif self.status == SprintStatus.IN_PROGRESS:
-            return 'fa fa-flag'
-        return None
-
-    @property
-    def get_button_text(self):
-        if self.status == SprintStatus.CREATED:
-            return 'Iniciar Sprint'
-        elif self.status == SprintStatus.IN_PROGRESS:
-            return 'Finalizar Sprint'
-        return None
+            button["icon"] = "fa fa-flag"
+            button["text"] = "Finalizar Sprint"
+        else:
+            return None
+        return button
 
     @cached_property
     def used_capacity(self):
@@ -52,7 +49,6 @@ class Sprint(models.Model):
         return UserStory.objects.filter(sprint_id=self.id).aggregate(
             models.Sum('estimation_time')
             )['estimation_time__sum'] or 0
-
 
     def __str__(self):
         return f"Sprint {self.number} - {self.project.name}"
