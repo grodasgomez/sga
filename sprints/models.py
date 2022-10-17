@@ -7,7 +7,7 @@ from user_stories.models import UserStory
 class SprintStatus(models.TextChoices):
     CREATED = 'PLANNED', 'Planeado'
     IN_PROGRESS = 'IN_PROGRESS', 'En progreso'
-    CANCELLED = 'CANCELLED', 'Cancelado' #TODO: no hay cancelado
+    CANCELLED = 'CANCELLED', 'Cancelado'
     FINISHED = 'FINISHED', 'Finalizado'
 
 class Sprint(models.Model):

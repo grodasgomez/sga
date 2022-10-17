@@ -188,6 +188,8 @@ class SprintUseCase:
         for us in user_stories:
             #realizamos una copia de la us para el historial
             old_user_story = copy.copy(us)
+            #TODO: ver esto
+            us.sprint_priority = us.sprint_priority + 30
             us.sprint = None
             us.column = 0
             us.sprint_member = None
