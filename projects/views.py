@@ -707,7 +707,6 @@ class UserStoryEditApiView(CustomLoginMixin, ProjectAccessMixin, View):
     """
     Clase encargada de editar los tipos de us
     """
-
     def put(self, request, project_id, us_id):
         data = json.loads(request.body)
         old_us = ProjectUseCase.get_user_story_by_id(id=us_id)

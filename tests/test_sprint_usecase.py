@@ -179,3 +179,22 @@ class SprintUseCaseTest(TestCase):
 
         SprintUseCase.finish_sprint(sprint, user, self.project.id)
         self.assertEqual(sprint.status, SprintStatus.FINISHED, 'El sprint no se finalizo')
+
+    def test_start_sprint(self):
+        sprint = SprintUseCase.create_sprint(self.project.id, duration=14)
+        developer = CustomUser.objects.create(
+            first_name='Developer',
+            last_name='Python',
+            email='developer@gmail.com',
+            password='dsad',
+            is_active=True,
+            role_system='user')
+        SprintUseCase.add_sprint_member(user = developer, sprint_id=sprint.id, **{'workload': 10})
+
+        us = ProjectUseCase.create_user_story(code="US-1", title='User Story 1', description='User Story 1',
+                                                business_value=1, technical_priority=1, estimation_time=1,
+                                                us_type=self.user_story_type, project_id=self.project.id)
+        SprintUseCase.assign_us_sprint(sprint.id, us.id)
+        sprint = SprintUseCase.start_sprint(sprint)
+        self.assertEqual(sprint.status, SprintStatus.IN_PROGRESS.value, 'El sprint no tiene el estado IN_PROGRESS')
+        self.assertEqual(sprint.duration, 14, 'El sprint no tiene la duracion correcta')
