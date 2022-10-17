@@ -3,6 +3,8 @@ const user_stories = JSON.parse(
 );
 const us_types = JSON.parse(document.getElementById("us_types").textContent);
 
+const projectId = Number(document.getElementById("project_id").textContent);
+
 let activeUsType = us_types[0];
 
 let currentBoards = createBoard(activeUsType);
@@ -84,7 +86,7 @@ function filterUs() {
 }
 
 async function updateUsColumn(usId, column) {
-  const url = `/projects/1/user-stories/${usId}/`;
+  const url = `/projects/${projectId}/user-stories/${usId}/`;
   const csrftoken = document.cookie
     .split(";")
     .find((row) => row.trim().startsWith("csrftoken="))
