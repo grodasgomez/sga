@@ -257,7 +257,7 @@ class ProjectUseCase:
             data['estimation_time'] = estimation_time
         if us_type:
             data['us_type'] = us_type
-        # TODO: RODAS EXPLICAME ESTO Column es None por default, puede valer 0...
+        # si hubo un cambio en la columna
         if column is not None:
             data['column'] = column
 

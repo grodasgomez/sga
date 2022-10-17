@@ -108,7 +108,7 @@ class SprintView(CustomLoginMixin, SprintAccessMixin, DetailView):
                 messages.success(request, f"Sprint iniciado correctamente")
             elif sprint.status == "IN_PROGRESS":
                 SprintUseCase.finish_sprint(sprint, request.user, self.kwargs.get('project_id'))
-                messages.success(request, f"Sprint finalizado correctamente")
+                messages.success(request, f"Sprint finalizado correctamente, prioridad de las historias de usuario actualizada")
         except CustomError as e:
             messages.warning(request, e)
         return redirect(reverse('projects:sprints:detail', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))

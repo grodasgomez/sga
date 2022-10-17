@@ -18,7 +18,8 @@
 		{% if button %}
 			<form method="post">
 			{% csrf_token %}
-				<button type="submit" class="btn btn-primary">
+				<button type="submit" class="btn btn-primary"
+				{% if button.text == "Finalizar Sprint" %} onclick="return confirm('¿Estas seguro que quieres finalizar el sprint?')" {% endif %}>
 					<span class="btn-label"><i class="{{ button.icon }}" aria-hidden="true"></i></span>
 					{{ button.text }}
 				</button>
