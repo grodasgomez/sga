@@ -81,7 +81,10 @@ class UserStoryHistoryRestoreView(CustomLoginMixin, ProjectPermissionMixin, View
         UserStoriesUseCase.restore_user_story(user_story_id,**data)
 
         new_user_story = ProjectUseCase.get_user_story_by_id(id=user_story_id)
-        UserStoriesUseCase.create_user_story_history(old_user_story, new_user_story, request.user, project_id)
+        result=UserStoriesUseCase.create_user_story_history(old_user_story, new_user_story, request.user, project_id)
 
-        messages.success(request, f"Historia de usuario <strong>{data['title']}</strong> restaurada correctamente")
+        if  (result):
+            messages.success(request, f"Historia de usuario <strong>{data['title']}</strong> restaurada correctamente")
+        else:
+            messages.success(request, f"La Historia de usuario <strong>{data['title']}</strong> ya poseia los datos seleccionados")
         return redirect(reverse("projects:history:index", kwargs={"project_id": project_id, "user_story_id": user_story_id}))

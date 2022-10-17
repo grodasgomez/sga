@@ -2,6 +2,7 @@ from django.db.models import Q
 from users.models import CustomUser
 from user_stories.models import UserStory, UserStoryHistory
 from projects.usecase import ProjectUseCase, RoleUseCase
+from sprints.models import Sprint
 
 class UserStoriesUseCase:
     @staticmethod
@@ -100,6 +101,16 @@ class UserStoriesUseCase:
         data['column'] = column
         data['sprint'] = sprint
         data['sprint_member'] = sprint_member
+
+        if sprint:
+            sprint_status=sprint.status
+            if sprint_status=="CANCELLED" or sprint_status=="FINISHED":
+                data['column'] = 0
+                data['sprint'] = None
+                data['sprint_member'] = None
+                
+        print (data)
+        
 
         UserStory.objects.filter(pk=id).update(**data)
         return UserStory.objects.get(pk=id)
