@@ -1,0 +1,15 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+	{% include 'utils/messages.html' %}
+    <h1>Informacion Extra de una Historia de Usuario</h1>
+	<h3>Historia de Usuario: {{user_story.title}}</h3>
+	<a href="{% url 'projects:sprints:member-list' project_id=user_story.project.id sprint_id=user_story.sprint.id %}" class="btn btn-labeled btn-info" role="button">
+		<span class="btn-label"><i class="fa-solid fa-comments"></i></span>Comentarios
+	</a>
+	<a href="{% url 'projects:sprints:backlog' project_id=user_story.project.id sprint_id=user_story.sprint.id %}" class="btn btn-labeled btn-info" role="button">
+		<span class="btn-label"><i class="fa-solid fa-bars-progress"></i></span>Tareas
+	</a>
+	<a href="{% url 'projects:sprints:member-list' project_id=user_story.project.id sprint_id=user_story.sprint.id %}" class="btn btn-labeled btn-info" role="button">
+		<span class="btn-label"><i class="fa-solid fa-file"></i></span>Archivos Adjuntos
+	</a>
+{% endblock %}

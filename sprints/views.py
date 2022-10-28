@@ -323,3 +323,12 @@ class SprintBoardView(CustomLoginMixin, ProjectAccessMixin, View):
             'us_types': [model_to_dict(us_type) for us_type in us_types],
         }
         return render(request, 'sprints/board.html', context)
+
+class SprintBacklogMoreInformationView(CustomLoginMixin, SprintAccessMixin, View):
+    def get(self, request, project_id, sprint_id, user_story_id):
+        user_story = UserStory.objects.get(id=user_story_id)
+        context = {
+            'user_story': user_story,
+            'backpage': reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id})
+        }
+        return render(request, 'sprints/backlog_more_information.html', context)

@@ -35,11 +35,12 @@ function getUsByType(usTypeId, indexColumn) {
     .filter((us) => us.us_type === usTypeId && us.column === indexColumn)
     .map(({ id, ...usData }) => ({
       id: `us-${id}`,
-      title: getUsTemplate(usData),
+      title: getUsTemplate(id,usData),
     }));
 }
 
-function getUsTemplate(us) {
+function getUsTemplate(id,us) {
+  console.log(us);
   const htmlTemplate = `
     <div class="kanban-item-title">
       ${us.title}
@@ -47,10 +48,18 @@ function getUsTemplate(us) {
     <div class="kanban-item-footer">
       <p class="kanban-item-code">${us.code}</p>
       ${us.user ? ` <img src="${us.user.picture}" alt="" width="24" height="24" class="rounded-circle">` : ""}
+      <a href="/projects/" class="kanban-item-add btn" title="Informacion extra" onclick="redirectToViewAdd(${ id }, ${ us.project }, ${ us.sprint })">
+            <span class="btn-label"><i class="fa fa-list-alt" aria-hidden="true"></i>
+            </span>
+      </a>
     </div>`;
 
   return htmlTemplate;
 
+}
+
+function redirectToViewAdd(us_id, project_id, sprint_id) {
+  window.location.replace(`/projects/${project_id}/sprints/${sprint_id}/backlog/${us_id}/moreinformation/`);
 }
 
 function createBoard(usType){

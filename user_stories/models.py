@@ -51,3 +51,17 @@ class UserStoryHistory(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+class UserStoryComment(models.Model):
+    user_story = models.ForeignKey(UserStory, on_delete=models.CASCADE)
+    project_member = models.ForeignKey(ProjectMember, on_delete=models.CASCADE)
+    comment = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return self.user_story.code
+
+    class Meta:
+        ordering = ['-created_at']
