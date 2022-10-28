@@ -8,7 +8,7 @@ from projects.mixin import *
 from projects.models import UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase
 from users.models import CustomUser
-from sprints.forms import SprintCreateForm, SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm
+from sprints.forms import SprintCreateForm, SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm,FormCreateComment
 from sprints.models import Sprint, SprintMember
 from sprints.usecase import *
 from sprints.mixin import *
@@ -332,3 +332,56 @@ class SprintBacklogMoreInformationView(CustomLoginMixin, SprintAccessMixin, View
             'backpage': reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id})
         }
         return render(request, 'sprints/backlog_more_information.html', context)
+
+class SprintBacklogCommentsView(CustomLoginMixin, SprintAccessMixin, View):
+    """
+    Clase encargada de mostrar los comentarios de una US
+    """
+    def get (self, request, project_id, sprint_id, user_story_id):
+        user_story = UserStory.objects.get(id=user_story_id)
+        comments = UserStoriesUseCase.user_story_comments_by_us_id(user_story_id)
+        context = {
+            'user_story': user_story,
+            'comments': comments,
+            'backpage': reverse('projects:sprints:backlog-more-information', kwargs={'project_id': project_id, 'sprint_id': sprint_id, 'user_story_id':user_story_id })
+        }
+        return render(request, 'sprints/backlog_comments.html', context)
+
+class SprintBacklogCreateCommentView(CustomLoginMixin, SprintAccessMixin, View):
+    """
+    Clase encargada de agregar un comentarios a una US
+    """
+    form_class = FormCreateComment
+
+    def get(self, request, project_id, sprint_id, user_story_id):
+        user_story = UserStory.objects.get(id=user_story_id)
+        form = self.form_class(user_story_id)
+        context= {
+            'user_story': user_story,
+            "form" : form,
+            "project_id":project_id,
+            "sprint_id":sprint_id,
+            "user_story_id":user_story_id,
+            "backpage": reverse('projects:sprints:backlog-comments', kwargs={'project_id': project_id, 'sprint_id': sprint_id, 'user_story_id':user_story_id })
+        }
+        return render(request, 'sprints/backlog_comment_create.html', context)
+
+    def post(self, request, project_id, sprint_id, user_story_id):
+        user_story = UserStory.objects.get(id=user_story_id)
+        form=self.form_class(user_story_id,request.POST) #creamos un form con los datos cargados
+
+        if form.is_valid(): #vemos si es valido
+            cleaned_data=form.cleaned_data #tomamos los datos
+            UserStoriesUseCase.create_user_story_comment(user_story_id=user_story_id, user=request.user, project_id=project_id, **cleaned_data)
+            messages.success(request, f"Comentario creado correctamente")
+            return redirect(reverse("projects:sprints:backlog-comments", kwargs={'project_id': project_id, 'sprint_id': sprint_id, 'user_story_id':user_story_id}))
+        #si el form no es valido retorna a la misma pagina
+        context= {
+            'user_story': user_story,
+            "form" : form,
+            "project_id":project_id,
+            "sprint_id":sprint_id,
+            "user_story_id":user_story_id,
+            "backpage": reverse('projects:sprints:backlog-comments', kwargs={'project_id': project_id, 'sprint_id': sprint_id, 'user_story_id':user_story_id })
+        }
+        return render(request, 'sprints/backlog_comment_create.html', context)

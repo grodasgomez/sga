@@ -12,4 +12,7 @@ urlpatterns = [
     path('<int:sprint_id>/backlog/assign/', views.SprintBacklogAssignView.as_view(), name='backlog-assign-us'),
     path('<int:sprint_id>/backlog/<int:user_story_id>/assign/', views.SprintBacklogAssignMemberView.as_view(), name='backlog-assign-member'),
     path('<int:sprint_id>/backlog/<int:user_story_id>/moreinformation/', views.SprintBacklogMoreInformationView.as_view(), name='backlog-more-information'),
+    path('<int:sprint_id>/backlog/<int:user_story_id>/moreinformation/comments', views.SprintBacklogCommentsView.as_view(), name='backlog-comments'),
+    path('<int:sprint_id>/backlog/<int:user_story_id>/moreinformation/comments/create', views.SprintBacklogCreateCommentView.as_view(), name='backlog-comment-create'),
+    
 ]

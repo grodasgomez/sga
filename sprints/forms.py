@@ -5,6 +5,8 @@ from sprints.models import Sprint, SprintMember
 from sga import widgets
 from sprints.usecase import SprintUseCase
 from users.models import CustomUser
+from user_stories.models import UserStoryComment
+from projects.utils import build_field_error
 
 class SprintCreateForm(forms.Form):
     """
@@ -79,3 +81,22 @@ class AssignSprintMemberForm(forms.Form):
             widget=widgets.SelectInput(),
             required=False
         )
+
+class FormCreateComment(forms.Form):
+    """
+    Formulario para crear un comentario
+    """
+    def __init__(self, user_story_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user_story_id = user_story_id
+        self.fields['comment'] = forms.CharField(max_length=100, label='Comentario',widget=widgets.TextInput())  # Comentario
+
+    def clean(self):
+        cleaned_data = super().clean()
+        comment = cleaned_data.get('comment')
+        already_exists = UserStoryComment.objects.filter(
+            comment=comment, user_story_id=self.user_story_id).exists()
+        if already_exists:
+            raise forms.ValidationError(build_field_error(
+                'title', 'Ya existe este comentario'))
+        return cleaned_data

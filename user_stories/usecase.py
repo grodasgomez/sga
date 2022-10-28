@@ -1,6 +1,6 @@
 from django.db.models import Q
 from users.models import CustomUser
-from user_stories.models import UserStory, UserStoryHistory
+from user_stories.models import UserStory, UserStoryHistory, UserStoryComment
 from projects.usecase import ProjectUseCase, RoleUseCase
 from sprints.models import Sprint
 
@@ -111,3 +111,16 @@ class UserStoriesUseCase:
 
         UserStory.objects.filter(pk=id).update(**data)
         return UserStory.objects.get(pk=id)
+    
+    @staticmethod
+    def user_story_comments_by_us_id(user_story_id):
+        """
+        Retorna los comentarios de una historia de usuario
+        """
+        return UserStoryComment.objects.filter(user_story_id=user_story_id).order_by('-created_at')
+    
+    def create_user_story_comment(user_story_id, user, project_id, comment):
+        """
+        Crea un comentario de una historia de usuario
+        """
+        return UserStoryComment.objects.create(user_story_id=user_story_id, project_member=RoleUseCase.get_project_member_by_user(user,project_id), comment=comment)
