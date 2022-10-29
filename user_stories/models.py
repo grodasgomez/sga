@@ -51,3 +51,39 @@ class UserStoryHistory(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+
+def us_directory_path(instance, filename):
+    return f"user_stories/{instance.user_story.code}/{filename}"
+class UserStoryAttachment(models.Model):
+    user_story = models.ForeignKey(UserStory, on_delete=models.CASCADE)
+    file = models.FileField(upload_to=us_directory_path, null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def filename(self):
+        return self.file.name.split('/')[-1]
+    
+    @property
+    def size(self):
+        # Return a string with the size and the unit
+        amountOfDivisions = 0
+        size = self.file.size
+        while size > 1024:
+            size = size / 1024
+            amountOfDivisions += 1
+        units = {
+            0: 'B',
+            1: 'KB',
+            2: 'MB',
+            3: 'GB',
+            4: 'TB',
+        }
+        return f"{round(size, 2)} {units[amountOfDivisions]}"
+    def __str__(self):
+        return self.user_story.code
+
+    class Meta:
+        ordering = ['id']

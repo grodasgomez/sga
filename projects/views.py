@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.views import View
 from django.db.models.query import QuerySet
 from django.urls import reverse
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.forms.models import model_to_dict
 
 
@@ -15,6 +15,7 @@ from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEdit
     ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory, FormDeleteProject)
 from projects.models import Project, UserStoryType, ProjectMember, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
+from user_stories.models import UserStoryAttachment
 from user_stories.usecase import UserStoriesUseCase
 from projects.mixin import *
 from sga.mixin import *
@@ -476,12 +477,12 @@ class ProductBacklogCreateView(CustomLoginMixin, ProjectPermissionMixin, Project
         has_perm = ProjectUseCase.member_has_permissions(user.id, project_id, self.permissions)
         has_role_SM = ProjectUseCase.member_has_roles(user.id, project_id, ['Scrum Master'])
         has_role_PO = ProjectUseCase.member_has_roles(user.id, project_id, ['Product Owner'])
-
-        form = FormCreateUserStory(project_id, request.POST)
+        attachments = request.FILES.getlist('attachments')
+        form = FormCreateUserStory(project_id, request.POST, request.FILES)
         if has_perm or has_role_SM:
-            form = FormCreateUserStory(project_id, request.POST)
+            form = FormCreateUserStory(project_id, request.POST, request.FILES)
         elif (has_role_PO):
-            form = FormCreateUserStoryPO(project_id, request.POST)
+            form = FormCreateUserStoryPO(project_id, request.POST, request.FILES)
         if form.is_valid():
             cleaned_data = form.cleaned_data
 
@@ -489,7 +490,7 @@ class ProductBacklogCreateView(CustomLoginMixin, ProjectPermissionMixin, Project
                 cleaned_data['technical_priority'] = 0
             if not ('estimation_time' in cleaned_data):
                 cleaned_data['estimation_time'] = 0
-
+            cleaned_data['attachments'] = attachments
             code = Project.objects.get(id=project_id).prefix + "-" + str(ProjectUseCase.count_user_stories_by_project(project_id) + 1)
             ProjectUseCase.create_user_story(code, project_id=project_id, **cleaned_data)
             messages.success(request, f"Historia de usuario <strong>{cleaned_data['title']}</strong> creado correctamente")
@@ -684,7 +685,7 @@ class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, ProjectSt
 
     def post(self, request, project_id, us_id):
 
-        form = FormEditUserStory(project_id,request.POST)
+        form = FormEditUserStory(project_id,request.POST, request.FILES)
         context= {
             "form" : form,
             "backpage": reverse("projects:project-backlog", kwargs={"project_id": project_id})
@@ -714,3 +715,20 @@ class UserStoryEditApiView(CustomLoginMixin, ProjectAccessMixin, View):
         UserStoriesUseCase.create_user_story_history(old_us, new_us, request.user, project_id)
         user_story = model_to_dict(new_us)
         return JsonResponse({"data": user_story}, status=200)
+
+class ProductBacklogDetailView(CustomLoginMixin, ProjectAccessMixin, View):
+    def get(self, request, project_id, us_id):
+        user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
+        attachments = ProjectUseCase.get_attachments_by_user_story(us_id)
+        context = {
+            "project_id": project_id,
+            "user_story": user_story,
+            "attachments": attachments,
+            "backpage": reverse('projects:project-backlog', kwargs={'project_id': project_id})
+        }
+        return render(request, 'backlog/detail.html', context)
+
+class UserStoryAttachmentDownloadView(CustomLoginMixin, ProjectAccessMixin, View):
+    def get(self, request, project_id, us_id, attachment_id):
+        attachment = UserStoryAttachment.objects.get(id=attachment_id)
+        return FileResponse(open(attachment.file.path, 'rb'), content_type='application/force-download')

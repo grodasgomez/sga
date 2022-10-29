@@ -1,0 +1,28 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+	{% include 'utils/messages.html' %}
+	<h1>{{user_story.code }} - {{ user_story.title}}</h1>
+	<p><strong>Descripción:</strong> {{user_story.description}}</p>
+	<p><strong>Prioridad:</strong> {{user_story.sprint_priority}}</p>
+	<p><strong>Valor de negocio:</strong> {{user_story.business_value}}</p>
+	<p><strong>Prioridad técnica:</strong> {{user_story.technical_priority}}</p>
+	<p><strong>Estimación en horas:</strong> {{user_story.estimation_time}}</p>
+	<p><strong>Estado:</strong> {{user_story.status}}</p>
+  <h4> Documentos adjuntos </h4>
+  <ul class="list-group list-group-flush">
+    {% for file in attachments%}
+      <li class="list-group-item">
+        {{file.filename}}
+        <span class="badge text-bg-primary">{{file.size}}</span>
+
+        <a href="{% url 'projects:us-attachment-download' project_id=project_id us_id=user_story.id attachment_id=file.id%}"
+          class="btn" title="Descargar archivo">
+          <i class="fa fa-download"></i>
+        </a>
+      </li>
+    {% empty %}
+      <li class="list-group-item">No hay archivos adjuntos</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
+
