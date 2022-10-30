@@ -46,7 +46,10 @@ function getUsTemplate(us) {
     </div>
     <div class="kanban-item-footer">
       <p class="kanban-item-code">${us.code}</p>
-      ${us.user ? ` <img src="${us.user.picture}" alt="" width="24" height="24" class="rounded-circle">` : ""}
+      <div class="kanban-item-footer__right">
+        <span class="badge rounded-pill text-bg-dark">${us.sprint_priority}</span>
+        ${us.user ? ` <img src="${us.user.picture}" alt="" width="24" height="24" class="rounded-circle">` : ""}
+      </div>
     </div>`;
 
   return htmlTemplate;
