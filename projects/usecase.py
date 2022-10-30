@@ -204,7 +204,7 @@ class ProjectUseCase:
         return UserStory.objects.filter(project_id=project_id).count()
 
     @staticmethod
-    def create_user_story(code, title, description, business_value,technical_priority,estimation_time,us_type, project_id, attachments):
+    def create_user_story(code, title, description, business_value,technical_priority,estimation_time,us_type, project_id, attachments=[]):
         """
         Crea un us para el proyecto dado
         """
@@ -222,7 +222,7 @@ class ProjectUseCase:
             project=project)
 
         for attachment in attachments:
-            file = ProjectUseCase.create_attachment(us.id, attachment)
+            ProjectUseCase.create_attachment(us.id, attachment)
         return us
 
     @staticmethod
