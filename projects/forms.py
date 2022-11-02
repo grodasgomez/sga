@@ -7,6 +7,7 @@ from users.models import CustomUser
 from projects.usecase import RoleUseCase
 from projects.models import Permission
 from user_stories.models import UserStory
+from user_stories.models import UserStoryComment
 
 class FormCreateProject(forms.Form):
 
@@ -324,4 +325,23 @@ class FormEditUserStory(forms.Form):
         self.fields['business_value'] = forms.IntegerField( min_value=1, max_value=100 ,label='Valor de Negocio',widget=widgets.NumberInput())  # Valor de Negocio del US
         self.fields['technical_priority'] = forms.IntegerField(min_value=1, max_value=100 ,label='Prioridad Tecnica',widget=widgets.NumberInput())  # Prioridad Tecnica del US
         self.fields['estimation_time'] = forms.IntegerField(min_value=1, max_value=100 , label='Tiempo estimado',widget=widgets.NumberInput())  # Tiempo estimado del US
+
+class FormCreateComment(forms.Form):
+    """
+    Formulario para crear un comentario
+    """
+    def __init__(self, user_story_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user_story_id = user_story_id
+        self.fields['comment'] = forms.CharField(max_length=100, label='Comentario',widget=widgets.TextInput())  # Comentario
+
+    def clean(self):
+        cleaned_data = super().clean()
+        comment = cleaned_data.get('comment')
+        already_exists = UserStoryComment.objects.filter(
+            comment=comment, user_story_id=self.user_story_id).exists()
+        if already_exists:
+            raise forms.ValidationError(build_field_error(
+                'title', 'Ya existe este comentario'))
+        return cleaned_data
 

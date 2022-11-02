@@ -22,7 +22,7 @@
   <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
       
-      <a href="{% url 'projects:sprints:backlog-comment-create' project_id=user_story.project.id sprint_id=user_story.sprint.id user_story_id=user_story.id %}" class="btn btn-labeled btn-info">
+      <a href="{% url 'projects:comment-create' project_id=user_story.project.id us_id=user_story.id %}" class="btn btn-labeled btn-info">
         <span class="btn-label"><i class="fa fa-plus"></i></span>Agregar Comentario
       </a>
 

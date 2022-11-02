@@ -50,7 +50,7 @@ function getUsTemplate(id,us) {
       <div class="kanban-item-footer__right">
         <span class="badge rounded-pill text-bg-dark">${us.sprint_priority}</span>
         ${us.user ? ` <img src="${us.user.picture}" alt="" width="24" height="24" class="rounded-circle">` : ""}
-        <a href="/projects/" class="kanban-item-add btn" title="Informacion extra" onclick="redirectToViewAdd(${ id }, ${ us.project }, ${ us.sprint })">
+        <a href="/projects/${ us.project }/backlog/${ id }/" class="kanban-item-add btn" title="Informacion extra" onclick="redirectToViewAdd(${ id }, ${ us.project })">
             <span class="btn-label"><i class="fa fa-list-alt" aria-hidden="true"></i>
             </span>
         </a>
@@ -61,8 +61,8 @@ function getUsTemplate(id,us) {
 
 }
 
-function redirectToViewAdd(us_id, project_id, sprint_id) {
-  window.location.replace(`/projects/${project_id}/sprints/${sprint_id}/backlog/${us_id}/moreinformation/`);
+function redirectToViewAdd(us_id, project_id) {
+  window.location.replace(`/projects/${project_id}/backlog/${us_id}/`);
 }
 
 function createBoard(usType){

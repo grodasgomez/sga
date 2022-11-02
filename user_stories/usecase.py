@@ -119,8 +119,8 @@ class UserStoriesUseCase:
         """
         return UserStoryComment.objects.filter(user_story_id=user_story_id).order_by('-created_at')
     
-    def create_user_story_comment(user_story_id, user, project_id, comment):
+    def create_user_story_comment(us_id, user, project_id, comment):
         """
         Crea un comentario de una historia de usuario
         """
-        return UserStoryComment.objects.create(user_story_id=user_story_id, project_member=RoleUseCase.get_project_member_by_user(user,project_id), comment=comment)
+        return UserStoryComment.objects.create(user_story_id=us_id, project_member=RoleUseCase.get_project_member_by_user(user,project_id), comment=comment)

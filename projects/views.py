@@ -12,14 +12,16 @@ from django.forms.models import model_to_dict
 
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
     FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole,
-    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory, FormDeleteProject)
+    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory, FormDeleteProject, FormCreateComment)
 from projects.models import Project, UserStoryType, ProjectMember, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
+from sprints.mixin import SprintAccessMixin
 from user_stories.models import UserStoryAttachment
 from user_stories.usecase import UserStoriesUseCase
 from projects.mixin import *
 from sga.mixin import *
 from users.models import CustomUser
+from user_stories.models import UserStory
 
 # Create your views here.
 class ProjectListView(VerifiedMixin, View):
@@ -734,3 +736,40 @@ class UserStoryAttachmentDownloadView(CustomLoginMixin, ProjectAccessMixin, View
     def get(self, request, project_id, us_id, attachment_id):
         attachment = UserStoryAttachment.objects.get(id=attachment_id)
         return FileResponse(open(attachment.file.path, 'rb'), content_type='application/force-download')
+
+class ProductBacklogCreateCommentView(CustomLoginMixin, ProjectAccessMixin, View):
+    """
+    Clase encargada de agregar un comentarios a una US
+    """
+    form_class = FormCreateComment
+
+    def get(self, request, project_id, us_id):
+        user_story = UserStory.objects.get(id=us_id)
+        form = self.form_class(us_id)
+        context= {
+            'user_story': user_story,
+            "form" : form,
+            "project_id":project_id,
+            "us_id":us_id,
+            "backpage": reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id })
+        }
+        return render(request, 'backlog/comment_create.html', context)
+
+    def post(self, request, project_id, us_id):
+        user_story = UserStory.objects.get(id=us_id)
+        form=self.form_class(us_id,request.POST) #creamos un form con los datos cargados
+
+        if form.is_valid(): #vemos si es valido
+            cleaned_data=form.cleaned_data #tomamos los datos
+            UserStoriesUseCase.create_user_story_comment(us_id=us_id, user=request.user, project_id=project_id, **cleaned_data)
+            messages.success(request, f"Comentario creado correctamente")
+            return redirect(reverse("projects:project-backlog-detail", kwargs={'project_id': project_id, 'us_id':us_id}))
+        #si el form no es valido retorna a la misma pagina
+        context= {
+            'user_story': user_story,
+            "form" : form,
+            "project_id":project_id,
+            "user_story_id":us_id,
+            "backpage": reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id })
+        }
+        return render(request, 'backlog/comment_create.html', context)
