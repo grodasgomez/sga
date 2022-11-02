@@ -315,11 +315,15 @@ class SprintBoardView(CustomLoginMixin, ProjectAccessMixin, View):
 
         user_stories = UserStory.objects.filter(sprint_id=sprint.id).all()
         us_types = UserStoryType.objects.filter(project_id=project_id).all()
-
+        current_member = ProjectMember.objects.get(project_id=project_id, user_id=request.user.id)
         context = {
             'project_id': project_id,
             'sprint': sprint,
             'user_stories': [us.to_kanban_item() for us in user_stories],
             'us_types': [model_to_dict(us_type) for us_type in us_types],
+            'current_member': {
+                'id': request.user.id,
+                'roles': [role.name for role in current_member.roles.all()]
+            }
         }
         return render(request, 'sprints/board.html', context)
