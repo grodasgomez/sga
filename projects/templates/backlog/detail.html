@@ -21,7 +21,6 @@
   </ul>
   <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-      
       <a href="{% url 'projects:comment-create' project_id=user_story.project.id us_id=user_story.id %}" class="btn btn-labeled btn-info">
         <span class="btn-label"><i class="fa fa-plus"></i></span>Agregar Comentario
       </a>
@@ -47,21 +46,7 @@
 
     </div>
     <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-      <ul class="list-group list-group-flush">
-        {% for file in attachments%}
-          <li class="list-group-item">
-            {{file.filename}}
-            <span class="badge text-bg-primary">{{file.size}}</span>
-    
-            <a href="{% url 'projects:us-attachment-download' project_id=project_id us_id=user_story.id attachment_id=file.id%}"
-              class="btn" title="Descargar archivo">
-              <i class="fa fa-download"></i>
-            </a>
-          </li>
-        {% empty %}
-          <li class="list-group-item">No hay archivos adjuntos</li>
-        {% endfor %}
-      </ul>
+      {% include 'backlog/detail_attachments.html'%}
     </div>
     <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
       Tareas

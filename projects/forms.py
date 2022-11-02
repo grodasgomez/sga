@@ -345,3 +345,17 @@ class FormCreateComment(forms.Form):
                 'title', 'Ya existe este comentario'))
         return cleaned_data
 
+
+class FormCreateAttachment(forms.Form):
+    """
+    Formulario para crear un comentario
+    """
+    def __init__(self, user_story_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user_story_id = user_story_id
+        self.fields['attachments'] = forms.FileField(
+            required=False, label='Adjuntos', widget=widgets.FileInput(attrs={'multiple': True}))
+    def clean(self):
+        cleaned_data = super().clean()
+        return cleaned_data
+

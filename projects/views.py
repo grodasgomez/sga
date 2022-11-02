@@ -12,7 +12,7 @@ from django.forms.models import model_to_dict
 
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
     FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole,
-    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory, FormDeleteProject, FormCreateComment)
+    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory, FormDeleteProject, FormCreateComment, FormCreateAttachment)
 from projects.models import Project, UserStoryType, ProjectMember, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
 from sprints.mixin import SprintAccessMixin
@@ -773,3 +773,41 @@ class ProductBacklogCreateCommentView(CustomLoginMixin, ProjectAccessMixin, View
             "backpage": reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id })
         }
         return render(request, 'backlog/comment_create.html', context)
+
+class UserStoryAttachmentCreateView(CustomLoginMixin, ProjectStatusMixin, FormView):
+
+
+    template_name = 'backlog/attachment_create.html'
+    form_class = FormCreateAttachment
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user_story_id'] = self.kwargs.get('us_id')
+        return kwargs
+
+    def form_valid(self, form):
+        attachments = self.request.FILES.getlist('attachments')
+        us_id = self.kwargs.get('us_id')
+        files = []
+        for attachment in attachments:
+            file = ProjectUseCase.create_attachment(us_id, attachment)
+            files.append(file.filename)
+        messages.success(self.request, f"Archivos <strong>{', '.join(files)}</strong> subidos correctamente")
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        """Use this to add extra context."""
+        context = super().get_context_data(**kwargs)
+        context['user_story'] = ProjectUseCase.get_user_story_by_id(id=self.kwargs.get('us_id'))
+        context['backpage'] = reverse("projects:user-story-type-list", kwargs={"project_id": self.kwargs["project_id"]})
+        return context
+
+    def get_success_url(self):
+        project_id = self.kwargs.get('project_id')
+        return reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':self.kwargs.get('us_id')})
+
+class UserStoryAttachmentDeleteView(CustomLoginMixin, ProjectAccessMixin, View):
+    def get(self, request, project_id, us_id, attachment_id):
+        filename = ProjectUseCase.delete_attachment(attachment_id)
+        messages.success(request, f"Archivo <strong>{filename}</strong> eliminado correctamente")
+        return redirect(reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id}))

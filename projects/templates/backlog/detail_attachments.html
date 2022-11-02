@@ -1,0 +1,28 @@
+<a href="{% url 'projects:us-attachment-create' project_id=user_story.project.id us_id=user_story.id %}" class="btn btn-labeled btn-info">
+  <span class="btn-label"><i class="fa fa-plus"></i></span>Agregar Adjuntos
+</a>
+<ul class="list-group list-group-flush">
+  {% for file in attachments%}
+  <li class="list-group-item">
+    {{file.filename}}
+    <span class="badge text-bg-primary">{{file.size}}</span>
+
+    <a
+      href="{% url 'projects:us-attachment-download' project_id=project_id us_id=user_story.id attachment_id=file.id%}"
+      class="btn"
+      title="Descargar archivo"
+    >
+      <i class="fa fa-download"></i>
+    </a>
+    <a
+    href="{% url 'projects:us-attachment-delete' project_id=project_id us_id=user_story.id attachment_id=file.id%}"
+    class="btn"
+    title="Eliminar archivo"
+    >
+    <i class="fa fa-trash"></i>
+  </a>
+  </li>
+  {% empty %}
+  <li class="list-group-item">No hay archivos adjuntos</li>
+  {% endfor %}
+</ul>
