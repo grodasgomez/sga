@@ -3,7 +3,7 @@
 <b></b>
 	<h1>Editar Historia de Usuario</h1>
 
-	<form method="post" class="form row g-3">
+	<form method="post" class="form row g-3" enctype="multipart/form-data">
 		{% csrf_token %}
 		{% for field in form %}
       {% include "utils/form_field.html" with field=field %}

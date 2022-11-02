@@ -4,7 +4,7 @@ from datetime import date
 from projects.models import Project, ProjectMember, ProjectStatus
 from projects.models import Role, UserStoryType
 from users.models import CustomUser
-from user_stories.models import UserStory
+from user_stories.models import UserStory, UserStoryAttachment
 from sprints.models import Sprint, SprintStatus
 
 class ProjectUseCase:
@@ -204,13 +204,13 @@ class ProjectUseCase:
         return UserStory.objects.filter(project_id=project_id).count()
 
     @staticmethod
-    def create_user_story(code, title, description, business_value,technical_priority,estimation_time,us_type, project_id):
+    def create_user_story(code, title, description, business_value,technical_priority,estimation_time,us_type, project_id, attachments=[]):
         """
         Crea un us para el proyecto dado
         """
         sprint_priority = round(0.6 * business_value + 0.4 * technical_priority)
         project = Project.objects.get(id=project_id)
-        return UserStory.objects.create(
+        us =  UserStory.objects.create(
             code=code,
             title=title,
             description=description,
@@ -220,6 +220,10 @@ class ProjectUseCase:
             estimation_time=estimation_time,
             us_type=us_type,
             project=project)
+
+        for attachment in attachments:
+            ProjectUseCase.create_attachment(us.id, attachment)
+        return us
 
     @staticmethod
     def import_user_story_types(project_id, from_project_id, user_story_types):
@@ -270,6 +274,20 @@ class ProjectUseCase:
         Obtiene el estado de un proyecto
         """
         return Project.objects.get(id=project_id).status
+
+    @staticmethod
+    def create_attachment(user_story_id, file):
+        """
+        Crea un archivo adjunto
+        """
+        return UserStoryAttachment.objects.create(user_story_id=user_story_id, file=file)
+
+    @staticmethod
+    def get_attachments_by_user_story(user_story_id):
+        """
+        Obtiene los archivos adjuntos de una us
+        """
+        return UserStoryAttachment.objects.filter(user_story_id=user_story_id).order_by('-created_at')
 
 class RoleUseCase:
     @staticmethod

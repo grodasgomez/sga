@@ -47,7 +47,11 @@
 		<tbody>
 		{% for user_story in user_stories %}
 		<tr height="60px">
-			<td>{{ user_story.code }}</td>
+      <td>
+        <a href="{% url 'projects:project-backlog-detail' project_id=project_id us_id=user_story.id %}" class="btn-custom">
+          <span class="btn-label">{{ user_story.code }}</span>
+        </a>
+      </td>
 			<td>{{ user_story.title }}</td>
 			<td>{{ user_story.description }}</td>
             <td>{{ user_story.business_value }}</td>

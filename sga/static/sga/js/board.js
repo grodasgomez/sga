@@ -47,11 +47,14 @@ function getUsTemplate(id,us) {
     </div>
     <div class="kanban-item-footer">
       <p class="kanban-item-code">${us.code}</p>
-      ${us.user ? ` <img src="${us.user.picture}" alt="" width="24" height="24" class="rounded-circle">` : ""}
-      <a href="/projects/" class="kanban-item-add btn" title="Informacion extra" onclick="redirectToViewAdd(${ id }, ${ us.project }, ${ us.sprint })">
+      <div class="kanban-item-footer__right">
+        <span class="badge rounded-pill text-bg-dark">${us.sprint_priority}</span>
+        ${us.user ? ` <img src="${us.user.picture}" alt="" width="24" height="24" class="rounded-circle">` : ""}
+        <a href="/projects/" class="kanban-item-add btn" title="Informacion extra" onclick="redirectToViewAdd(${ id }, ${ us.project }, ${ us.sprint })">
             <span class="btn-label"><i class="fa fa-list-alt" aria-hidden="true"></i>
             </span>
-      </a>
+        </a>
+      </div>
     </div>`;
 
   return htmlTemplate;

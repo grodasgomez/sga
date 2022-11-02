@@ -189,7 +189,8 @@ class FormCreateUserStory(forms.Form):
         self.fields['business_value'] = forms.IntegerField( min_value=1, max_value=100 ,label='Valor de Negocio',widget=widgets.NumberInput())  # Valor de Negocio del US
         self.fields['technical_priority'] = forms.IntegerField(min_value=1, max_value=100 ,label='Prioridad Tecnica',widget=widgets.NumberInput())  # Prioridad Tecnica del US
         self.fields['estimation_time'] = forms.IntegerField(min_value=1, max_value=100 , label='Tiempo estimado',widget=widgets.NumberInput())  # Tiempo estimado del US
-
+        self.fields['attachments'] = forms.FileField(
+            required=False, label='Adjuntos', widget=widgets.FileInput(attrs={'multiple': True}))  # Adjuntos del US
     def clean(self):
         cleaned_data = super().clean()
         title = cleaned_data.get('title')
@@ -215,11 +216,11 @@ class FormCreateUserStoryPO(forms.Form):
         self.fields['title'] = forms.CharField(max_length=100, label='Titulo',widget=widgets.TextInput())  # TITULO del US
         self.fields['description'] = forms.CharField(max_length=100, label='Descripcion',widget=widgets.TextInput())  # descripcion del US
         self.fields['business_value'] = forms.IntegerField( min_value=1, max_value=100 ,label='Valor de Negocio',widget=widgets.NumberInput())  # Valor de Negocio del US
-
+        self.fields['attachments'] = forms.FileField(
+            required=False, label='Adjuntos', widget=widgets.FileInput(attrs={'multiple': True}))  # Adjuntos del US
     def clean(self):
         cleaned_data = super().clean()
         title = cleaned_data.get('title')
-
         already_exists = UserStory.objects.filter(
             title=title, project_id=self.project_id).exists()
         if already_exists:
