@@ -112,3 +112,7 @@ span.btn-label {
   font-size: 0.8rem;
   margin:0;
 }
+
+.tab-pane{
+  padding-top: 10px;
+}
