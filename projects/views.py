@@ -12,11 +12,11 @@ from django.forms.models import model_to_dict
 
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
     FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole,
-    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory, FormDeleteProject, FormCreateComment)
+    ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory, FormDeleteProject, FormCreateComment, FormCreateTask)
 from projects.models import Project, UserStoryType, ProjectMember, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
 from sprints.mixin import SprintAccessMixin
-from user_stories.models import UserStoryAttachment
+from user_stories.models import UserStoryAttachment, UserStoryTask
 from user_stories.usecase import UserStoriesUseCase
 from projects.mixin import *
 from sga.mixin import *
@@ -723,11 +723,13 @@ class ProductBacklogDetailView(CustomLoginMixin, ProjectAccessMixin, View):
         user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
         attachments = ProjectUseCase.get_attachments_by_user_story(us_id)
         comments = UserStoriesUseCase.user_story_comments_by_us_id(us_id)
+        tasks = UserStoriesUseCase.user_story_tasks_by_us_id(us_id)
         context = {
             "project_id": project_id,
             "user_story": user_story,
             "attachments": attachments,
             "comments" : comments,
+            "tasks" : tasks,
             "backpage": reverse('projects:project-backlog', kwargs={'project_id': project_id})
         }
         return render(request, 'backlog/detail.html', context)
@@ -773,3 +775,45 @@ class ProductBacklogCreateCommentView(CustomLoginMixin, ProjectAccessMixin, View
             "backpage": reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id })
         }
         return render(request, 'backlog/comment_create.html', context)
+
+class ProductBacklogCreateTaskView(CustomLoginMixin, ProjectAccessMixin, View):
+    """
+    Clase encargada de agregar un comentarios a una US
+    """
+    form_class = FormCreateTask
+
+    def get(self, request, project_id, us_id):
+        user_story = UserStory.objects.get(id=us_id)
+        form = self.form_class(us_id)
+        tasks_from_us = UserStoryTask.objects.filter(user_story_id=us_id)
+        hours_worked = 0
+        for task in tasks_from_us:
+            hours_worked = hours_worked + task.hours_worked
+        context= {
+            'user_story': user_story,
+            "form" : form,
+            "project_id":project_id,
+            "us_id":us_id,
+            "hours_worked": hours_worked,
+            "backpage": reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id })
+        }
+        return render(request, 'backlog/task_create.html', context)
+
+    def post(self, request, project_id, us_id):
+        user_story = UserStory.objects.get(id=us_id)
+        form=self.form_class(us_id,request.POST) #creamos un form con los datos cargados
+
+        if form.is_valid(): #vemos si es valido
+            cleaned_data=form.cleaned_data #tomamos los datos
+            UserStoriesUseCase.create_user_story_task(user_story=user_story, user=request.user, **cleaned_data)
+            messages.success(request, f"Tarea agregada correctamente")
+            return redirect(reverse("projects:project-backlog-detail", kwargs={'project_id': project_id, 'us_id':us_id}))
+        #si el form no es valido retorna a la misma pagina
+        context= {
+            'user_story': user_story,
+            "form" : form,
+            "project_id":project_id,
+            "user_story_id":us_id,
+            "backpage": reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id })
+        }
+        return render(request, 'backlog/task_create.html', context)

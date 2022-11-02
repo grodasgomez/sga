@@ -52,7 +52,16 @@ class UserStoryHistory(models.Model):
     class Meta:
         ordering = ['-created_at']
 
-
+class UserStoryTask(models.Model):
+    user_story = models.ForeignKey(UserStory, on_delete=models.CASCADE)
+    sprint = models.ForeignKey('sprints.Sprint', on_delete=models.CASCADE, null=True)
+    sprint_member = models.ForeignKey('sprints.SprintMember', on_delete=models.CASCADE, null=True)
+    description = models.CharField(max_length=100)
+    hours_worked = models.IntegerField(default=0)
+    column = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(null=True)
 
 def us_directory_path(instance, filename):
     return f"user_stories/{instance.user_story.code}/{filename}"
@@ -65,7 +74,7 @@ class UserStoryAttachment(models.Model):
     @property
     def filename(self):
         return self.file.name.split('/')[-1]
-    
+
     @property
     def size(self):
         # Return a string with the size and the unit

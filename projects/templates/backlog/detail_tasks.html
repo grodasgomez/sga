@@ -1,0 +1,25 @@
+<br>
+<a href="{% url 'projects:task-create' project_id=user_story.project.id us_id=user_story.id %}" class="btn btn-labeled btn-info">
+  <span class="btn-label"><i class="fa fa-plus"></i></span>Agregar Tarea
+</a>
+
+<table class="table-custom">
+  <thead>
+    <tr>
+      <th scope="col">Descripcion</th>
+      <th scope="col">Horas Trabajadas</th>
+      <th scope="col">Autor</th>
+      <th scope="col">Fecha</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}
+    <tr height="60px">
+      <td>{{ task.description }}</td>
+      <td>{{ task.hours_worked }}</td>
+      <td>{{ task.sprint_member.user.email }}</td>
+      <td>{{ task.created_at }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

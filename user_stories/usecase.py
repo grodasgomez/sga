@@ -1,8 +1,8 @@
 from django.db.models import Q
 from users.models import CustomUser
-from user_stories.models import UserStory, UserStoryHistory, UserStoryComment
+from user_stories.models import UserStory, UserStoryHistory, UserStoryComment, UserStoryTask
 from projects.usecase import ProjectUseCase, RoleUseCase
-from sprints.models import Sprint
+from sprints.models import Sprint, SprintMember
 
 class UserStoriesUseCase:
     @staticmethod
@@ -111,16 +111,37 @@ class UserStoriesUseCase:
 
         UserStory.objects.filter(pk=id).update(**data)
         return UserStory.objects.get(pk=id)
-    
+
     @staticmethod
     def user_story_comments_by_us_id(user_story_id):
         """
         Retorna los comentarios de una historia de usuario
         """
         return UserStoryComment.objects.filter(user_story_id=user_story_id).order_by('-created_at')
-    
+
     def create_user_story_comment(us_id, user, project_id, comment):
         """
         Crea un comentario de una historia de usuario
         """
         return UserStoryComment.objects.create(user_story_id=us_id, project_member=RoleUseCase.get_project_member_by_user(user,project_id), comment=comment)
+
+    @staticmethod
+    def user_story_tasks_by_us_id(user_story_id):
+        """
+        Retorna las tareas de una historia de usuario
+        """
+        return UserStoryTask.objects.filter(user_story_id=user_story_id).order_by('-created_at')
+
+    def create_user_story_task(user_story, user, description, hours):
+        """
+        Crea una tarea de una historia de usuario
+        """
+        sprint=user_story.sprint
+        return UserStoryTask.objects.create(
+            user_story=user_story,
+            sprint=sprint,
+            sprint_member=SprintMember.objects.get(user=user,sprint=sprint),
+            description=description,
+            hours_worked=hours,
+            column=user_story.column #TODO esta bien?
+        )

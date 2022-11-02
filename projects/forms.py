@@ -6,8 +6,7 @@ from sga import widgets
 from users.models import CustomUser
 from projects.usecase import RoleUseCase
 from projects.models import Permission
-from user_stories.models import UserStory
-from user_stories.models import UserStoryComment
+from user_stories.models import UserStory, UserStoryComment, UserStoryTask
 
 class FormCreateProject(forms.Form):
 
@@ -328,7 +327,7 @@ class FormEditUserStory(forms.Form):
 
 class FormCreateComment(forms.Form):
     """
-    Formulario para crear un comentario
+    Formulario para crear un comentario de una us
     """
     def __init__(self, user_story_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -345,3 +344,12 @@ class FormCreateComment(forms.Form):
                 'title', 'Ya existe este comentario'))
         return cleaned_data
 
+class FormCreateTask(forms.Form):
+    """
+    Formulario para crear una Tarea de una us
+    """
+    def __init__(self, user_story_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user_story_id = user_story_id
+        self.fields['description'] = forms.CharField(max_length=100, label='Descripcion',widget=widgets.TextInput())
+        self.fields['hours'] = forms.IntegerField(min_value=1, max_value=100 , label='Horas',widget=widgets.NumberInput())
