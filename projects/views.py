@@ -720,10 +720,12 @@ class ProductBacklogDetailView(CustomLoginMixin, ProjectAccessMixin, View):
     def get(self, request, project_id, us_id):
         user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
         attachments = ProjectUseCase.get_attachments_by_user_story(us_id)
+        comments = UserStoriesUseCase.user_story_comments_by_us_id(us_id)
         context = {
             "project_id": project_id,
             "user_story": user_story,
             "attachments": attachments,
+            "comments" : comments,
             "backpage": reverse('projects:project-backlog', kwargs={'project_id': project_id})
         }
         return render(request, 'backlog/detail.html', context)
