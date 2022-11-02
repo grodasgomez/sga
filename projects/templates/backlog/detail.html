@@ -8,21 +8,41 @@
 	<p><strong>Prioridad técnica:</strong> {{user_story.technical_priority}}</p>
 	<p><strong>Estimación en horas:</strong> {{user_story.estimation_time}}</p>
 	<p><strong>Estado:</strong> {{user_story.status}}</p>
-  <h4> Documentos adjuntos </h4>
-  <ul class="list-group list-group-flush">
-    {% for file in attachments%}
-      <li class="list-group-item">
-        {{file.filename}}
-        <span class="badge text-bg-primary">{{file.size}}</span>
-
-        <a href="{% url 'projects:us-attachment-download' project_id=project_id us_id=user_story.id attachment_id=file.id%}"
-          class="btn" title="Descargar archivo">
-          <i class="fa fa-download"></i>
-        </a>
-      </li>
-    {% empty %}
-      <li class="list-group-item">No hay archivos adjuntos</li>
-    {% endfor %}
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Comentarios</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Adjuntos</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Tareas</button>
+    </li>
   </ul>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+        Comentarios
+    </div>
+    <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+      <ul class="list-group list-group-flush">
+        {% for file in attachments%}
+          <li class="list-group-item">
+            {{file.filename}}
+            <span class="badge text-bg-primary">{{file.size}}</span>
+    
+            <a href="{% url 'projects:us-attachment-download' project_id=project_id us_id=user_story.id attachment_id=file.id%}"
+              class="btn" title="Descargar archivo">
+              <i class="fa fa-download"></i>
+            </a>
+          </li>
+        {% empty %}
+          <li class="list-group-item">No hay archivos adjuntos</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+      Tareas
+    </div>
+  </div>
 {% endblock %}
 
