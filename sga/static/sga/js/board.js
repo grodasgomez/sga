@@ -109,10 +109,18 @@ function getUsTemplate(id, us) {
         }
         <a href="/projects/${
           us.project
-        }/backlog/${id}/" class="kanban-item-add btn" title="Informacion extra" onclick="redirectToViewAdd(${id}, ${
+        }/backlog/${id}/" class="kanban-item-add btn px-1 py-0" title="Informacion extra" onclick="redirectToViewAdd(${id}, ${
     us.project
   })">
-            <span class="btn-label"><i class="fa fa-list-alt" aria-hidden="true"></i>
+            <span class=""><i class="fa fa-list-alt" aria-hidden="true"></i>
+            </span>
+        </a>
+        <a href="/projects/${
+          us.project
+        }/backlog/${id}/tasks/create" class="kanban-item-add btn px-1 py-0" title="Agregar Tarea" onclick="redirectToViewAddTask(${id}, ${
+    us.project
+  })">
+            <span class=""><i class="fa fa-plus-square" aria-hidden="true"></i>
             </span>
         </a>
       </div>
@@ -122,7 +130,11 @@ function getUsTemplate(id, us) {
 }
 
 function redirectToViewAdd(us_id, project_id) {
-  window.location.replace(`/projects/${project_id}/backlog/${us_id}/`);
+  window.location = (`/projects/${project_id}/backlog/${us_id}/`);
+}
+
+function redirectToViewAddTask(us_id, project_id) {
+  window.location = (`/projects/${project_id}/backlog/${us_id}/tasks/create`);
 }
 
 function createBoard(usType) {

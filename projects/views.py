@@ -883,7 +883,7 @@ class ProductBacklogCreateTaskView(CustomLoginMixin, ProjectAccessMixin, View):
             "project_id":project_id,
             "us_id":us_id,
             "hours_worked": hours_worked,
-            "backpage": reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id })
+            "backpage": reverse('projects:board:index', kwargs={'project_id': project_id})
         }
         return render(request, 'backlog/task_create.html', context)
 
@@ -895,14 +895,14 @@ class ProductBacklogCreateTaskView(CustomLoginMixin, ProjectAccessMixin, View):
             cleaned_data=form.cleaned_data #tomamos los datos
             UserStoriesUseCase.create_user_story_task(user_story=user_story, user=request.user, **cleaned_data)
             messages.success(request, f"Tarea agregada correctamente")
-            return redirect(reverse("projects:project-backlog-detail", kwargs={'project_id': project_id, 'us_id':us_id}))
+            return redirect(reverse("projects:board:index", kwargs={'project_id': project_id}))
         #si el form no es valido retorna a la misma pagina
         context= {
             'user_story': user_story,
             "form" : form,
             "project_id":project_id,
             "user_story_id":us_id,
-            "backpage": reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id })
+            "backpage": reverse('projects:board:index', kwargs={'project_id': project_id})
         }
         return render(request, 'backlog/task_create.html', context)
 class UserStoryAttachmentCreateView(CustomLoginMixin, ProjectStatusMixin, FormView):
