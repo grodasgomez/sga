@@ -352,8 +352,8 @@ class BurndownChartView(CustomLoginMixin, SprintAccessMixin, View):
     """
     def get(self, request, project_id, sprint_id):
         sprint = SprintUseCase.get_sprint_by_id(sprint_id)
-        if sprint.status == SprintStatus.CREATED:
-            messages.warning(request, "El sprint no ha iniciado")
+        if not sprint.status == SprintStatus.IN_PROGRESS: #todo: cambiar a ==CREATED cuando se agregue el mixin
+            messages.warning(request, "El sprint no se encuentra en progreso") #el sprint no se ha finalizado
             return redirect(reverse("projects:sprints:detail", kwargs={"project_id": project_id, "sprint_id": sprint_id}))
 
         sprint = Sprint.objects.get(id=sprint_id)
@@ -375,7 +375,7 @@ class BurndownChartView(CustomLoginMixin, SprintAccessMixin, View):
             else:
                 estimated_hours.append(int(estimation_total_sprint-(estimation_total_sprint/real_duration_days)*(x+1)))
         print("estimation_total_sprint",estimation_total_sprint)
-        days_until_today = (datetime.now().date()-sprint.start_date).days+1+2
+        days_until_today = (datetime.now().date()-sprint.start_date).days+1
         #horas trabajadas por dia en base a tareas
         worked_hours = []
         for x in range(days_until_today):
