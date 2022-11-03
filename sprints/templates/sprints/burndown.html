@@ -1,0 +1,52 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+<h1> Burndown </h1>
+<script>
+	window.onload = function () {
+		var chart = new CanvasJS.Chart("chartContainer", {
+			animationEnabled: true,
+			title: {
+				text: "Burndown Chart"
+			},
+			axisX: {
+				title: "Fechas"
+			},
+			axisY: {
+				title: "Horas",
+				includeZero: true
+			},
+			data: [{
+				type: "line",
+				name: "Realizado",
+				showInLegend: true,
+				dataPoints: [
+					{ x: 1, y: 35.939 },
+					{ x: 2, y: 40.896 },
+					{ x: 3, y: 56.625 },
+					{ x: 4, y: 26.003 },
+					{ x: 5, y: 20.376 },
+				]
+			},
+			{
+				type: "line",
+				name: "Estimado",
+				showInLegend: true,
+				dataPoints: [
+					{ x: 1, y: 40 },
+					{ x: 2, y: 45 },
+					{ x: 3, y: 52 },
+					{ x: 4, y: 50 },
+					{ x: 5, y: 45 },
+				]
+			},
+			]
+		});
+		chart.render();
+	}
+</script>
+
+<body>
+	<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</body>
+{% endblock %}

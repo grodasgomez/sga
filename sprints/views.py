@@ -340,3 +340,7 @@ class SprintBoardView(CustomLoginMixin, ProjectAccessMixin, View):
             }
         }
         return render(request, 'sprints/board.html', context)
+
+class BurndownChart(CustomLoginMixin, SprintAccessMixin, View):
+    def get(self, request, project_id, sprint_id):
+        return render(request, 'sprints/burndown.html')

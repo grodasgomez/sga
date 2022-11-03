@@ -5,9 +5,11 @@
 	<a href="{% url 'projects:sprints:member-list' project_id=project_id sprint_id=object.id %}" class="btn btn-labeled btn-info" role="button">
 		<span class="btn-label"><i class="fa-solid fa-users"></i></span>Ver Miembros
 	</a>
-	</a>
 	<a href="{% url 'projects:sprints:backlog' project_id=project_id sprint_id=object.id %}" class="btn btn-labeled btn-info" role="button">
 		<span class="btn-label"><i class="fa-solid fa-layer-group"></i></i></i></span>Backlog
+	</a>
+	<a href="{% url 'projects:sprints:burndown' project_id=project_id sprint_id=object.id %}" class="btn btn-labeled btn-info" role="button">
+		<span class="btn-label"><i class="fa-solid fa-layer-group"></i></i></i></span>Burndown
 	</a>
 	<p><strong>Capacidad:</strong> {{object.capacity}}</p>
 	<p><strong>Fecha de inicio:</strong> {{object.start_date|date:"d/m/Y"}}</p>

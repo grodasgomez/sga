@@ -13,7 +13,7 @@ from django.forms.models import model_to_dict
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
     FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole,
     ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory, FormDeleteProject, FormCreateComment, FormCreateTask, FormCreateAttachment, FormCreateHoliday)
-from projects.models import Project, UserStoryType, ProjectMember, ProjectStatus 
+from projects.models import Project, UserStoryType, ProjectMember, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
 from sprints.mixin import SprintAccessMixin
 from user_stories.models import UserStoryAttachment, UserStoryTask
@@ -811,7 +811,7 @@ class ProjectCreateHolidayView(CustomLoginMixin, ProjectPermissionMixin, Project
             "backpage": reverse("projects:index-holidays", kwargs={"project_id": project_id})
         }
         return render(request, 'holidays/create.html', context)
-    
+
     def post(self, request, project_id):
         form=self.form_class(project_id,request.POST) #creamos un form con los datos cargados
 
@@ -861,7 +861,7 @@ class ProjectDeleteHolidayView(CustomLoginMixin, ProjectPermissionMixin, Project
             holiday.delete()
             messages.success(request, f"Feriado <strong>{holiday.date}</strong> eliminado correctamente")
             return redirect(reverse("projects:index-holidays", kwargs={'project_id': project_id}))
-        
+
         return render(request, 'holidays/delete.html', context)
 
 class ProductBacklogCreateTaskView(CustomLoginMixin, ProjectAccessMixin, View):
@@ -948,3 +948,7 @@ class ProductBacklogDeleteCommentView(CustomLoginMixin, ProjectAccessMixin, View
         comment = UserStoriesUseCase.delete_user_story_comment(comment_id)
         messages.success(request, f"Comentario <strong>{comment.comment}</strong> eliminado correctamente")
         return redirect(reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id}))
+
+class VelocityChart(CustomLoginMixin, ProjectAccessMixin, View):
+    def get(self, request, project_id):
+        return render(request, 'projects/velocity.html')

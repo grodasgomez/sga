@@ -20,6 +20,9 @@
     <a href="{% url 'projects:index-holidays' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
       <span class="btn-label"><i class="fa fa-calendar" aria-hidden="true"></i></i></i></span>Feriados
     </a>
+    <a href="{% url 'projects:velocity' project_id=object.id %}" class="btn btn-labeled btn-info" role="button">
+      <span class="btn-label"><i class="fa-solid fa-layer-group"></i></i></i></span>Velocity
+    </a>
   </div>
   {% include 'utils/messages.html' %}
   <h2>Detalles</h2>
