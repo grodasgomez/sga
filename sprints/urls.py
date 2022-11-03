@@ -11,5 +11,6 @@ urlpatterns = [
     path('<int:sprint_id>/backlog/', views.SprintBacklogView.as_view(), name='backlog'),
     path('<int:sprint_id>/backlog/assign/', views.SprintBacklogAssignView.as_view(), name='backlog-assign-us'),
     path('<int:sprint_id>/backlog/<int:user_story_id>/assign/', views.SprintBacklogAssignMemberView.as_view(), name='backlog-assign-member'),
+    path('<int:sprint_id>/backlog/<int:user_story_id>/remove/', views.SprintBacklogRemoveView.as_view(), name='backlog-remove'),
     path('<int:sprint_id>/burndown', views.BurndownChartView.as_view(), name='burndown'),
 ]

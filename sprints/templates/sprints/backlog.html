@@ -43,12 +43,9 @@
 				</a>
 			</td>
 			<td>
-				<form method="post" name="remove_us">
-					{% csrf_token %}
-					<input name="user_story_id" type="hidden" value="{{ user_story.id }}">
-					<input type="submit" name="Quitar" value="Quitar">
-					</a>
-				</form>
+				<a href="{% url 'projects:sprints:backlog-remove' project_id=project_id sprint_id=sprint_id user_story_id=user_story.id %}" class="btn" title="Remover US">
+					<i class="fa fa-trash"></i>
+				</a>
 			</td>
 		</tr>
 		{% endfor %}

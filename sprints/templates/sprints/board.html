@@ -10,14 +10,22 @@
 {% include 'utils/messages.html' %}
 <b></b>
 	<h1> {{sprint.name}} - Tablero</h1>
-  <select id="us_type" class="form-select my-3" onchange="filterUs()" >
-    {% for us_type in us_types%}
-      <option value="{{us_type.id}}">{{us_type.name}}</option>
-    {% endfor %}
-  </select>
+  {% include 'utils/messages.html' %}
+  <div class="row g-3 align-items-center">
+    <div class="col-auto">
+      <label for="us_type" class="col-form-label">Tipo de Historia</label>
+    </div>
+    <div class="col-auto">
+      <select id="us_type" class="form-select" onchange="filterUs()">
+        {% for us_type in us_types%}
+          <option value="{{us_type.id}}">{{us_type.name}}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
   {{user_stories|json_script:"user_stories"}}
   {{us_types|json_script:"us_types"}}
   {{project_id|json_script:"project_id"}}
   {{current_member|json_script:"current_member"}}
-	<div id="myKanban"></div>
+	<div id="myKanban" class="mt-5"></div>
 {% endblock %}

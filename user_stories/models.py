@@ -45,6 +45,8 @@ class UserStory(models.Model):
                 'name': user.name,
                 'picture': user.picture
             }
+        tasks = UserStoryTask.objects.filter(user_story=self, sprint=self.sprint)
+        data['tasks'] = [model_to_dict(task) for task in tasks]
         return data
     class Meta:
         ordering = ['id']

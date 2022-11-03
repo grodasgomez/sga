@@ -32,17 +32,16 @@ const kanban = new jKanban({
 
     if (us.column === targetUsTypeColumn) return;
 
-    const isScrumMaster = currentMember.roles.includes('Scrum Master');
+    const isScrumMaster = currentMember.roles.includes("Scrum Master");
     if (isScrumMaster) {
       us.column = targetUsTypeColumn;
       updateUsColumn(usId, targetUsTypeColumn);
       return;
     }
 
-    // Verificamos si la us tiene una tarea dentro de la columna a la que se esta moviendo
-    us.tasks = []; //TODO: Obtener las tareas de la US
+    // Verificamos si la us tiene una tarea dentro de la columna del cual se quiere mover
     const hasTask =
-      us.tasks.some((task) => task.column === usTypeColumn) || us.column === 0;
+      us.tasks.some((task) => task.column === us.column) || us.column === 0;
 
     // Verificamos si el usuario que quiere mover la us es el mismo que esta asignado a la us
     const isAssigned = us.user?.id === currentMember.id;
@@ -92,34 +91,23 @@ function getUsByType(usTypeId, indexColumn) {
 
 function getUsTemplate(id, us) {
   console.log(us);
+  const userImgEl = us.user
+    ? ` <img src="${us.user.picture}" alt="" width="24" height="24" class="rounded-circle" title="Usuario asignado">`
+    : "";
   const htmlTemplate = `
     <div class="kanban-item-title">
       ${us.title}
     </div>
     <div class="kanban-item-footer">
-      <p class="kanban-item-code">${us.code}</p>
+      <a href="/projects/${us.project}/backlog/${id}" onclick="goTo(this)" class="kanban-item-code" >${us.code}</a>
       <div class="kanban-item-footer__right">
-        <span class="badge rounded-pill text-bg-dark">${
-          us.sprint_priority
-        }</span>
-        ${
-          us.user
-            ? ` <img src="${us.user.picture}" alt="" width="24" height="24" class="rounded-circle">`
-            : ""
-        }
-        <a href="/projects/${
-          us.project
-        }/backlog/${id}/" class="kanban-item-add btn px-1 py-0" title="Informacion extra" onclick="redirectToViewAdd(${id}, ${
-    us.project
-  })">
+        <span class="badge rounded-pill text-bg-dark" title="Prioridad del sprint">${us.sprint_priority}</span>
+        ${userImgEl}
+        <a href="/projects/${us.project}/backlog/${id}/" class="kanban-item-add btn px-1 py-0" title="Informacion extra" onclick="redirectToViewAdd(${id}, ${us.project})">
             <span class=""><i class="fa fa-list-alt" aria-hidden="true"></i>
             </span>
         </a>
-        <a href="/projects/${
-          us.project
-        }/backlog/${id}/tasks/create" class="kanban-item-add btn px-1 py-0" title="Agregar Tarea" onclick="redirectToViewAddTask(${id}, ${
-    us.project
-  })">
+        <a href="/projects/${us.project}/backlog/${id}/tasks/create" class="kanban-item-add btn px-1 py-0" title="Agregar Tarea" onclick="redirectToViewAddTask(${id}, ${us.project})">
             <span class=""><i class="fa fa-plus-square" aria-hidden="true"></i>
             </span>
         </a>
@@ -130,11 +118,16 @@ function getUsTemplate(id, us) {
 }
 
 function redirectToViewAdd(us_id, project_id) {
-  window.location = (`/projects/${project_id}/backlog/${us_id}/`);
+  window.location = `/projects/${project_id}/backlog/${us_id}/`;
 }
 
 function redirectToViewAddTask(us_id, project_id) {
-  window.location = (`/projects/${project_id}/backlog/${us_id}/tasks/create`);
+  window.location = `/projects/${project_id}/backlog/${us_id}/tasks/create`;
+}
+
+function goTo(el) {
+  const url = el.getAttribute("href");
+  window.location = url;
 }
 
 function createBoard(usType) {
