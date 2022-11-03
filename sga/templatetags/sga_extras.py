@@ -60,6 +60,10 @@ def breadcrumb(context):
         'import': 'Importación',
         'board': 'Tablero',
         'assign': 'Asignación',
+        'tasks': 'Tareas',
+        'comments': 'Comentarios',
+        'holidays': 'Feriados',
+        'attachments': 'Adjuntos'
     }
     get_name = {
         'projects': lambda x: Project.objects.get(pk=x).name,

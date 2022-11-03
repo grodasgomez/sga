@@ -33,6 +33,10 @@ class UserStory(models.Model):
             models.Sum('hours_worked')
             )['hours_worked__sum'] or 0
 
+    @property
+    def column_name(self):
+        return self.us_type.columns[self.column]
+
     def __str__(self):
         return self.code
 

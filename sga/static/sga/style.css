@@ -16,6 +16,10 @@ a.nav-link > i {
     margin-right: 0.5rem;
 }
 
+a.nav-sub-link > i {
+  margin-right: 0.3rem;
+}
+
 form > div.invalid-feedback {
   display: block !important;
 }
@@ -70,6 +74,7 @@ span.btn-label {
   margin-top: .125rem;
   margin-left: 3.25rem;
   text-decoration: none;
+  align-items: center;
 }
 
 .nav-sub-link.active {
