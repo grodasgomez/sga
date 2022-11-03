@@ -145,3 +145,12 @@ class UserStoriesUseCase:
             hours_worked=hours,
             column=user_story.column #TODO esta bien?
         )
+    
+    @staticmethod
+    def delete_user_story_comment(id):
+        """
+        Elimina un comentario
+        """
+        comment = UserStoryComment.objects.get(id=id)
+        comment.delete()
+        return comment

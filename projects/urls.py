@@ -15,6 +15,7 @@ urlpatterns = [
     path('<int:project_id>/backlog/<int:us_id>/', views.ProductBacklogDetailView.as_view(), name='project-backlog-detail'),
     path('<int:project_id>/backlog/<int:us_id>/comments/create', views.ProductBacklogCreateCommentView.as_view(), name='comment-create'),
     path('<int:project_id>/backlog/<int:us_id>/tasks/create', views.ProductBacklogCreateTaskView.as_view(), name='task-create'),
+    path('<int:project_id>/backlog/<int:us_id>/comments/<int:comment_id>/delete', views.ProductBacklogDeleteCommentView.as_view(), name='comment-delete'),
 
     #Attachments
     path('<int:project_id>/backlog/<int:us_id>/attachments/<int:attachment_id>', views.UserStoryAttachmentDownloadView.as_view(), name='us-attachment-download'),

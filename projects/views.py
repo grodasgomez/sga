@@ -942,3 +942,9 @@ class UserStoryAttachmentDeleteView(CustomLoginMixin, ProjectAccessMixin, View):
         filename = ProjectUseCase.delete_attachment(attachment_id)
         messages.success(request, f"Archivo <strong>{filename}</strong> eliminado correctamente")
         return redirect(reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id}))
+
+class ProductBacklogDeleteCommentView(CustomLoginMixin, ProjectAccessMixin, View):
+    def get(self, request, project_id, us_id, comment_id):
+        comment = UserStoriesUseCase.delete_user_story_comment(comment_id)
+        messages.success(request, f"Comentario <strong>{comment.comment}</strong> eliminado correctamente")
+        return redirect(reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id}))
