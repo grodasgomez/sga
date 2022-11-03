@@ -1,0 +1,28 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+  <h1>Feriados</h1>
+  <a href="{% url 'projects:create-holiday' project_id=project_id %}" class="btn btn-labeled btn-info">
+    <span class="btn-label"><i class="fa fa-plus"></i></span>Crear Feriado
+  </a>
+  {% include 'utils/messages.html'%}
+  <table class="table-custom">
+    <thead>
+      <tr>
+        <th scope="col">Fecha</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for holiday in holidays %}
+      <tr height="60px">
+        <td>{{ holiday.date }}</td>
+        <td>
+          <a href="{% url 'projects:delete-holiday' project_id=project_id project_holiday_id=holiday.id %}" class="btn" title="Eliminar feriado">
+            <span class="btn-label"><i class="fa fa-trash"></i></span>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

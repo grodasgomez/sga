@@ -47,4 +47,9 @@ urlpatterns = [
 
     # User Stories
     path('<int:project_id>/backlog/<int:user_story_id>/history/', include(('user_stories.urls', 'history'))),
+
+    # Holidays
+    path('<int:project_id>/holidays/', views.ProjectHolidayView.as_view(), name='index-holidays'), #el index de feriados del proyecto, el id es del proyecto
+    path('<int:project_id>/holidays/create/', views.ProjectCreateHolidayView.as_view(), name='create-holiday'), #el index de feriados del proyecto, el id es del proyecto
+    path('<int:project_id>/holidays/delete/<int:project_holiday_id>/', views.ProjectDeleteHolidayView.as_view(), name='delete-holiday'), #el index de feriados del proyecto, el id es del proyecto
 ]

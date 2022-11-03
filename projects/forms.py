@@ -1,12 +1,13 @@
 from django import forms
-from projects.models import Project, UserStoryType, Role
+from projects.models import Project, UserStoryType, Role, ProjectHoliday
 from projects.usecase import ProjectUseCase
 from projects.utils import build_field_error
 from sga import widgets
 from users.models import CustomUser
 from projects.usecase import RoleUseCase
 from projects.models import Permission
-from user_stories.models import UserStory, UserStoryComment, UserStoryTask
+from user_stories.models import UserStory, UserStoryComment
+import datetime
 
 class FormCreateProject(forms.Form):
 
@@ -342,6 +343,25 @@ class FormCreateComment(forms.Form):
         if already_exists:
             raise forms.ValidationError(build_field_error(
                 'title', 'Ya existe este comentario'))
+        return cleaned_data
+
+class FormCreateHoliday(forms.Form):
+    """
+    Formulario para crear un feriado
+    """
+    def __init__(self, project_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project_id = project_id
+        self.fields['date'] = forms.DateField(initial=datetime.date.today)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date = cleaned_data.get('date')
+        already_exists = ProjectHoliday.objects.filter(
+            project_id=self.project_id, date=date).exists()
+        if already_exists:
+            raise forms.ValidationError(build_field_error(
+                'title', 'Ya existe este feriado'))
         return cleaned_data
 
 class FormCreateTask(forms.Form):

@@ -1,0 +1,17 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+<b></b>
+	<h1>Borrar Feriado</h1>
+	{% include 'utils/messages.html'%}
+	<form method="post" class="form row g-3">
+		{% csrf_token %}
+		{% for field in form %}
+      {% include "utils/form_field_no_edit.html" with field=field %}
+    {% endfor %}
+
+    {% for error in form.non_field_errors %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endfor %}
+		<input type="submit" value="Borrar">
+	</form>
+{% endblock %}

@@ -63,3 +63,13 @@ class UserStoryType(models.Model):
 
     def __str__(self):
         return self.name
+
+class ProjectHoliday(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    date = models.DateField(null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return self.date

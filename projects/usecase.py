@@ -1,7 +1,7 @@
 from django.db.models import Q
 from datetime import date
 
-from projects.models import Project, ProjectMember, ProjectStatus
+from projects.models import Project, ProjectMember, ProjectStatus, ProjectHoliday
 from projects.models import Role, UserStoryType
 from users.models import CustomUser
 from user_stories.models import UserStory, UserStoryAttachment
@@ -288,6 +288,36 @@ class ProjectUseCase:
         Obtiene los archivos adjuntos de una us
         """
         return UserStoryAttachment.objects.filter(user_story_id=user_story_id).order_by('-created_at')
+
+    @staticmethod
+    def get_holidays_by_project(project_id):
+        """
+        Obtiene los dias festivos de un proyecto
+        """
+        return ProjectHoliday.objects.filter(project_id=project_id)
+    
+    @staticmethod
+    def get_holiday_by_id(id):
+        """
+        Obtiene un feriado
+        """
+        return ProjectHoliday.objects.get(id=id)
+
+    @staticmethod
+    def create_holiday(project_id, date):
+        """
+        Crea un feriado
+        """
+        return ProjectHoliday.objects.create(project_id=project_id, date=date)
+    
+    @staticmethod
+    def delete_holiday(id):
+        """
+        Borra un feriado
+        """
+        holiday=ProjectHoliday.objects.get(id=id) #rol editado
+        holiday.delete()
+        return holiday
 
     @staticmethod
     def delete_attachment(attachment_id):
