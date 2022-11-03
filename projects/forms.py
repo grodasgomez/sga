@@ -353,3 +353,17 @@ class FormCreateTask(forms.Form):
         self.user_story_id = user_story_id
         self.fields['description'] = forms.CharField(max_length=100, label='Descripcion',widget=widgets.TextInput())
         self.fields['hours'] = forms.IntegerField(min_value=1, max_value=100 , label='Horas',widget=widgets.NumberInput())
+
+class FormCreateAttachment(forms.Form):
+    """
+    Formulario para crear un comentario
+    """
+    def __init__(self, user_story_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user_story_id = user_story_id
+        self.fields['attachments'] = forms.FileField(
+            required=False, label='Adjuntos', widget=widgets.FileInput(attrs={'multiple': True}))
+    def clean(self):
+        cleaned_data = super().clean()
+        return cleaned_data
+

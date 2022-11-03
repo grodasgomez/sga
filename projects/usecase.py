@@ -289,6 +289,17 @@ class ProjectUseCase:
         """
         return UserStoryAttachment.objects.filter(user_story_id=user_story_id).order_by('-created_at')
 
+    @staticmethod
+    def delete_attachment(attachment_id):
+        """
+        Elimina un archivo adjunto
+        """
+        attachment = UserStoryAttachment.objects.get(id=attachment_id)
+        filename = attachment.filename
+        attachment.file.delete()
+        attachment.delete()
+        return filename
+
 class RoleUseCase:
     @staticmethod
     def create_role(id, name, description, permissions):

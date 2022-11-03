@@ -2,6 +2,7 @@
 {% load static %}
 {% block head %}
   <link rel="stylesheet" href="{% static 'sga/jkanban.min.css' %}">
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="{% static 'sga/js/jkanban.min.js' %}"></script>
   <script defer src="{% static 'sga/js/board.js' %}"></script>
 {% endblock %}
@@ -16,5 +17,6 @@
   {{user_stories|json_script:"user_stories"}}
   {{us_types|json_script:"us_types"}}
   {{project_id|json_script:"project_id"}}
+  {{current_member|json_script:"current_member"}}
 	<div id="myKanban"></div>
 {% endblock %}
