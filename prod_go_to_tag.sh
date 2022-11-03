@@ -33,8 +33,8 @@ for tag in $tags; do
             echo "No se recreo la base de datos"
         fi
 
-        $docker logs -f web
-        
+        $docker -f docker-compose.prod.yml --env-file=.prod.env logs -f web
+
         exit 0
     fi
 done
