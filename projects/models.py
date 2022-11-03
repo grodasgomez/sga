@@ -71,5 +71,5 @@ class ProjectHoliday(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
 
-    def __str__(self):
-        return self.date
+    # def __str__(self):
+    #     return self.date

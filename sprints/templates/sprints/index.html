@@ -31,7 +31,7 @@
         <td>{{ object.used_capacity }}</td>
         <td>{{ object.duration }}</td>
         <td>{{ object.start_date|date:"d/m/Y" }}</td>
-        <td>{{ object.end_date|date:"d/m/Y" }}</td>
+        <td>{{ object.end_date|date:"d/m/Y" }} {% if object.status != "FINISHED" %} (Estimado) {% endif %}</td>
         <td>
           <a href="{% url 'projects:sprints:member-create' project_id=project_id sprint_id=object.id %}" class="btn" title="Añadir miembro">
             <span class="btn-label"><i class="fa fa-user-plus"></i></span>

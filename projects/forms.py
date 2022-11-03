@@ -7,7 +7,7 @@ from users.models import CustomUser
 from projects.usecase import RoleUseCase
 from projects.models import Permission
 from user_stories.models import UserStory, UserStoryComment
-import datetime
+from datetime import datetime
 
 class FormCreateProject(forms.Form):
 
@@ -352,7 +352,7 @@ class FormCreateHoliday(forms.Form):
     def __init__(self, project_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.project_id = project_id
-        self.fields['date'] = forms.DateField(initial=datetime.date.today)
+        self.fields['date'] = forms.DateField(initial=datetime.now())
 
     def clean(self):
         cleaned_data = super().clean()

@@ -6,6 +6,7 @@ from users.models import CustomUser
 from user_stories.models import UserStory
 from user_stories.usecase import UserStoriesUseCase
 import copy
+from datetime import timedelta
 
 class SprintUseCase:
     @staticmethod
@@ -173,6 +174,23 @@ class SprintUseCase:
 
         sprint.status = SprintStatus.IN_PROGRESS
         sprint.start_date = datetime.now()
+        aux= sprint.start_date.date()
+        print (sprint.project_id)
+        holidays= ProjectUseCase.get_holidays_by_project(project_id=sprint.project_id)
+        holidays= holidays.values_list('date', flat=True)
+        cont=0
+        while (True):
+            
+            if aux not in holidays and aux.weekday() < 5:
+                cont=cont+1
+
+            if cont is sprint.duration:
+                break
+
+            aux=aux+timedelta(days=1)
+                
+
+        sprint.end_date = aux
         sprint.save()
         return sprint
 
