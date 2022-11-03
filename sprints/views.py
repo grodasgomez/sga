@@ -231,20 +231,7 @@ class SprintBacklogView(CustomLoginMixin, SprintAccessMixin, View):
             "sprint_id" : sprint_id,
             "backpage": reverse("projects:sprints:detail", kwargs={"project_id": project_id, "sprint_id": sprint_id})
         }
-
         return render(request, 'sprints/backlog.html', context)
-
-    def post(self, request, project_id, sprint_id):
-        user_story_id = request.POST.get('user_story_id')
-        us = UserStory.objects.get(id=user_story_id)
-        old_user_story = copy.copy(us)
-        us.sprint_id = None
-        us.sprint_member = None
-        us.column = 0
-        us.save()
-        UserStoriesUseCase.create_user_story_history(old_user_story, us, request.user, project_id)
-        messages.success(request, f"La US <strong>{us.code}</strong> fue removida del sprint")
-        return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
 
 class SprintBacklogAssignMemberView(CustomLoginMixin, ProjectPermissionMixin, SprintStatusMixin, View):
     """
@@ -318,6 +305,23 @@ class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, SprintSt
         messages.success(request, f"Historia/s de Usuario asignada/s correctamente: {message}")
         return redirect(reverse("projects:sprints:backlog", kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
 
+class SprintBacklogRemoveView(CustomLoginMixin, ProjectPermissionMixin, SprintStatusMixin, View):
+    """
+    Clase encargada de remover una US del sprint backlog (vuelve al product backlog)
+    """
+    permissions = ['ABM US Sprint']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id, sprint_id, user_story_id):
+        us = UserStory.objects.get(id=user_story_id)
+        old_us = copy.copy(us)
+        us.sprint_id = None
+        us.sprint_member = None
+        us.column = 0
+        us.save()
+        UserStoriesUseCase.create_user_story_history(old_us, us, request.user, project_id)
+        messages.success(request, f"La US <strong>{us.code}</strong> fue removida del sprint")
+        return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
 
 class SprintBoardView(CustomLoginMixin, ProjectAccessMixin, View):
     def get(self, request, project_id):
