@@ -110,7 +110,14 @@ span.btn-label {
 
 .kanban-item-code {
   font-size: 0.8rem;
+  font-weight: 600;
   margin:0;
+  cursor: pointer;
+  text-decoration: none;
+  color: #343636;
+}
+.kanban-item-code:hover {
+  color: #343636;
 }
 
 .tab-pane{
