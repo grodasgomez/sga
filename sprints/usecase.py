@@ -174,8 +174,29 @@ class SprintUseCase:
 
         sprint.status = SprintStatus.IN_PROGRESS
         sprint.start_date = datetime.now()
-        aux= sprint.start_date.date()
-        holidays= ProjectUseCase.get_holidays_by_project(project_id=sprint.project_id)
+
+        aux = SprintUseCase.calculate_sprint_end_date(sprint.start_date.date(), sprint.duration, sprint.project_id)
+
+        sprint.end_date = aux
+        sprint.save()
+        return sprint
+
+    def recalculate_sprint_end_date(sprint):
+        """
+        Recalcula la fecha de fin de un sprint
+        """
+        if (sprint):
+            sprint.end_date = SprintUseCase.calculate_sprint_end_date(sprint.start_date, sprint.duration, sprint.project_id)
+            sprint.save()
+        return sprint
+    
+    @staticmethod
+    def calculate_sprint_end_date(start_date, duration, project_id):
+        """
+        Calcula la fecha de finalización de un sprint
+        """
+        aux= start_date
+        holidays= ProjectUseCase.get_holidays_by_project(project_id=project_id)
         holidays= holidays.values_list('date', flat=True)
         cont=0
         while (True):
@@ -183,15 +204,13 @@ class SprintUseCase:
             if aux not in holidays and aux.weekday() < 5:
                 cont=cont+1
 
-            if cont is sprint.duration:
+            if cont is duration:
                 break
 
             aux=aux+timedelta(days=1)
+        
+        return aux
 
-
-        sprint.end_date = aux
-        sprint.save()
-        return sprint
 
     @staticmethod
     def finish_sprint(sprint, user, project_id):
@@ -212,7 +231,7 @@ class SprintUseCase:
             us.sprint_member = None
             us.save()
             UserStoriesUseCase.create_user_story_history(old_user_story, us, user, project_id)
-        return sprint
+        return sprint  
 
     @staticmethod
     def get_current_sprint(project_id):

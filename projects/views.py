@@ -22,6 +22,7 @@ from projects.mixin import *
 from sga.mixin import *
 from users.models import CustomUser
 from user_stories.models import UserStory
+from sprints.usecase import SprintUseCase
 
 # Create your views here.
 class ProjectListView(VerifiedMixin, View):
@@ -818,6 +819,9 @@ class ProjectCreateHolidayView(CustomLoginMixin, ProjectPermissionMixin, Project
         if form.is_valid(): #vemos si es valido
             cleaned_data=form.cleaned_data #tomamos los datos
             ProjectUseCase.create_holiday(project_id=project_id, **cleaned_data)
+
+            SprintUseCase.recalculate_sprint_end_date(SprintUseCase.get_current_sprint(project_id))
+
             messages.success(request, f"Feriado <strong>{cleaned_data['date']}</strong> creado correctamente")
             return redirect(reverse("projects:index-holidays", kwargs={'project_id': project_id}))
         #si el form no es valido retorna a la misma pagina
@@ -859,6 +863,9 @@ class ProjectDeleteHolidayView(CustomLoginMixin, ProjectPermissionMixin, Project
         }
         if holiday:
             holiday.delete()
+
+            SprintUseCase.recalculate_sprint_end_date(SprintUseCase.get_current_sprint(project_id))
+            
             messages.success(request, f"Feriado <strong>{holiday.date}</strong> eliminado correctamente")
             return redirect(reverse("projects:index-holidays", kwargs={'project_id': project_id}))
 
