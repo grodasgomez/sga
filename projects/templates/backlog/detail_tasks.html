@@ -4,6 +4,7 @@
     <tr>
       <th scope="col">Descripcion</th>
       <th scope="col">Horas Trabajadas</th>
+      <th scope="col">Sprint</th>
       <th scope="col">Autor</th>
       <th scope="col">Fecha</th>
     </tr>
@@ -13,6 +14,7 @@
     <tr height="60px">
       <td>{{ task.description }}</td>
       <td>{{ task.hours_worked }}</td>
+      <td>{{ task.sprint.number }}</td>
       <td>{{ task.sprint_member.user.email }}</td>
       <td>{{ task.created_at }}</td>
     </tr>

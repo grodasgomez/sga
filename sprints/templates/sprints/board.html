@@ -7,6 +7,7 @@
   <script defer src="{% static 'sga/js/board.js' %}"></script>
 {% endblock %}
 {% block content %}
+{% include 'utils/messages.html' %}
 <b></b>
 	<h1> {{sprint.name}} - Tablero</h1>
   {% include 'utils/messages.html' %}

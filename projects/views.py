@@ -956,6 +956,6 @@ class ProductBacklogDeleteCommentView(CustomLoginMixin, ProjectAccessMixin, View
         messages.success(request, f"Comentario <strong>{comment.comment}</strong> eliminado correctamente")
         return redirect(reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id}))
 
-class VelocityChart(CustomLoginMixin, ProjectAccessMixin, View):
+class VelocityChartView(CustomLoginMixin, ProjectAccessMixin, View):
     def get(self, request, project_id):
         return render(request, 'projects/velocity.html')

@@ -1,7 +1,7 @@
 from functools import cached_property
 from django.db import models
 
-from user_stories.models import UserStory
+from user_stories.models import UserStory, UserStoryTask
 
 
 class SprintStatus(models.TextChoices):
@@ -50,6 +50,15 @@ class Sprint(models.Model):
             models.Sum('estimation_time')
             )['estimation_time__sum'] or 0
 
+    @cached_property
+    def hours_worked(self):
+        """
+        Retorna las horas ya trabajadas en el sprint (de las tareas de las US).
+        """
+        return UserStory.objects.filter(sprint_id=self.id).aggregate(
+            models.Sum('hours_worked')
+            )['hours_worked__sum'] or 0
+
     def __str__(self):
         return f"Sprint {self.number} - {self.project.name}"
 
@@ -75,6 +84,15 @@ class SprintMember(models.Model):
         return UserStory.objects.filter(sprint_member_id=self.id).aggregate(
             models.Sum('estimation_time')
             )['estimation_time__sum'] or 0
+
+    @cached_property
+    def hours_worked(self):
+        """
+        Retorna las horas trabajadas de un miembro del sprint.
+        """
+        return UserStoryTask.objects.filter(sprint_member_id=self.id).aggregate(
+            models.Sum('hours_worked')
+            )['hours_worked__sum'] or 0
 
     def to_assignable_data(self):
         return {

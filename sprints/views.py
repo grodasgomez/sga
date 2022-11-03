@@ -13,9 +13,10 @@ from sprints.models import Sprint, SprintMember
 from sprints.usecase import *
 from sprints.mixin import *
 from user_stories.usecase import UserStoriesUseCase
-from user_stories.models import UserStory
+from user_stories.models import UserStory, UserStoryTask
 from sga.mixin import CustomLoginMixin
 import copy
+from datetime import date, timedelta
 
 class SprintListView(CustomLoginMixin, ProjectAccessMixin, ListView):
     """
@@ -330,8 +331,8 @@ class SprintBoardView(CustomLoginMixin, ProjectAccessMixin, View):
             messages.warning(request, "No hay sprint en progreso para este proyecto")
             return redirect(reverse("projects:project-detail", kwargs={"project_id": project_id}))
 
-        user_stories = UserStory.objects.filter(sprint_id=sprint.id).all()
-        us_types = UserStoryType.objects.filter(project_id=project_id).all()
+        user_stories = UserStory.objects.filter(sprint_id=sprint.id)
+        us_types = UserStoryType.objects.filter(project_id=project_id)
         current_member = ProjectMember.objects.get(project_id=project_id, user_id=request.user.id)
         context = {
             'project_id': project_id,
@@ -345,6 +346,48 @@ class SprintBoardView(CustomLoginMixin, ProjectAccessMixin, View):
         }
         return render(request, 'sprints/board.html', context)
 
-class BurndownChart(CustomLoginMixin, SprintAccessMixin, View):
+class BurndownChartView(CustomLoginMixin, SprintAccessMixin, View):
+    """
+    Clase encargada de Mostrar el Burndown Chart de un Sprint
+    """
     def get(self, request, project_id, sprint_id):
-        return render(request, 'sprints/burndown.html')
+        sprint = SprintUseCase.get_sprint_by_id(sprint_id)
+        if sprint.status == SprintStatus.CREATED:
+            messages.warning(request, "El sprint no ha iniciado")
+            return redirect(reverse("projects:sprints:detail", kwargs={"project_id": project_id, "sprint_id": sprint_id}))
+
+        sprint = Sprint.objects.get(id=sprint_id)
+        user_stories = UserStory.objects.filter(sprint_id=sprint.id)
+        tasks = UserStoryTask.objects.filter(sprint_id=sprint.id)
+
+        real_duration_days = (sprint.end_date-sprint.start_date).days+1
+        sprint_days = [sprint.start_date+timedelta(days=x) for x in range(real_duration_days)]
+        sprint_days_str = [x.strftime("%m/%d/%Y") for x in sprint_days] # para pasarle a JS
+
+        #horas estimadas que falta trabajar por dia
+        #agarra el total de horas estimadas y le va restando una cantidad constante por dia
+        estimation_total_sprint = sum([us.estimation_time for us in user_stories])
+        estimated_hours = []
+        holidays= ProjectUseCase.get_holidays_by_project(project_id=sprint.project_id).values_list('date', flat=True)
+        for x in range(real_duration_days):
+            if(sprint_days[x].weekday() in [6,1] or sprint_days[x] in holidays):
+                estimated_hours.append(estimated_hours[x-1])
+            else:
+                estimated_hours.append(int(estimation_total_sprint-(estimation_total_sprint/real_duration_days)*(x+1)))
+        print("estimation_total_sprint",estimation_total_sprint)
+        days_until_today = (datetime.now().date()-sprint.start_date).days+1+2
+        #horas trabajadas por dia en base a tareas
+        worked_hours = []
+        for x in range(days_until_today):
+            aux = estimation_total_sprint - sum([task.hours_worked for task in tasks if task.created_at.date()<=sprint_days[x]])
+            worked_hours.append(aux if aux>0 else 0)
+
+        context= {
+            "sprint_days" : sprint_days_str,
+            "estimated_hours" : estimated_hours,
+            "worked_hours" : worked_hours,
+            "project_id" : project_id,
+            "sprint_id" : sprint_id,
+            "backpage": reverse("projects:sprints:detail", kwargs={"project_id": project_id, "sprint_id": sprint_id})
+        }
+        return render(request, 'sprints/burndown.html',context)
