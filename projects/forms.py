@@ -361,7 +361,7 @@ class FormCreateHoliday(forms.Form):
             project_id=self.project_id, date=date).exists()
         if already_exists:
             raise forms.ValidationError(build_field_error(
-                'title', 'Ya existe este feriado'))
+                'date', 'Ya existe este feriado'))
         return cleaned_data
 
 class FormCreateTask(forms.Form):
