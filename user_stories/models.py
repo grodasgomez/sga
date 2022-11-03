@@ -5,6 +5,11 @@ from functools import cached_property
 from projects.models import Project,UserStoryType, ProjectMember
 from users.models import CustomUser
 
+
+class UserStoryStatus(models.TextChoices):
+    IN_PROGRESS = 'IN_PROGRESS', 'En progreso'
+    CANCELLED = 'CANCELLED', 'Cancelado'
+    FINISHED = 'FINISHED', 'Finalizado'
 class UserStory(models.Model):
     code = models.CharField(max_length=100)
     title = models.CharField(max_length=100)
@@ -18,6 +23,8 @@ class UserStory(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     sprint = models.ForeignKey('sprints.Sprint', on_delete=models.CASCADE, null=True)
     sprint_member = models.ForeignKey('sprints.SprintMember', on_delete=models.CASCADE, null=True)
+    status = models.CharField(choices=UserStoryStatus.choices, max_length=15,
+                              verbose_name='Estado', default=UserStoryStatus.IN_PROGRESS)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)

@@ -4,7 +4,7 @@ from datetime import date
 from projects.models import Project, ProjectMember, ProjectStatus, ProjectHoliday
 from projects.models import Role, UserStoryType
 from users.models import CustomUser
-from user_stories.models import UserStory, UserStoryAttachment
+from user_stories.models import UserStory, UserStoryAttachment, UserStoryStatus
 from sprints.models import Sprint, SprintStatus
 
 class ProjectUseCase:
@@ -44,6 +44,7 @@ class ProjectUseCase:
             us.column = 0
             us.sprint_member = None
             us.estimation_time = -1
+            us.status = UserStoryStatus.CANCELLED
             us.save()
         sprints = Sprint.objects.filter(project=project)
         for sprint in sprints:

@@ -35,7 +35,7 @@
 		<tr>
 			<th scope="col">Codigo</th>
 			<th scope="col">Titulo</th>
-			<th scope="col">Descripcion</th>
+			<th scope="col">Estado</th>
 			<th scope="col">Valor de negocio</th>
 			<th scope="col">Prioridad Tecnica</th>
 			<th scope="col">Tiempo Estimado (Hs)</th>
@@ -53,7 +53,7 @@
         </a>
       </td>
 			<td>{{ user_story.title }}</td>
-			<td>{{ user_story.description }}</td>
+			<td>{{ user_story.get_status_display }}</td>
             <td>{{ user_story.business_value }}</td>
 			<td>{{ user_story.technical_priority }}</td>
 			{% if user_story.estimation_time == 0 %}

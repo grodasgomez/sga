@@ -3,7 +3,7 @@ from projects.models import Project, ProjectMember
 from sprints.models import Sprint, SprintMember, SprintStatus
 from projects.usecase import ProjectUseCase
 from users.models import CustomUser
-from user_stories.models import UserStory
+from user_stories.models import UserStory, UserStoryStatus
 from user_stories.usecase import UserStoriesUseCase
 import copy
 from datetime import timedelta
@@ -224,11 +224,13 @@ class SprintUseCase:
         for us in user_stories:
             #realizamos una copia de la us para el historial
             old_user_story = copy.copy(us)
-            #TODO: if us done priority = 0 else +30?
-            us.sprint_priority = us.sprint_priority + 30
-            us.sprint = None
-            us.column = 0
-            us.sprint_member = None
+            if( len(us.us_type.columns) == us.column + 1):
+                us.status = UserStoryStatus.FINISHED
+            else:
+                us.sprint_member = None
+                us.sprint = None
+                us.column = 0
+                us.sprint_priority = us.sprint_priority + 30
             us.save()
             UserStoriesUseCase.create_user_story_history(old_user_story, us, user, project_id)
         return sprint  

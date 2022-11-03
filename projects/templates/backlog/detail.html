@@ -10,6 +10,7 @@
 	<p><strong>Estimación en horas:</strong> {{user_story.estimation_time}}</p>
 	<p><strong>Horas trabajadas:</strong> {{user_story.hours_worked}}</p>
 	<p><strong>Columna Actual:</strong> {{user_story.column_name}}</p>
+	<p><strong>Estado:</strong> {{user_story.get_status_display}}</p>
   <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
       <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Comentarios</button>
