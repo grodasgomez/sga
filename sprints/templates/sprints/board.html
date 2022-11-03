@@ -7,9 +7,10 @@
   <script defer src="{% static 'sga/js/board.js' %}"></script>
 {% endblock %}
 {% block content %}
+{% include 'utils/messages.html' %}
 <b></b>
 	<h1> {{sprint.name}} - Tablero</h1>
-  <select id="us_type" class="form-select" onchange="filterUs()">
+  <select id="us_type" class="form-select my-3" onchange="filterUs()" >
     {% for us_type in us_types%}
       <option value="{{us_type.id}}">{{us_type.name}}</option>
     {% endfor %}

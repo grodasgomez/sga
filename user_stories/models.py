@@ -1,5 +1,6 @@
 from django.db import models
 from django.forms.models import model_to_dict
+from functools import cached_property
 
 from projects.models import Project,UserStoryType, ProjectMember
 from users.models import CustomUser
@@ -10,8 +11,8 @@ class UserStory(models.Model):
     description = models.CharField(max_length=100)
     business_value= models.IntegerField()
     technical_priority= models.IntegerField()
-    estimation_time= models.IntegerField()
     sprint_priority = models.IntegerField()
+    estimation_time= models.IntegerField()
     us_type= models.ForeignKey(UserStoryType, on_delete=models.CASCADE)
     column = models.IntegerField(default=0)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
@@ -20,6 +21,17 @@ class UserStory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
+
+    @cached_property
+    def hours_worked(self):
+        """
+        Retorna las horas ya trabajadas en una us (cargadas en tareas).
+        @cached_property: permite que el valor se calcule una vez y se guarde en memoria
+        mientras el objeto exista.
+        """
+        return UserStoryTask.objects.filter(user_story_id=self.id).aggregate(
+            models.Sum('hours_worked')
+            )['hours_worked__sum'] or 0
 
     def __str__(self):
         return self.code
