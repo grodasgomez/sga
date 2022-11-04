@@ -102,3 +102,36 @@ class UserStoriesUseCaseTest(TestCase):
             restored_user_story=UserStoriesUseCase.restore_user_story(user_story.id,**data)
 
             self.assertEqual(restored_user_story, user_story, "La version del user story no fue restaurada en el proyecto")
+
+    def test_create_user_story_comment(self):
+        """
+        Funcion que prueba la creacion de un comentario de un user story
+        """
+        project_id = self.project.id
+        us_type=ProjectUseCase.create_user_story_type("Tipo de user story de prueba",['Por hacer', 'En progreso', 'Hecho'],project_id)
+        data = {
+            'code':str(project_id)+"-"+str(ProjectUseCase.count_user_stories_by_project(project_id)+1),
+            'title': 'User Story 1',
+            'description': 'Descripcion del user story 1',
+            'technical_priority': 1,
+            'business_value': 2,
+            'estimation_time': 1,
+            'us_type': us_type,
+            'project_id': project_id,
+        }
+
+        user1 = CustomUser()
+        user1.role_system = "user"
+        user1.email = "user1@gmail.com"
+        user1.save()
+
+        project_member = ProjectMember.objects.create(
+            project=self.project,
+            user=user1
+        )
+
+        user_story = ProjectUseCase.create_user_story(**data)
+
+        user_story_comment=UserStoriesUseCase.create_user_story_comment(user_story.id,user1,project_id,"Comentario de prueba")
+
+        self.assertIn(user_story_comment, UserStoriesUseCase.user_story_comments_by_us_id(user_story.id), "El comentario del user story no fue agregado al proyecto")

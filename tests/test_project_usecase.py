@@ -6,6 +6,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sga.settings")
 setup()
 from projects.models import Permission, Project, ProjectMember, Role, UserStoryType
 from projects.usecase import ProjectUseCase, RoleUseCase
+from sprints.usecase import SprintUseCase
 from users.models import CustomUser
 
 class ProjectUseCaseTest(TestCase):
@@ -350,3 +351,129 @@ class ProjectUseCaseTest(TestCase):
         self.assertEqual(len(attachments), 2, "No se encontraron los archivos")
         ProjectUseCase.delete_attachment(attachment.id)
         ProjectUseCase.delete_attachment(attachment2.id)
+
+    def test_create_holiday(self):
+        """
+        Funcion que prueba la creacion de un feriado
+        """
+        data = {
+            'date': '2022-11-4',
+        }
+        data_project = {
+            'name': 'Proyecto 2',
+            'description': 'Descripcion del proyecto 2',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+
+        project = ProjectUseCase.create_project(**data_project) #creacion de proyecto
+        holiday=ProjectUseCase.create_holiday(project_id=project.id,date=data['date']) #creacion de feriado
+
+        self.assertIn(holiday, ProjectUseCase.get_holidays_by_project(project.id), "El feriado no fue agregado al proyecto")
+
+    
+    def test_delete_holiday(self):
+        """
+        Funcion que prueba la eliminacion de un feriado
+        """
+        data = {
+            'date': '2022-11-4',
+        }
+        data_project = {
+            'name': 'Proyecto 2',
+            'description': 'Descripcion del proyecto 2',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+
+        project = ProjectUseCase.create_project(**data_project) #creacion de proyecto
+        holiday = ProjectUseCase.create_holiday(project_id=project.id,date=data['date']) #creacion de feriado
+        holiday = ProjectUseCase.delete_holiday(holiday.id) #eliminacion de feriado
+
+        self.assertNotIn(holiday, ProjectUseCase.get_holidays_by_project(project.id), "El feriado no fue eliminado del proyecto")
+    
+
+    def test_update_end_date_of_sprint_when_create_a_holiday(self):
+        """
+        Funcion que prueba la actualizacion de la fecha estimada de un sprint cuando se crea un feriado
+        """
+        data = {
+            'date': '2022-11-07',
+        }
+        data_project = {
+            'name': 'Proyecto 2',
+            'description': 'Descripcion del proyecto 2',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+
+        project = ProjectUseCase.create_project(**data_project) #creacion de proyecto
+        us_type=ProjectUseCase.create_user_story_type("Tipo de user story de prueba",['Por hacer', 'En progreso', 'Hecho'],project.id)
+
+        sprint = SprintUseCase.create_sprint(project.id, duration=5)
+        developer = CustomUser.objects.create(
+            first_name='Developer',
+            last_name='Python',
+            email='developer@gmail.com',
+            password='dsad',
+            is_active=True,
+            role_system='user')
+        SprintUseCase.add_sprint_member(user = developer, sprint_id=sprint.id, **{'workload': 10})
+
+        us = ProjectUseCase.create_user_story(code="US-1", title='User Story 1', description='User Story 1',
+                                                business_value=1, technical_priority=1, estimation_time=1,
+                                                us_type=us_type, project_id=project.id)
+
+        SprintUseCase.assign_us_sprint(sprint.id, us.id)
+        SprintUseCase.start_sprint(sprint)
+        sprint = SprintUseCase.get_sprint_by_id(sprint.id)
+        old_end_date=sprint.end_date
+
+        holiday = ProjectUseCase.create_holiday(project_id=project.id,date=data['date']) #creacion de feriado
+        sprint=SprintUseCase.recalculate_sprint_end_date(SprintUseCase.get_current_sprint(project.id))
+
+        self.assertNotEqual(old_end_date, sprint.end_date, "La fecha de fin del sprint sigue siendo la misma despues de agregar un feriado en un dia habil")
+    
+    def test_update_end_date_of_sprint_when_delete_a_holiday(self):
+        """
+        Funcion que prueba la actualizacion de la fecha estimada de un sprint cuando se borra un feriado
+        """
+        data = {
+            'date': '2022-11-07',
+        }
+        data_project = {
+            'name': 'Proyecto 2',
+            'description': 'Descripcion del proyecto 2',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+
+        project = ProjectUseCase.create_project(**data_project) #creacion de proyecto
+        us_type=ProjectUseCase.create_user_story_type("Tipo de user story de prueba",['Por hacer', 'En progreso', 'Hecho'],project.id)
+
+        sprint = SprintUseCase.create_sprint(project.id, duration=5)
+        developer = CustomUser.objects.create(
+            first_name='Developer',
+            last_name='Python',
+            email='developer@gmail.com',
+            password='dsad',
+            is_active=True,
+            role_system='user')
+        SprintUseCase.add_sprint_member(user = developer, sprint_id=sprint.id, **{'workload': 10})
+
+        us = ProjectUseCase.create_user_story(code="US-1", title='User Story 1', description='User Story 1',
+                                                business_value=1, technical_priority=1, estimation_time=1,
+                                                us_type=us_type, project_id=project.id)
+
+        SprintUseCase.assign_us_sprint(sprint.id, us.id)
+        holiday = ProjectUseCase.create_holiday(project_id=project.id,date=data['date']) #creacion de feriado
+        SprintUseCase.start_sprint(sprint)
+        sprint = SprintUseCase.get_sprint_by_id(sprint.id)
+        old_end_date=sprint.end_date
+
+        holiday = ProjectUseCase.delete_holiday(holiday.id) #eliminacion de feriado
+        sprint=SprintUseCase.recalculate_sprint_end_date(SprintUseCase.get_current_sprint(project.id))
+
+        self.assertNotEqual(old_end_date, sprint.end_date, "La fecha de fin del sprint sigue siendo la misma despues de borrar un feriado que era un dia habil")
+
+        
