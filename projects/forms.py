@@ -110,8 +110,8 @@ class FormUserStoryType(forms.Form):
 
     def custom_clean_columns(self, columns):
         # Creo un array de los nombres de las columnas
-        
-        final_columns = "To Do," + columns + ",Done"
+        columns=columns.upper()
+        final_columns = "TO DO," + columns + ",DONE"
         print (columns)
         print (final_columns)
         array_column = columns.split(',')
