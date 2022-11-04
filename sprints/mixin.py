@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import AccessMixin
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.http import HttpResponseNotFound
 from sprints.models import Sprint, SprintMember
 from projects.usecase import ProjectUseCase
 
@@ -16,6 +17,12 @@ class SprintAccessMixin(AccessMixin):
         user = request.user
         sprint_id = self.kwargs['sprint_id']
         project_id = self.kwargs['project_id']
+        # Se verifica que la url tiene el proyecto correcto
+        try:
+            sprint = Sprint.objects.get(id=sprint_id, project=project_id)
+        except:
+            messages.warning(self.request, "Ha ocurrido un error en la url ඞ SUS")
+            return redirect(reverse('index'))
         member = SprintMember.objects.filter(sprint=sprint_id, user=user).exists()
         self.is_scrum_master = ProjectUseCase.member_has_roles(user.id, project_id, ['Scrum Master'])
         if member or self.is_scrum_master:
