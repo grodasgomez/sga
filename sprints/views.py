@@ -370,8 +370,11 @@ class BurndownChartView(CustomLoginMixin, SprintAccessMixin, View):
         estimated_hours = []
         holidays= ProjectUseCase.get_holidays_by_project(project_id=sprint.project_id).values_list('date', flat=True)
         for x in range(real_duration_days):
-            if(sprint_days[x].weekday() in [6,1] or sprint_days[x] in holidays):
-                estimated_hours.append(estimated_hours[x-1])
+            if(sprint_days[x].weekday() > 4 or sprint_days[x] in holidays):
+                if(x==0):
+                    estimated_hours.append(estimation_total_sprint)
+                else:
+                    estimated_hours.append(estimated_hours[x-1])
             else:
                 estimated_hours.append(int(estimation_total_sprint-(estimation_total_sprint/real_duration_days)*(x+1)))
         print("estimation_total_sprint",estimation_total_sprint)
