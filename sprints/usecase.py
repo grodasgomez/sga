@@ -154,7 +154,8 @@ class SprintUseCase:
         """
         Retorna las historias de usuario de un Sprint
         """
-        return ProjectUseCase.user_stories_by_project(project_id).exclude(sprint=sprint_id)
+        return ProjectUseCase.user_stories_by_project(project_id).exclude(
+            sprint=sprint_id).exclude(status=UserStoryStatus.FINISHED).exclude(status=UserStoryStatus.CANCELLED)
 
     def start_sprint(sprint):
         """
