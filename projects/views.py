@@ -516,7 +516,9 @@ class ProductBacklogCancelView(CustomLoginMixin, ProjectPermissionMixin, Project
 
     def get(self, request, project_id, us_id):
         us = ProjectUseCase.get_user_story_by_id(us_id)
-        if us.sprint:
+        if us.status == UserStoryStatus.FINISHED:
+            messages.warning(request, f"La historia de usuario <strong>{us.title}</strong> ya se encuentra finalizada")
+        elif us.sprint:
             messages.warning(request, f"La historia de usuario <strong>{us.title}</strong> no se puede cancelar porque pertenece a un sprint")
         elif us.status == UserStoryStatus.CANCELLED:
             messages.warning(request, f"La historia de usuario <strong>{us.title}</strong> ya se encuentra cancelada")

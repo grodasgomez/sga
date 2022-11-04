@@ -191,7 +191,7 @@ class SprintUseCase:
             sprint.end_date = SprintUseCase.calculate_sprint_end_date(sprint.start_date, sprint.duration, sprint.project_id)
             sprint.save()
         return sprint
-    
+
     @staticmethod
     def calculate_sprint_end_date(start_date, duration, project_id):
         """
@@ -210,7 +210,7 @@ class SprintUseCase:
                 break
 
             aux=aux+timedelta(days=1)
-        
+
         return aux
 
 
@@ -235,12 +235,13 @@ class SprintUseCase:
                 us.sprint_priority = us.sprint_priority + 30
             us.save()
             UserStoriesUseCase.create_user_story_history(old_user_story, us, user, project_id)
-            old_user_story.project = None
-            old_user_story.id = None
-            #esto no tiene sentido pero funciona, no tocar
-            if not old_user_story.sprint_member:
-                old_user_story.sprint_member = None
-            old_user_story.save()
+            if us.status is not UserStoryStatus.FINISHED:
+                old_user_story.project = None
+                old_user_story.id = None
+                #esto no tiene sentido pero funciona, no tocar
+                if not old_user_story.sprint_member:
+                    old_user_story.sprint_member = None
+                old_user_story.save()
         return sprint
 
     @staticmethod
