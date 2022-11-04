@@ -73,7 +73,7 @@ class ProjectUseCase:
         return ProjectUseCase.create_user_story_type(
             name='Historia de Usuario',
             project_id=project_id,
-            columns=['Por hacer', 'En progreso', 'Hecho']
+            columns=['TO DO', 'DOING', 'DONE']
         )
 
     @staticmethod
