@@ -17,6 +17,7 @@ class Sprint(models.Model):
     capacity = models.IntegerField(null=True, verbose_name='Capacidad en horas')
     duration = models.IntegerField(null=True, verbose_name='Duración en días')
     start_date = models.DateField(null=True, verbose_name='Fecha de inicio')
+    estimated_end_date = models.DateField(null=True)
     end_date = models.DateField(null=True, verbose_name='Fecha de finalización')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

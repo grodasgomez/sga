@@ -20,7 +20,7 @@ class UserStory(models.Model):
     estimation_time= models.IntegerField()
     us_type= models.ForeignKey(UserStoryType, on_delete=models.CASCADE)
     column = models.IntegerField(default=0)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE,null=True)
     sprint = models.ForeignKey('sprints.Sprint', on_delete=models.CASCADE, null=True)
     sprint_member = models.ForeignKey('sprints.SprintMember', on_delete=models.CASCADE, null=True)
     status = models.CharField(choices=UserStoryStatus.choices, max_length=15,
