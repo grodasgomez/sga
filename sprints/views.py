@@ -115,7 +115,7 @@ class SprintView(CustomLoginMixin, SprintAccessMixin, DetailView):
             messages.warning(request, e)
         return redirect(reverse('projects:sprints:detail', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
 
-class SprintMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, SprintStatusMixin, FormView):
+class SprintMemberCreateView(CustomLoginMixin, SprintPermissionMixin, SprintStatusMixin, FormView):
     """
     Vista para crear miembro de un sprint
     """
@@ -157,7 +157,7 @@ class SprintMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, SprintSta
         messages.success(self.request, f"Usuario <strong>{data['user']}</strong> agregado al sprint correctamente")
         return super().form_valid(form)
 
-class SprintMemberEditView(CustomLoginMixin, ProjectPermissionMixin, SprintStatusMixin, FormView):
+class SprintMemberEditView(CustomLoginMixin, SprintPermissionMixin, SprintStatusMixin, FormView):
     """
     Vista para editar miembro de un sprint
     """
@@ -234,7 +234,7 @@ class SprintBacklogView(CustomLoginMixin, SprintAccessMixin, View):
         }
         return render(request, 'sprints/backlog.html', context)
 
-class SprintBacklogAssignMemberView(CustomLoginMixin, ProjectPermissionMixin, SprintStatusMixin, View):
+class SprintBacklogAssignMemberView(CustomLoginMixin, SprintPermissionMixin, SprintStatusMixin, View):
     """
     Clase encargada de asignar una US a un miembro del sprint
     """
@@ -272,7 +272,7 @@ class SprintBacklogAssignMemberView(CustomLoginMixin, ProjectPermissionMixin, Sp
             return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
         return render(request, 'sprints/backlog_assign_member.html', {'form': form})
 
-class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, SprintStatusMixin, View):
+class SprintBacklogAssignView(CustomLoginMixin, SprintPermissionMixin, SprintStatusMixin, View):
     """
     Clase encargada de asignar una US del product backlog al sprint
     """
@@ -306,7 +306,7 @@ class SprintBacklogAssignView(CustomLoginMixin, ProjectPermissionMixin, SprintSt
         messages.success(request, f"Historia/s de Usuario asignada/s correctamente: {message}")
         return redirect(reverse("projects:sprints:backlog", kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
 
-class SprintBacklogRemoveView(CustomLoginMixin, ProjectPermissionMixin, SprintStatusMixin, View):
+class SprintBacklogRemoveView(CustomLoginMixin, SprintPermissionMixin, SprintStatusMixin, View):
     """
     Clase encargada de remover una US del sprint backlog (vuelve al product backlog)
     """

@@ -269,5 +269,13 @@
 			"name": "ABM Holidays",
 			"description": "ABM Holidays"
 		}
+	},
+	{
+		"model": "projects.permission",
+		"pk": 10,
+		"fields": {
+			"name": "ABM Miembro Sprint",
+			"description": "ABM Miembro Sprint"
+		}
 	}
 ]
