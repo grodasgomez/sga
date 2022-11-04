@@ -250,7 +250,11 @@ class UserStoryTypeEditView(CustomLoginMixin, ProjectPermissionMixin, ProjectSta
 
     def get(self, request, project_id, id):
         data = ProjectUseCase.get_user_story_type(id).__dict__
-        data['columns'] = ",".join(data.get('columns'))
+        columns_array=data.get('columns')
+        columns_array=columns_array[1:-1]
+        
+        data['columns'] = ",".join(columns_array)
+
         form = FormEditUserStoryType(id, project_id, initial=data)
         context = {
             "form": form,

@@ -10,8 +10,19 @@
     {% endfor %}
 
     {% for error in form.non_field_errors %}
-      <div class="alert alert-danger">{{ error }}</div>
+      	<div class="alert alert-danger">{{ error }}</div>
     {% endfor %}
+		<p id="result_entry"></p>
 		<input type="submit" value="Guardar">
 	</form>
+
+	<script>
+		const text = document.getElementById('id_columns');
+		const result = document.getElementById('result_entry');
+		
+		text.addEventListener('input', function() {
+			result.innerHTML = "Columnas finales: TO DO,"+text.value.toUpperCase()+",DONE";
+		});
+	</script>
+
 {% endblock %}

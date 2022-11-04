@@ -261,5 +261,13 @@
 			"name": "ABM US Proyecto",
 			"description": "ABM US Proyecto"
 		}
+	},
+	{
+		"model": "projects.permission",
+		"pk": 9,
+		"fields": {
+			"name": "ABM Holidays",
+			"description": "ABM Holidays"
+		}
 	}
 ]
