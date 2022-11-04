@@ -7,6 +7,8 @@ from projects.models import Permission, Project, ProjectMember, Role, UserStoryT
 from projects.usecase import ProjectUseCase, RoleUseCase
 from user_stories.usecase import UserStoriesUseCase
 from users.models import CustomUser
+from sprints.usecase import SprintUseCase
+from user_stories.models import UserStory, UserStoryStatus, UserStoryTask
 
 
 class UserStoriesUseCaseTest(TestCase):
@@ -135,3 +137,50 @@ class UserStoriesUseCaseTest(TestCase):
         user_story_comment=UserStoriesUseCase.create_user_story_comment(user_story.id,user1,project_id,"Comentario de prueba")
 
         self.assertIn(user_story_comment, UserStoriesUseCase.user_story_comments_by_us_id(user_story.id), "El comentario del user story no fue agregado al proyecto")
+
+    def test_create_user_story_task(self):
+        """
+        Funcion que prueba la creacion de una tarea de un user story
+        """
+        project_id = self.project.id
+        us_type=ProjectUseCase.create_user_story_type("Tipo de user story de prueba",['Por hacer', 'En progreso', 'Hecho'],project_id)
+
+        sprint = SprintUseCase.create_sprint(self.project.id, duration=14)
+        data = {
+            'code':str(project_id)+"-"+str(ProjectUseCase.count_user_stories_by_project(project_id)+1),
+            'title': 'User Story 1',
+            'description': 'Descripcion del user story 1',
+            'technical_priority': 1,
+            'business_value': 2,
+            'estimation_time': 1,
+            'us_type': us_type,
+            'project_id': project_id,
+        }
+
+        user_story = ProjectUseCase.create_user_story(**data)
+        user_story.sprint = sprint
+        user_story.save()
+        data['business_value']=3
+        data.pop('code')
+        data.pop('project_id')
+
+        user1 = CustomUser.objects.create(
+            first_name='Developer',
+            last_name='Python',
+            email='developer@gmail.com',
+            password='dsad',
+            is_active=True,
+            role_system='user')
+        data = {
+            'workload': 10,
+        }
+
+        description = "Tarea de prueba"
+        hours = 1
+        user_story_task=UserStoryTask()
+        user_story_task.description=description
+        user_story_task.hours=hours
+        user_story_task.user_story=user_story
+        user_story_task.save()
+
+        self.assertEqual(user_story_task.user_story, user_story, "La tarea nofue asignada a la user_story")
