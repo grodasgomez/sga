@@ -33,6 +33,26 @@ for tag in $tags; do
             echo "No se recreo la base de datos"
         fi
 
+        echo "Desea correr los tests? (y/n)"
+        read bd
+
+        if [ "$bd" == "y" ]; then
+            $docker exec web python manage.py test
+        else
+            echo "No se corrieron los tests"
+        fi
+
+        echo "Desea ver la documentacion? (y/n)"
+        read bd
+
+        if [ "$bd" == "y" ]; then
+            $docker exec web python django_pydoc.py -p 1234 -n 0.0.0.0
+        else
+            echo "No se vera la documentacion"
+        fi
+
+        
+
         $docker logs -f web
 
         exit 0
