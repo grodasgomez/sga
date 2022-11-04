@@ -21,6 +21,7 @@ from projects.mixin import *
 from sga.mixin import *
 from users.models import CustomUser
 from user_stories.models import UserStory, UserStoryStatus
+from user_stories.mixin import UserStoryStatusMixin
 from sprints.usecase import SprintUseCase
 
 # Create your views here.
@@ -690,7 +691,7 @@ class RoleImportView2(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMix
 
         return redirect(reverse('projects:index-roles', kwargs={'project_id': project_id}))
 
-class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
+class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, UserStoryStatusMixin, View):
     """
     Clase encargada de editar us en el product Backlog de un proyecto
     """
@@ -769,7 +770,7 @@ class UserStoryAttachmentDownloadView(CustomLoginMixin, ProjectAccessMixin, View
         attachment = UserStoryAttachment.objects.get(id=attachment_id)
         return FileResponse(open(attachment.file.path, 'rb'), content_type='application/force-download')
 
-class ProductBacklogCreateCommentView(CustomLoginMixin, ProjectAccessMixin, ProjectStatusMixin, View):
+class ProductBacklogCreateCommentView(CustomLoginMixin, ProjectAccessMixin, UserStoryStatusMixin, View):
     """
     Clase encargada de agregar un comentarios a una US
     """
@@ -947,7 +948,7 @@ class ProductBacklogCreateTaskView(CustomLoginMixin, ProjectStatusMixin, View):
         }
         return render(request, 'backlog/task_create.html', context)
 
-class ProductBacklogCreateAttachmentView(CustomLoginMixin, ProjectAccessMixin, ProjectStatusMixin, FormView):
+class ProductBacklogCreateAttachmentView(CustomLoginMixin, ProjectAccessMixin, UserStoryStatusMixin, FormView):
     template_name = 'backlog/attachment_create.html'
     form_class = FormCreateAttachment
 
@@ -976,13 +977,13 @@ class ProductBacklogCreateAttachmentView(CustomLoginMixin, ProjectAccessMixin, P
         project_id = self.kwargs.get('project_id')
         return reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':self.kwargs.get('us_id')})
 
-class ProductBacklogDeleteAttachmentView(CustomLoginMixin, ProjectAccessMixin, ProjectStatusMixin, View):
+class ProductBacklogDeleteAttachmentView(CustomLoginMixin, ProjectAccessMixin, UserStoryStatusMixin, View):
     def get(self, request, project_id, us_id, attachment_id):
         filename = ProjectUseCase.delete_attachment(attachment_id)
         messages.success(request, f"Archivo <strong>{filename}</strong> eliminado correctamente")
         return redirect(reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id}))
 
-class ProductBacklogDeleteCommentView(CustomLoginMixin, ProjectAccessMixin, ProjectStatusMixin, View):
+class ProductBacklogDeleteCommentView(CustomLoginMixin, ProjectAccessMixin, UserStoryStatusMixin, View):
     def get(self, request, project_id, us_id, comment_id):
         comment = UserStoriesUseCase.delete_user_story_comment(comment_id)
         messages.success(request, f"Comentario <strong>{comment.comment}</strong> eliminado correctamente")

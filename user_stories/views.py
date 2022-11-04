@@ -10,6 +10,7 @@ from sga.mixin import CustomLoginMixin
 import json
 from projects.forms import FormEditUserStory
 from user_stories.forms import FormRestoreUserStoryHistory
+from user_stories.mixin import UserStoryStatusMixin
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 
@@ -31,7 +32,7 @@ class UserStoryHistoryView(CustomLoginMixin, ProjectPermissionMixin, View):
         }
         return render(request, 'history/index.html', context) #le pasamos a la vista
 
-class UserStoryHistoryRestoreView(CustomLoginMixin, ProjectPermissionMixin, View):
+class UserStoryHistoryRestoreView(CustomLoginMixin, ProjectPermissionMixin, UserStoryStatusMixin, View):
     """
     Clase encargada de restaurar una version vieja de una historia de usuario
     """

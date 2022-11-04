@@ -86,7 +86,8 @@ class SprintPermissionMixin(AccessMixin):
 class SprintStatusMixin(AccessMixin):
     """
     Clase que verifica si el sprint esta en estado de progreso,
-    si no lo esta, no se pueden realizar modificaciones
+    si no lo esta, no se pueden realizar modificaciones,
+    con la opcion de tener un estado especial
     """
     special_status = None
     special_message = None
