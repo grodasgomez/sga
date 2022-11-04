@@ -8,10 +8,21 @@
 		{% for field in form %}
       {% include "utils/form_field.html" with field=field %}
     {% endfor %}
-
+	
     {% for error in form.non_field_errors %}
       <div class="alert alert-danger">{{ error }}</div>
     {% endfor %}
+	<p id="result_entry"></p>
 		<input type="submit" value="Guardar">
 	</form>
+
+	<script>
+		const text = document.getElementById('id_columns');
+		const result = document.getElementById('result_entry');
+		
+		text.addEventListener('input', function() {
+			result.innerHTML = "Columnas finales: To Do,"+text.value+",Done";
+		});
+	</script>
+	
 {% endblock %}

@@ -105,19 +105,26 @@ class FormUserStoryType(forms.Form):
     """
     name = forms.CharField(max_length=100, label='Nombre',
                            widget=widgets.TextInput())
-    columns = forms.CharField(label='Columnas',
-                              widget=widgets.TextInput(attrs={'placeholder': 'Ej: To Do, In Progress, Done'}))
+    columns = forms.CharField(label='Columnas (Las columnas ingresadas iran entre To Do y Done)',
+                              widget=widgets.TextInput(attrs={'placeholder': 'Ej: In Progress, Testing'}))
 
     def custom_clean_columns(self, columns):
         # Creo un array de los nombres de las columnas
+        
+        final_columns = "To Do," + columns + ",Done"
+        print (columns)
+        print (final_columns)
         array_column = columns.split(',')
 
         array_column = [x.strip() for x in array_column]
 
         # Verifico que haya minimo dos columnas
-        if len(array_column) < 2:
+        if len(array_column) < 1:
             raise forms.ValidationError(build_field_error(
-                'columns', 'Debe ingresar al menos dos columnas'))
+                'columns', 'Debe ingresar al menos una columna'))
+
+        array_column = final_columns.split(',')
+        array_column = [x.strip() for x in array_column]
 
         # Verifico que no haya columnas repetidas
         if len(array_column) != len(set(array_column)):
