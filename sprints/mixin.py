@@ -69,7 +69,7 @@ class SprintPermissionMixin(AccessMixin):
     def has_permission(self, user, project_id):
         # Se verifica que el usuario tenga el permiso
         has_perm = ProjectUseCase.member_has_permissions(user.id, project_id, self.permissions)
-        return has_perm or has_role
+        return has_perm
 
     def handle_no_permission(self):
         """
