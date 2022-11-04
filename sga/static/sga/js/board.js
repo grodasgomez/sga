@@ -37,11 +37,14 @@ const kanban = new jKanban({
       us.column = targetUsTypeColumn;
       updateUsColumn(usId, targetUsTypeColumn);
       return;
+    }else if (targetUsTypeColumn > us.column+1) {
+      restoreUs(us);
+      return;
     }
 
     // Verificamos si la us tiene una tarea dentro de la columna del cual se quiere mover
-    const hasTask =
-      us.tasks.some((task) => task.column === us.column) || us.column === 0;
+    const usTasks = us.tasks.filter((task) => task.column === us.column && task.disabled == false);
+    const hasTask = usTasks.length > 0 || us.column == 0;
 
     // Verificamos si el usuario que quiere mover la us es el mismo que esta asignado a la us
     const isAssigned = us.user?.id === currentMember.id;
@@ -51,6 +54,7 @@ const kanban = new jKanban({
 
     if (isAssigned && (hasTask || isBacking)) {
       us.column = targetUsTypeColumn;
+      usTasks.forEach((task) => task.disabled = true);
       updateUsColumn(usId, targetUsTypeColumn);
     } else restoreUs(us);
   },

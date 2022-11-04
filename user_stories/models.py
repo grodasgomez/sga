@@ -84,6 +84,7 @@ class UserStoryTask(models.Model):
     description = models.CharField(max_length=100)
     hours_worked = models.IntegerField(default=0)
     column = models.IntegerField(default=0)
+    disabled = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)

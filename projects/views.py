@@ -709,7 +709,7 @@ class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, ProjectSt
 
 class UserStoryEditApiView(CustomLoginMixin, ProjectAccessMixin, View):
     """
-    Clase encargada de editar los tipos de us
+    Clase encargada de editar la us
     """
     def put(self, request, project_id, us_id):
         data = json.loads(request.body)
@@ -717,6 +717,10 @@ class UserStoryEditApiView(CustomLoginMixin, ProjectAccessMixin, View):
         new_us =ProjectUseCase.edit_user_story(us_id, **data)
         UserStoriesUseCase.create_user_story_history(old_us, new_us, request.user, project_id)
         user_story = model_to_dict(new_us)
+        tasks = UserStoryTask.objects.filter(user_story_id=us_id)
+        for task in tasks :
+            task.disabled = True
+            print(task.description)
         return JsonResponse({"data": user_story}, status=200)
 
 class ProductBacklogDetailView(CustomLoginMixin, ProjectAccessMixin, View):
@@ -878,6 +882,10 @@ class ProductBacklogCreateTaskView(CustomLoginMixin, ProjectAccessMixin, View):
     form_class = FormCreateTask
 
     def get(self, request, project_id, us_id):
+        user_story = UserStory.objects.get(id=us_id)
+        if not user_story.sprint_member or not user_story.sprint_member.user == request.user: 
+            messages.warning(request, "No tiene permisos para realizar esta acción")
+            return redirect(reverse('projects:board:index', kwargs={'project_id': project_id}))
         user_story = UserStory.objects.get(id=us_id)
         form = self.form_class(us_id)
         tasks_from_us = UserStoryTask.objects.filter(user_story_id=us_id)
