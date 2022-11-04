@@ -743,7 +743,8 @@ class UserStoryEditApiView(CustomLoginMixin, ProjectAccessMixin, View):
         tasks = UserStoryTask.objects.filter(user_story_id=us_id)
         for task in tasks :
             task.disabled = True
-            print(task.description)
+            print(f"Disabling tasks {task.user_story.code}-{task.description}")
+            task.save()
         return JsonResponse({"data": user_story}, status=200)
 
 class ProductBacklogDetailView(CustomLoginMixin, ProjectAccessMixin, View):

@@ -33,8 +33,10 @@ const kanban = new jKanban({
     if (us.column === targetUsTypeColumn) return;
 
     const isScrumMaster = currentMember.roles.includes("Scrum Master");
+    const enabledUsTasks = us.tasks.filter((task) => task.column === us.column && task.disabled == false);
     if (isScrumMaster) {
       us.column = targetUsTypeColumn;
+      enabledUsTasks.forEach((task) => task.disabled = true);
       updateUsColumn(usId, targetUsTypeColumn);
       return;
     }else if (targetUsTypeColumn > us.column+1) {
@@ -43,8 +45,7 @@ const kanban = new jKanban({
     }
 
     // Verificamos si la us tiene una tarea dentro de la columna del cual se quiere mover
-    const usTasks = us.tasks.filter((task) => task.column === us.column && task.disabled == false);
-    const hasTask = usTasks.length > 0 || us.column == 0;
+    const hasTask = enabledUsTasks.length > 0 || us.column == 0;
 
     // Verificamos si el usuario que quiere mover la us es el mismo que esta asignado a la us
     const isAssigned = us.user?.id === currentMember.id;
@@ -54,7 +55,7 @@ const kanban = new jKanban({
 
     if (isAssigned && (hasTask || isBacking)) {
       us.column = targetUsTypeColumn;
-      usTasks.forEach((task) => task.disabled = true);
+      enabledUsTasks.forEach((task) => task.disabled = true);
       updateUsColumn(usId, targetUsTypeColumn);
     } else restoreUs(us);
   },
