@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.http import JsonResponse, FileResponse
 from django.forms.models import model_to_dict
 
-
 from projects.forms import (FormCreateProject, FormCreateProjectMember, FormEditProjectMember, FormCreateUserStoryType, FormEditUserStoryType,
     FormCreateRole, ImportUserStoryTypeForm1, ImportUserStoryTypeForm2, FormCreateUserStory,FormEditUserStoryType, FormCreateRole,
     ImportUserStoryTypeForm1, ImportUserStoryTypeForm2,ImportRoleForm1, FormCreateUserStoryPO, FormEditUserStory, FormDeleteProject, FormCreateComment, FormCreateTask, FormCreateAttachment, FormCreateHoliday)
@@ -21,13 +20,15 @@ from user_stories.usecase import UserStoriesUseCase
 from projects.mixin import *
 from sga.mixin import *
 from users.models import CustomUser
-from user_stories.models import UserStory
+from user_stories.models import UserStory, UserStoryStatus
 from sprints.usecase import SprintUseCase
 
 # Create your views here.
 class ProjectListView(VerifiedMixin, View):
     """
-    Clase para mostrar los proyectos de acuerdo al usuario logueado
+    Clase para mostrar los proyectos de acuerdo al usuario logueado,
+    es una vista que todos los usuarios verificados pueden ver,
+    pero solo los administradores pueden ver proyectos al cual no pertenecen
     """
     def get(self, request):
         user: CustomUser = request.user
@@ -50,7 +51,8 @@ class ProjectListView(VerifiedMixin, View):
 
 class ProjectView(CustomLoginMixin, ProjectAccessMixin, View):
     """
-    Clase encargada de mostrar los detalles de una view
+    Clase encargada de mostrar los detalles de una view,
+    es una vista que todos los miembros del proyecto pueden ver
     """
     def get(self, request, project_id):
         user = request.user
@@ -73,7 +75,8 @@ class ProjectView(CustomLoginMixin, ProjectAccessMixin, View):
 
 class ProjectMembersView(CustomLoginMixin, ProjectAccessMixin, View):
     """
-    Clase encargada de mostrar los miembros de un proyecto
+    Clase encargada de mostrar los miembros de un proyecto,
+    es una vista que todos los miembros del proyecto pueden ver
     """
     def get(self, request, project_id):
         data: Project = Project.objects.get(id=project_id)
@@ -99,7 +102,8 @@ class ProjectMembersView(CustomLoginMixin, ProjectAccessMixin, View):
 
 class ProjectCreateView(AdminMixin, View):
     """
-    Clase encargada de manejar la creacion de un proyecto
+    Clase encargada de manejar la creacion de un proyecto,
+    solamente el administrador de sistemas tiene acceso a esta vista
     """
     form_class = FormCreateProject
 
@@ -120,7 +124,7 @@ class ProjectCreateView(AdminMixin, View):
             return HttpResponseRedirect('/projects')
         return render(request, 'projects/create.html', {'form': form})
 
-class ProjectDeleteView(ProjectPermissionMixin, ProjectStatusMixin, View):
+class ProjectDeleteView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Clase encargada de manejar la cancelación de un proyecto
     """
@@ -215,7 +219,6 @@ class ProjectRoleView(CustomLoginMixin, ProjectAccessMixin, View):
         }
         return render(request, 'roles/index.html', context) #le pasamos a la vista
 
-#User Story
 class UserStoryTypeCreateView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Vista para crear un tipo de historia de usuario en un proyecto
@@ -252,7 +255,7 @@ class UserStoryTypeEditView(CustomLoginMixin, ProjectPermissionMixin, ProjectSta
         data = ProjectUseCase.get_user_story_type(id).__dict__
         columns_array=data.get('columns')
         columns_array=columns_array[1:-1]
-        
+
         data['columns'] = ",".join(columns_array)
 
         form = FormEditUserStoryType(id, project_id, initial=data)
@@ -479,7 +482,6 @@ class ProductBacklogCreateView(CustomLoginMixin, ProjectPermissionMixin, Project
         return render(request, 'backlog/create.html', context)
 
     def post(self, request, project_id):
-
         user = self.request.user
         has_perm = ProjectUseCase.member_has_permissions(user.id, project_id, self.permissions)
         has_role_SM = ProjectUseCase.member_has_roles(user.id, project_id, ['Scrum Master'])
@@ -505,12 +507,30 @@ class ProductBacklogCreateView(CustomLoginMixin, ProjectPermissionMixin, Project
 
         return render(request, 'backlog/create.html', {'form': form})
 
+class ProductBacklogCancelView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
+    """
+    Clase encargada de cancelar una user story
+    """
+    permissions = ['ABM US Proyecto']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id, us_id):
+        us = ProjectUseCase.get_user_story_by_id(us_id)
+        if us.sprint:
+            messages.warning(request, f"La historia de usuario <strong>{us.title}</strong> no se puede cancelar porque pertenece a un sprint")
+        elif us.status == UserStoryStatus.CANCELLED:
+            messages.warning(request, f"La historia de usuario <strong>{us.title}</strong> ya se encuentra cancelada")
+        else:
+            messages.success(request, f"La historia de usuario <strong>{us.title}</strong> se ha cancelado")
+            us.status = UserStoryStatus.CANCELLED
+            us.save()
+        return redirect(reverse('projects:project-backlog', kwargs={'project_id': project_id}))
+
 class UserStoryTypeImportView1(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, FormView):
     """
     Clase encargada de manejar la primera parte de la importacion de tipos de historias de usuario,
     seleccionando el proyecto de donde se importaran los tipos de historias de usuario
     """
-
     permissions = ['ABM Tipo US']
     roles = ['Scrum Master']
 
@@ -529,7 +549,6 @@ class UserStoryTypeImportView1(CustomLoginMixin, ProjectPermissionMixin, Project
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        """Use this to add extra context."""
         context = super().get_context_data(**kwargs)
         context['backpage'] = reverse("projects:user-story-type-list", kwargs={"project_id": self.kwargs["project_id"]})
         return context
@@ -542,7 +561,6 @@ class UserStoryTypeImportView2(CustomLoginMixin, ProjectPermissionMixin, Project
     Clase encargada de manejar la segunda parte de la importacion de tipos de historias de usuario,
     seleccionando los tipos de historias de usuario a importar
     """
-
     permissions = ['ABM Tipo US']
     roles = ['Scrum Master']
 
@@ -592,7 +610,6 @@ class RoleImportView1(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMix
     Clase encargada de manejar la primera parte de la importacion de roles,
     seleccionando el proyecto de donde se importaran los roles
     """
-
     permissions = ['ABM Roles']
     roles = ['Scrum Master']
 
@@ -621,7 +638,6 @@ class RoleImportView2(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMix
     Clase encargada de manejar la segunda parte de la importacion de roles,
     seleccionando los roles a importar
     """
-
     permissions = ['ABM Roles']
     roles = ['Scrum Master']
 
@@ -728,6 +744,9 @@ class UserStoryEditApiView(CustomLoginMixin, ProjectAccessMixin, View):
         return JsonResponse({"data": user_story}, status=200)
 
 class ProductBacklogDetailView(CustomLoginMixin, ProjectAccessMixin, View):
+    """
+    Clase encargada de mostrar el detalle de una us
+    """
     def get(self, request, project_id, us_id):
         user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
         attachments = ProjectUseCase.get_attachments_by_user_story(us_id)
@@ -748,7 +767,7 @@ class UserStoryAttachmentDownloadView(CustomLoginMixin, ProjectAccessMixin, View
         attachment = UserStoryAttachment.objects.get(id=attachment_id)
         return FileResponse(open(attachment.file.path, 'rb'), content_type='application/force-download')
 
-class ProductBacklogCreateCommentView(CustomLoginMixin, ProjectAccessMixin, View):
+class ProductBacklogCreateCommentView(CustomLoginMixin, ProjectAccessMixin, ProjectStatusMixin, View):
     """
     Clase encargada de agregar un comentarios a una US
     """
@@ -785,8 +804,7 @@ class ProductBacklogCreateCommentView(CustomLoginMixin, ProjectAccessMixin, View
         }
         return render(request, 'backlog/comment_create.html', context)
 
-
-class ProjectHolidayView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
+class ProjectHolidayView(CustomLoginMixin, ProjectAccessMixin, View):
     """
     Clase encargada de mostrar los feriados de un proyecto
     """
@@ -873,21 +891,23 @@ class ProjectDeleteHolidayView(CustomLoginMixin, ProjectPermissionMixin, Project
             holiday.delete()
 
             SprintUseCase.recalculate_sprint_end_date(SprintUseCase.get_current_sprint(project_id))
-            
+
             messages.success(request, f"Feriado <strong>{holiday.date}</strong> eliminado correctamente")
             return redirect(reverse("projects:index-holidays", kwargs={'project_id': project_id}))
 
         return render(request, 'holidays/delete.html', context)
 
-class ProductBacklogCreateTaskView(CustomLoginMixin, ProjectAccessMixin, View):
+class ProductBacklogCreateTaskView(CustomLoginMixin, ProjectStatusMixin, View):
     """
-    Clase encargada de agregar un comentarios a una US
+    Clase encargada de agregar un comentarios a una US,
+    solo requiere de ProjectStatusMixin para que no se pueda
+    agregar una tarea a una US de un proyecto finalizado/cancelado
     """
     form_class = FormCreateTask
 
     def get(self, request, project_id, us_id):
         user_story = UserStory.objects.get(id=us_id)
-        if not user_story.sprint_member or not user_story.sprint_member.user == request.user: 
+        if not user_story.sprint_member or not user_story.sprint_member.user == request.user:
             messages.warning(request, "No tiene permisos para realizar esta acción")
             return redirect(reverse('projects:board:index', kwargs={'project_id': project_id}))
         user_story = UserStory.objects.get(id=us_id)
@@ -924,9 +944,8 @@ class ProductBacklogCreateTaskView(CustomLoginMixin, ProjectAccessMixin, View):
             "backpage": reverse('projects:board:index', kwargs={'project_id': project_id})
         }
         return render(request, 'backlog/task_create.html', context)
-class UserStoryAttachmentCreateView(CustomLoginMixin, ProjectStatusMixin, FormView):
 
-
+class ProductBacklogCreateAttachmentView(CustomLoginMixin, ProjectAccessMixin, ProjectStatusMixin, FormView):
     template_name = 'backlog/attachment_create.html'
     form_class = FormCreateAttachment
 
@@ -946,7 +965,6 @@ class UserStoryAttachmentCreateView(CustomLoginMixin, ProjectStatusMixin, FormVi
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        """Use this to add extra context."""
         context = super().get_context_data(**kwargs)
         context['user_story'] = ProjectUseCase.get_user_story_by_id(id=self.kwargs.get('us_id'))
         context['backpage'] = reverse("projects:user-story-type-list", kwargs={"project_id": self.kwargs["project_id"]})
@@ -956,13 +974,13 @@ class UserStoryAttachmentCreateView(CustomLoginMixin, ProjectStatusMixin, FormVi
         project_id = self.kwargs.get('project_id')
         return reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':self.kwargs.get('us_id')})
 
-class UserStoryAttachmentDeleteView(CustomLoginMixin, ProjectAccessMixin, View):
+class ProductBacklogDeleteAttachmentView(CustomLoginMixin, ProjectAccessMixin, ProjectStatusMixin, View):
     def get(self, request, project_id, us_id, attachment_id):
         filename = ProjectUseCase.delete_attachment(attachment_id)
         messages.success(request, f"Archivo <strong>{filename}</strong> eliminado correctamente")
         return redirect(reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id}))
 
-class ProductBacklogDeleteCommentView(CustomLoginMixin, ProjectAccessMixin, View):
+class ProductBacklogDeleteCommentView(CustomLoginMixin, ProjectAccessMixin, ProjectStatusMixin, View):
     def get(self, request, project_id, us_id, comment_id):
         comment = UserStoriesUseCase.delete_user_story_comment(comment_id)
         messages.success(request, f"Comentario <strong>{comment.comment}</strong> eliminado correctamente")

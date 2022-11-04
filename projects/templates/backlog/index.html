@@ -1,6 +1,6 @@
 {% extends 'sga/layout/base_generic.html'%}
 {% block content %}
-  <h1> Backlog del Proyecto</h1>
+	<h1> Backlog del Proyecto</h1>
 	<a href="{% url 'projects:project-backlog-create' project_id=project_id %}" class="btn btn-labeled btn-info">
 		<span class="btn-label"><i class="fa fa-plus"></i></span>Crear US
 	</a>
@@ -47,30 +47,27 @@
 		<tbody>
 		{% for user_story in user_stories %}
 		<tr height="60px">
-      <td>
-        <a href="{% url 'projects:project-backlog-detail' project_id=project_id us_id=user_story.id %}" class="btn-custom">
-          <span class="btn-label">{{ user_story.code }}</span>
-        </a>
-      </td>
+			<td>
+				<a href="{% url 'projects:project-backlog-detail' project_id=project_id us_id=user_story.id %}" class="btn-custom">
+					<span class="btn-label">{{ user_story.code }}</span>
+				</a>
+			</td>
 			<td>{{ user_story.title }}</td>
 			<td>{{ user_story.get_status_display }}</td>
-            <td>{{ user_story.business_value }}</td>
+            	<td>{{ user_story.business_value }}</td>
 			<td>{{ user_story.technical_priority }}</td>
-			{% if user_story.estimation_time == 0 %}
-				<td> Finalizado </td>
-			{% elif user_story.estimation_time == -1 %}
-				<td> Cancelado </td>
-			{% else %}
-				<td>{{ user_story.estimation_time }}</td>
-			{% endif %}
+			<td>{{ user_story.estimation_time }}</td>
 			<td>{{ user_story.sprint_priority }}</td>
             	<td>{{ user_story.us_type.name }}</td>
 			<td>
 				<a href="{% url 'projects:project-backlog-edit' project_id=project_id us_id=user_story.id %}" class="btn" title="Editar Historia de Usuario">
-				  <span class="btn-label"><i class="fa fa-pencil"></i></span>
+				  	<span class="btn-label"><i class="fa fa-pencil"></i></span>
 				</a>
 				<a href="{% url 'projects:history:index' project_id=project_id user_story_id=user_story.id %}" class="btn" title="Historial de Historia de Usuario">
 					<span class="btn-label"><i class="fa fa-history"></i></span>
+				</a>
+				<a href="{% url 'projects:backlog-cancel' project_id=project_id us_id=user_story.id %}" class="btn" title="Cancelar US">
+					<span class="btn-label"><i class="fa fa-trash"></i></span>
 				</a>
 			</td>
 		</tr>

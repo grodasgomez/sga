@@ -74,7 +74,7 @@ class ProjectStatusMixin(AccessMixin):
         # Se obtiene el project_id de la url
         project_id = self.kwargs['project_id']
         project = Project.objects.get(id=project_id)
-        if project.status == 'CANCELLED' or project.status == 'CANCELLED':
+        if project.status == 'CANCELLED' or project.status == 'FINISHED':
             return self.handle_no_status()
         return super().dispatch(request, *args, **kwargs)
 

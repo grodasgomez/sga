@@ -10,6 +10,7 @@ class UserStoryStatus(models.TextChoices):
     IN_PROGRESS = 'IN_PROGRESS', 'En progreso'
     CANCELLED = 'CANCELLED', 'Cancelado'
     FINISHED = 'FINISHED', 'Finalizado'
+
 class UserStory(models.Model):
     code = models.CharField(max_length=100)
     title = models.CharField(max_length=100)
@@ -59,6 +60,7 @@ class UserStory(models.Model):
         tasks = UserStoryTask.objects.filter(user_story=self, sprint=self.sprint)
         data['tasks'] = [model_to_dict(task) for task in tasks]
         return data
+
     class Meta:
         ordering = ['id']
 
@@ -91,6 +93,7 @@ class UserStoryTask(models.Model):
 
 def us_directory_path(instance, filename):
     return f"user_stories/{instance.user_story.code}/{filename}"
+
 class UserStoryAttachment(models.Model):
     user_story = models.ForeignKey(UserStory, on_delete=models.CASCADE)
     file = models.FileField(upload_to=us_directory_path, null=False)

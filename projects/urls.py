@@ -13,6 +13,7 @@ urlpatterns = [
     path('<int:project_id>/backlog/create/', views.ProductBacklogCreateView.as_view(), name='project-backlog-create'),
     path('<int:project_id>/backlog/<int:us_id>/edit/', views.ProductBacklogEditView.as_view(), name='project-backlog-edit'),
     path('<int:project_id>/backlog/<int:us_id>/', views.ProductBacklogDetailView.as_view(), name='project-backlog-detail'),
+    path('<int:project_id>/backlog/<int:us_id>/cancel/', views.ProductBacklogCancelView.as_view(), name='backlog-cancel'),
     path('<int:project_id>/backlog/<int:us_id>/comments/create', views.ProductBacklogCreateCommentView.as_view(), name='comment-create'),
     path('<int:project_id>/backlog/<int:us_id>/tasks/create', views.ProductBacklogCreateTaskView.as_view(), name='task-create'),
     path('<int:project_id>/backlog/<int:us_id>/comments/<int:comment_id>/delete', views.ProductBacklogDeleteCommentView.as_view(), name='comment-delete'),
@@ -20,8 +21,8 @@ urlpatterns = [
 
     #Attachments
     path('<int:project_id>/backlog/<int:us_id>/attachments/<int:attachment_id>', views.UserStoryAttachmentDownloadView.as_view(), name='us-attachment-download'),
-    path('<int:project_id>/backlog/<int:us_id>/attachments/create', views.UserStoryAttachmentCreateView.as_view(), name='us-attachment-create'),
-    path('<int:project_id>/backlog/<int:us_id>/attachments/<int:attachment_id>/delete', views.UserStoryAttachmentDeleteView.as_view(), name='us-attachment-delete'),
+    path('<int:project_id>/backlog/<int:us_id>/attachments/create', views.ProductBacklogCreateAttachmentView.as_view(), name='us-attachment-create'),
+    path('<int:project_id>/backlog/<int:us_id>/attachments/<int:attachment_id>/delete', views.ProductBacklogDeleteAttachmentView.as_view(), name='us-attachment-delete'),
 
     #User story type
     path('<int:project_id>/user-story-type/', views.UserStoryTypeListView.as_view(), name='user-story-type-list'),
