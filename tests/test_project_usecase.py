@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django import setup
+from django.core.files.uploadedfile import SimpleUploadedFile
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sga.settings")
 setup()
@@ -295,3 +296,57 @@ class ProjectUseCaseTest(TestCase):
         busqueda = ""
         found_us = ProjectUseCase.user_stories_by_project_filter(project.id,filtro,busqueda)
         self.assertEqual(len(found_us), 2, "No se encontro la cantidad debida de historias de usuario")
+
+    def test_create_attachment(self):
+        data1 = {
+            'name': 'Proyecto 1',
+            'description': 'Descripcion del proyecto 1',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+        project = ProjectUseCase.create_project(**data1)
+        us_type=ProjectUseCase.create_user_story_type("Tipo de user story de prueba",['Por hacer', 'En progreso', 'Hecho'],project.id)
+        data = {
+            'code':str(project.id)+"-"+str(ProjectUseCase.count_user_stories_by_project(project.id)+1),
+            'title': 'User Story 1',
+            'description': 'Descripcion del user story 1',
+            'technical_priority': 1,
+            'business_value': 2,
+            'estimation_time': 1,
+            'us_type': us_type,
+            'project_id': project.id,
+        }
+        user_story1 = ProjectUseCase.create_user_story(**data)
+        file = SimpleUploadedFile("file.txt", b"file_content")
+        attachment = ProjectUseCase.create_attachment(user_story1.id, file)
+        self.assertEqual(attachment.user_story.id, user_story1.id, "El archivo no fue agregado a la historia de usuario")
+        ProjectUseCase.delete_attachment(attachment.id)
+
+    def test_get_attachments_by_user_story(self):
+        data1 = {
+            'name': 'Proyecto 1',
+            'description': 'Descripcion del proyecto 1',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+        project = ProjectUseCase.create_project(**data1)
+        us_type=ProjectUseCase.create_user_story_type("Tipo de user story de prueba",['Por hacer', 'En progreso', 'Hecho'],project.id)
+        data = {
+            'code':str(project.id)+"-"+str(ProjectUseCase.count_user_stories_by_project(project.id)+1),
+            'title': 'User Story 1',
+            'description': 'Descripcion del user story 1',
+            'technical_priority': 1,
+            'business_value': 2,
+            'estimation_time': 1,
+            'us_type': us_type,
+            'project_id': project.id,
+        }
+        user_story1 = ProjectUseCase.create_user_story(**data)
+        file = SimpleUploadedFile("file.txt", b"file_content")
+        file2 = SimpleUploadedFile("file2.txt", b"file_content2")
+        attachment = ProjectUseCase.create_attachment(user_story1.id, file)
+        attachment2 = ProjectUseCase.create_attachment(user_story1.id, file2)
+        attachments = ProjectUseCase.get_attachments_by_user_story(user_story1.id)
+        self.assertEqual(len(attachments), 2, "No se encontraron los archivos")
+        ProjectUseCase.delete_attachment(attachment.id)
+        ProjectUseCase.delete_attachment(attachment2.id)
