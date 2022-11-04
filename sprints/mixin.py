@@ -88,16 +88,26 @@ class SprintStatusMixin(AccessMixin):
     Clase que verifica si el sprint esta en estado de progreso,
     si no lo esta, no se pueden realizar modificaciones
     """
+    special_status = None
+    special_message = None
+
     def dispatch(self, request, *args, **kwargs):
         # Se obtiene el sprint_id de la url
         sprint_id = self.kwargs['sprint_id']
         sprint = Sprint.objects.get(id=sprint_id)
         if sprint.status == 'CANCELLED' or sprint.status == 'FINISHED':
             return self.handle_no_status()
+        # Caso especial (actualmente solo quitar us del sprint backlog)
+        if self.special_status and sprint.status == self.special_status:
+            self.raise_exception = True
+            return self.handle_no_status()
         return super().dispatch(request, *args, **kwargs)
 
     def handle_no_status(self):
-        messages.warning(self.request, 'El sprint no se puede modificar')
+        if self.raise_exception:
+            messages.warning(self.request, self.special_message)
+        else:
+            messages.warning(self.request, 'El sprint no se puede modificar')
         # en el caso en que el error te redirija a la misma pagina, bucle infinito
         if self.request.build_absolute_uri() == self.request.META.get('HTTP_REFERER'):
             return redirect(reverse('index'))

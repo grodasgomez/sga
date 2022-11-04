@@ -312,6 +312,8 @@ class SprintBacklogRemoveView(CustomLoginMixin, SprintPermissionMixin, SprintSta
     """
     permissions = ['ABM US Sprint']
     roles = ['Scrum Master']
+    special_status = "IN_PROGRESS"
+    special_message = "No se puede remover una US de un sprint en progreso"
 
     def get(self, request, project_id, sprint_id, user_story_id):
         us = UserStory.objects.get(id=user_story_id)
