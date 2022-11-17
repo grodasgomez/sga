@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 
 from .manager import CustomUserManager
-
+from notifications.models import Notification
 class CustomUser(AbstractBaseUser):
     first_name = models.CharField(max_length=100, verbose_name='Nombres')
     last_name = models.CharField(max_length=100, verbose_name='Apellidos')
@@ -40,6 +40,10 @@ class CustomUser(AbstractBaseUser):
         if social_account_data:
             return social_account_data.get_avatar_url()
         return f"https://ui-avatars.com/api/?name={self.name}"
+
+    @property
+    def unread_notifications(self):
+        return Notification.objects.filter(user=self, read=False).count()
 
     class Meta:
         db_table = 'sga_user'

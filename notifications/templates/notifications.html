@@ -1,0 +1,23 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% load humanize %}
+
+{% block content %}
+<h1>Notificaciones {{user.id}}</h1>
+{% include 'utils/messages.html'%}
+<div class="notifications">
+  {% for notification in notifications %}
+    <div class="notification {% if not read %}not-read{% endif %}">
+      <div class="notification-header">
+        <p class="notification-title">{{notification.title}}</p>
+        <p class="notification-relative-time">{{notification.created_at|naturaltime}}</p>
+      </div>
+      <p class="notification-content">
+        {{notification.content|safe}}
+      </p>
+      <div class="notification-footer">
+        <a href="{% url 'notifications:mark' notification_id=notification.id %}" class="link-primary">Marcar como leido</a>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
