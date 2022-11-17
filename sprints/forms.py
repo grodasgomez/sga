@@ -44,6 +44,19 @@ class SprintMemberCreateForm(forms.Form):
             empty_label='Seleccione un usuario',
             label='Usuario', widget=widgets.SelectInput())
 
+class SprintMemberSwitchForm(forms.Form):
+    """
+    Formulario para cambiar un miembro del sprint por otro usuario del proyecto
+    """
+    def __init__(self, project_id, sprint_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['workload'] = forms.IntegerField(label='Carga de trabajo', min_value=1,
+                                                     max_value=12, widget=widgets.TextInput(attrs={'type': 'number','readonly': 'readonly'}))
+        self.fields['user'] = forms.ModelChoiceField(
+            queryset=SprintUseCase.get_addable_users(project_id, sprint_id),
+            empty_label='Seleccione un usuario',
+            label='Usuario', widget=widgets.SelectInput())
+
 class SprintMemberEditForm(forms.Form):
     """
     Formulario para cambiar la carga horaria de un miembro de un sprint

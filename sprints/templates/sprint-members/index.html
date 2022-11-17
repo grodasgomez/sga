@@ -26,6 +26,9 @@
           <a href="{% url 'projects:sprints:member-edit' project_id=project_id sprint_id=sprint.id sprint_member_id=object.id %}" class="btn" title="Editar miembro">
 						<span class="btn-label"><i class="fa fa-pencil"></i></span>
 					</a>
+          <a href="{% url 'projects:sprints:member-switch' project_id=project_id sprint_id=sprint.id sprint_member_id=object.id %}" class="btn" title="Cambiar miembro">
+						<span class="btn-label"><i class="fa fa-refresh"></i></span>
+					</a>
         </td>
       </tr>
       {% endfor %}

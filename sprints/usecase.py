@@ -117,6 +117,19 @@ class SprintUseCase:
         return sprint_member
 
     @staticmethod
+    def switch_sprint_member(user, sprint_member_id, workload):
+        """
+        Método para cambiar un sprint member a otro user
+        """
+        sprint_member = SprintMember.objects.get(id=sprint_member_id)
+
+        # Cambiar el usuario asignado a este sprint member
+        sprint_member.user = user
+        sprint_member.save()
+
+        return sprint_member
+
+    @staticmethod
     def assign_us_sprint(sprint_id, user_story_id):
         """
         Asigna una historia de usuario a un sprint

@@ -8,7 +8,7 @@ from projects.mixin import *
 from projects.models import UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase
 from users.models import CustomUser
-from sprints.forms import SprintCreateForm, SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm,FormCreateComment
+from sprints.forms import SprintCreateForm, SprintMemberCreateForm, SprintMemberEditForm, SprintStartForm, AssignSprintMemberForm,FormCreateComment, SprintMemberSwitchForm
 from sprints.models import Sprint, SprintMember
 from sprints.usecase import *
 from sprints.mixin import *
@@ -155,6 +155,55 @@ class SprintMemberCreateView(CustomLoginMixin, SprintPermissionMixin, SprintStat
             **data
         )
         messages.success(self.request, f"Usuario <strong>{data['user']}</strong> agregado al sprint correctamente")
+        return super().form_valid(form)
+
+class SprintMemberSwitchView(CustomLoginMixin, SprintPermissionMixin, SprintStatusMixin, FormView):
+    """
+    Vista para cambiar un miembro del sprint por otro usuario del proyecto
+    """
+    permissions = ['ABM Miembro Sprint']
+    roles = ['Scrum Master']
+
+    template_name = 'sprint-members/switch.html'
+    form_class = SprintMemberSwitchForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['project_id'] = self.kwargs.get('project_id')
+        kwargs['sprint_id'] = self.kwargs.get('sprint_id')
+        sprint_member = SprintMember.objects.get(id=self.kwargs.get('sprint_member_id'))
+        kwargs['initial'] = {
+            'workload': sprint_member.workload,
+            'user': sprint_member.user.email
+        }
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sprint_member = SprintMember.objects.get(id=self.kwargs.get('sprint_member_id'))
+        context['sprint_member'] = sprint_member
+        context['project_id'] = self.kwargs.get('project_id')
+        context['backpage'] = reverse('projects:sprints:index', kwargs={'project_id': context['project_id']})
+        return context
+
+    def get_success_url(self):
+        return reverse('projects:sprints:member-list', kwargs={
+            'project_id': self.kwargs.get('project_id'),
+            'sprint_id': self.kwargs.get('sprint_id'),
+        })
+
+    def form_valid(self, form):
+        """
+        Metodo que se ejecuta si el formulario es valido
+        """
+        data = form.cleaned_data
+        sprint_member = SprintMember.objects.get(id=self.kwargs.get('sprint_member_id'))
+        old_member_email = sprint_member.user.email
+        sprint_member_data=SprintUseCase.switch_sprint_member(
+            sprint_member_id=sprint_member.id,
+            **data
+        )
+        messages.success(self.request, f"Miembro <strong>{old_member_email}</strong> cambiado por <strong>{sprint_member_data.user.email}</strong>")
         return super().form_valid(form)
 
 class SprintMemberEditView(CustomLoginMixin, SprintPermissionMixin, SprintStatusMixin, FormView):
