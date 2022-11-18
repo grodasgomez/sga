@@ -331,6 +331,13 @@ class ProjectUseCase:
         attachment.delete()
         return filename
 
+    @staticmethod
+    def get_project_scrum_masters(project_id: int):
+        """
+        Obtiene los scrum masters de un proyecto
+        """
+        return ProjectMember.objects.filter(project_id=project_id, roles__name='Scrum Master')
+
 class RoleUseCase:
     @staticmethod
     def create_role(id, name, description, permissions):

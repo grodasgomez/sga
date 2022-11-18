@@ -31,6 +31,7 @@ urlpatterns = [
     path('projects/', include(('projects.urls', 'projects'))),
     path('users/', include(('users.urls', 'users'))),
     path('user_stories/', include(('user_stories.urls', 'user_stories'))),
+    path('notifications/', include(('notifications.urls', 'notifications'))),
 
     ### SOLO PARA LOGEAR CON USUARIOS DE PRUEBA ###
     path('accounts/login-email/', views.login_email, name='login-email'),
