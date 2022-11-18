@@ -17,6 +17,8 @@ from user_stories.models import UserStory, UserStoryTask
 from sga.mixin import CustomLoginMixin
 import copy
 from datetime import date, timedelta
+from notifications.usecase import NotificationUseCase
+
 
 class SprintListView(CustomLoginMixin, ProjectAccessMixin, ListView):
     """
@@ -150,10 +152,11 @@ class SprintMemberCreateView(CustomLoginMixin, SprintPermissionMixin, SprintStat
         """
         data = form.cleaned_data
         sprint_id = self.kwargs.get('sprint_id')
-        SprintUseCase.add_sprint_member(
+        sprint_member = SprintUseCase.add_sprint_member(
             sprint_id=sprint_id,
             **data
         )
+        NotificationUseCase.notify_add_member_to_sprint(sprint_member)
         messages.success(self.request, f"Usuario <strong>{data['user']}</strong> agregado al sprint correctamente")
         return super().form_valid(form)
 
@@ -266,6 +269,9 @@ class SprintBacklogAssignMemberView(CustomLoginMixin, SprintPermissionMixin, Spr
             cleaned_data = form.cleaned_data
             old_us=ProjectUseCase.get_user_story_by_id(user_story_id)
             SprintUseCase.assign_us_sprint_member(**cleaned_data, user_story_id=user_story_id)
+
+            NotificationUseCase.notify_assign_us(cleaned_data['sprint_member'].user, old_us)
+
             us_data=UserStory.objects.get(id=user_story_id)
             UserStoriesUseCase.create_user_story_history(old_us, us_data, request.user, project_id)
             messages.success(request, f"Miembro <strong>{cleaned_data['sprint_member']}</strong> asignado correctamente al US <strong>{us_data.title}</strong>")

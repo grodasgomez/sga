@@ -23,6 +23,7 @@ from users.models import CustomUser
 from user_stories.models import UserStory, UserStoryStatus
 from user_stories.mixin import UserStoryStatusMixin
 from sprints.usecase import SprintUseCase
+from notifications.usecase import NotificationUseCase
 
 # Create your views here.
 class ProjectListView(VerifiedMixin, View):
@@ -172,7 +173,8 @@ class ProjectMemberCreateView(CustomLoginMixin, ProjectPermissionMixin, ProjectS
         form = self.form_class(project_id, request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
-            ProjectUseCase.add_member(project_id=project_id, **cleaned_data)
+            member = ProjectUseCase.add_member(project_id=project_id, **cleaned_data)
+            NotificationUseCase.notify_add_member_to_project(member.user, member.project)
             messages.success(request, f"Miembro <strong>{cleaned_data['user'].email}</strong> agregado correctamente")
             return redirect(reverse("projects:project-members", kwargs={"project_id": project_id}))
         return render(request, 'project_member/create.html', {'form': form})
@@ -739,6 +741,11 @@ class UserStoryEditApiView(CustomLoginMixin, ProjectAccessMixin, View):
         old_us = ProjectUseCase.get_user_story_by_id(id=us_id)
         new_us =ProjectUseCase.edit_user_story(us_id, **data)
         UserStoriesUseCase.create_user_story_history(old_us, new_us, request.user, project_id)
+        assigned_user = new_us.sprint_member.user
+        logged_user = request.user
+        if (assigned_user and logged_user.id != assigned_user.id):
+            NotificationUseCase.notify_change_us_column(new_us, logged_user.email)
+
         user_story = model_to_dict(new_us)
         tasks = UserStoryTask.objects.filter(user_story_id=us_id)
         for task in tasks :
@@ -795,7 +802,12 @@ class ProductBacklogCreateCommentView(CustomLoginMixin, ProjectAccessMixin, User
 
         if form.is_valid(): #vemos si es valido
             cleaned_data=form.cleaned_data #tomamos los datos
-            UserStoriesUseCase.create_user_story_comment(us_id=us_id, user=request.user, project_id=project_id, **cleaned_data)
+            comment = UserStoriesUseCase.create_user_story_comment(us_id=us_id, user=request.user, project_id=project_id, **cleaned_data)
+            us = comment.user_story
+
+            if(us.sprint_member and us.sprint_member.id != request.user.id):
+                NotificationUseCase.notify_comment_us(us)
+
             messages.success(request, f"Comentario creado correctamente")
             return redirect(reverse("projects:project-backlog-detail", kwargs={'project_id': project_id, 'us_id':us_id}))
         #si el form no es valido retorna a la misma pagina

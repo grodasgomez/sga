@@ -15,7 +15,7 @@ class NotificationView(CustomLoginMixin, View):
     template_name = 'notifications.html'
 
     def get(self, request):
-        notifications = NotificationUseCase.get_unread_notifications(
+        notifications = NotificationUseCase.get_notifications(
             request.user)
         context = {
             'notifications': notifications
