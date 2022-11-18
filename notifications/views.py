@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.urls import reverse
 from .usecase import NotificationUseCase
-
 from sga.mixin import CustomLoginMixin
 
 # Create your views here.
@@ -30,5 +29,5 @@ class NotificationMarkView(CustomLoginMixin, View):
     template_name = 'notifications.html'
 
     def get(self, request, notification_id):
-        NotificationUseCase.mark_notifications_as_read(notification_id)
+        NotificationUseCase.mark_notification_as_read(notification_id)
         return redirect(reverse("notifications:index"))

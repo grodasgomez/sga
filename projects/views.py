@@ -741,10 +741,16 @@ class UserStoryEditApiView(CustomLoginMixin, ProjectAccessMixin, View):
         old_us = ProjectUseCase.get_user_story_by_id(id=us_id)
         new_us =ProjectUseCase.edit_user_story(us_id, **data)
         UserStoriesUseCase.create_user_story_history(old_us, new_us, request.user, project_id)
+
+        # Notificamos al usuario asignado a la us si es que hay uno y no fue el que cambió la columna
         assigned_user = new_us.sprint_member.user
         logged_user = request.user
         if (assigned_user and logged_user.id != assigned_user.id):
             NotificationUseCase.notify_change_us_column(new_us, logged_user.email)
+
+        # Notificamos a los scrum master del proyecto si la us se movió a la columna DONE
+        if new_us.is_done:
+            NotificationUseCase.notify_done_us(new_us)
 
         user_story = model_to_dict(new_us)
         tasks = UserStoryTask.objects.filter(user_story_id=us_id)
