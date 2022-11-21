@@ -1,9 +1,9 @@
 from datetime import datetime
 from projects.models import Project, ProjectMember
 from sprints.models import Sprint, SprintMember, SprintStatus
-from projects.usecase import ProjectUseCase
+from projects.usecase import ProjectUseCase, RoleUseCase
 from users.models import CustomUser
-from user_stories.models import UserStory, UserStoryStatus
+from user_stories.models import UserStory, UserStoryStatus, UserStoryHistory
 from user_stories.usecase import UserStoriesUseCase
 import copy
 from datetime import timedelta
@@ -117,15 +117,34 @@ class SprintUseCase:
         return sprint_member
 
     @staticmethod
-    def switch_sprint_member(user, sprint_member_id, workload):
+    def switch_sprint_member(user, sprint_member, workload,request_user, project_id):
         """
         Método para cambiar un sprint member a otro user
         """
-        sprint_member = SprintMember.objects.get(id=sprint_member_id)
 
         # Cambiar el usuario asignado a este sprint member
         sprint_member.user = user
         sprint_member.save()
+
+        # Actualizamos el historial de cada US del miembro
+        user_stories = UserStory.objects.filter(sprint_member=sprint_member)
+        for us in user_stories:
+            data={
+                "code": us.code,
+                "title": us.title,
+                "description": us.description,
+                "business_value": us.business_value,
+                "technical_priority": us.technical_priority,
+                "estimation_time": us.estimation_time,
+                "sprint_priority": us.sprint_priority,
+                "us_type": us.us_type.id,
+                "column": us.column,
+                "project": us.project.id,
+                "sprint": us.sprint.id,
+                "sprint_member": us.sprint_member.id,
+            }
+            description="Miembro del sprint"
+            UserStoryHistory.objects.create(user_story=us, project_member=RoleUseCase.get_project_member_by_user(request_user,project_id), description=description, dataJson=data)
 
         return sprint_member
 

@@ -200,7 +200,9 @@ class SprintMemberSwitchView(CustomLoginMixin, SprintPermissionMixin, SprintStat
         sprint_member = SprintMember.objects.get(id=self.kwargs.get('sprint_member_id'))
         old_member_email = sprint_member.user.email
         sprint_member_data=SprintUseCase.switch_sprint_member(
-            sprint_member_id=sprint_member.id,
+            sprint_member=sprint_member,
+            project_id=self.kwargs.get('project_id'),
+            request_user=self.request.user,
             **data
         )
         messages.success(self.request, f"Miembro <strong>{old_member_email}</strong> cambiado por <strong>{sprint_member_data.user.email}</strong>")
