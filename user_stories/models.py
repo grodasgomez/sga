@@ -45,6 +45,13 @@ class UserStory(models.Model):
     def column_name(self):
         return self.us_type.columns[self.column]
 
+    @property
+    def is_done(self):
+        """
+        Retorna True si la us está en la columna DONE de su tipo asociado.
+        """
+        return self.column == len(self.us_type.columns) - 1
+
     def __str__(self):
         return self.code
 

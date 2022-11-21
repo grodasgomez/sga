@@ -80,6 +80,16 @@
           </a>
         </li>
       {% endif %}
+      <li>
+        <a href="{% url 'notifications:index' %}" class="nav-link {% if 'notifications' in request.path%} active {%else%} link-dark {%endif%} nav-notification">
+          <i class="fa-solid fa-bell">
+          </i>
+          {% if user.unread_notifications > 0 %}
+            <span class="notification-badge badge bg-danger rounded-pill">{{ user.unread_notifications }}</span>
+          {% endif %}
+          Notificaciones
+        </a>
+      </li>
     {% endif %}
   </ul>
   {% if backpage %}

@@ -63,7 +63,8 @@ def breadcrumb(context):
         'tasks': 'Tareas',
         'comments': 'Comentarios',
         'holidays': 'Feriados',
-        'attachments': 'Adjuntos'
+        'attachments': 'Adjuntos',
+        'notifications': 'Notificaciones',
     }
     get_name = {
         'projects': lambda x: Project.objects.get(pk=x).name,
