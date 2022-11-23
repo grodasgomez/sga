@@ -277,5 +277,21 @@
 			"name": "ABM Miembro Sprint",
 			"description": "ABM Miembro Sprint"
 		}
+	},
+	{
+		"model": "projects.permission",
+		"pk": 11,
+		"fields": {
+			"name": "Iniciar Proyecto",
+			"description": "Iniciar Proyecto"
+		}
+	},
+	{
+		"model": "projects.permission",
+		"pk": 12,
+		"fields": {
+			"name": "Finalizar Proyecto",
+			"description": "Finalizar Proyecto"
+		}
 	}
 ]

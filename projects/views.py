@@ -62,18 +62,29 @@ class ProjectView(CustomLoginMixin, ProjectAccessMixin, View):
         members: QuerySet = project.project_members.all()
         #TODO: modify_sprint_method
         can_start_project = ProjectUseCase.can_start_project(user.id, project_id)
+        can_finish_project = ProjectUseCase.can_finish_project(user.id, project_id)
         context= {
             "object" : project,
             "members" : members, #TODO: NO SE USA QUE HACE ESTO
             "can_start_project" : can_start_project,
+            "can_finish_project" : can_finish_project,
             "backpage": reverse("projects:index")
         }
         return render(request, 'projects/project_detail.html', context)
 
     def post(self, request, project_id):
-        ProjectUseCase.start_project(project_id)
-        messages.success(request, 'Proyecto iniciado correctamente')
-        return redirect(request.META['HTTP_REFERER'])
+        project: Project = Project.objects.get(id=project_id)
+        print ("Project")
+        print  (project.status)
+        if project.status == ProjectStatus.CREATED:
+            print ("Project 2")
+            ProjectUseCase.start_project(project_id)
+            print ("Project started")
+            messages.success(request, 'Proyecto iniciado correctamente')
+            return redirect(reverse("projects:project-detail", kwargs={"project_id": project_id}))
+            #return redirect(request.META['HTTP_REFERER'])
+        elif project.status == ProjectStatus.IN_PROGRESS:
+            return redirect(reverse("projects:finish", kwargs={"project_id": project_id}))
 
 class ProjectMembersView(CustomLoginMixin, ProjectAccessMixin, View):
     """
@@ -1011,3 +1022,40 @@ class ProductBacklogDeleteCommentView(CustomLoginMixin, ProjectAccessMixin, User
 class VelocityChartView(CustomLoginMixin, ProjectAccessMixin, View):
     def get(self, request, project_id):
         return render(request, 'projects/velocity.html')
+
+class ProjectFinishView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
+    """
+    Clase encargada de manejar la finalizacion de un proyecto
+    """
+    form_class = FormDeleteProject
+
+    permissions = ['ABM Proyecto']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id):
+        project = Project.objects.get(id=project_id)
+        data = vars(project)
+        scrum_master = ProjectMember.objects.get(project=project, roles__name="Scrum Master")
+        data['scrum_master']=scrum_master.user.email
+        form = self.form_class(initial=data)
+        context={
+            "form": form,
+            "backpage": reverse("projects:index")
+        }
+        return render(request, 'projects/finish.html', context)
+
+    def post(self, request, project_id):
+        project = Project.objects.get(id=project_id)
+        result = ProjectUseCase.finish_project(project_id)
+
+        if result == 0:
+            messages.success(request, f"Proyecto <strong>{project.name}</strong> finalizado correctamente")
+        elif result == 1:
+            messages.warning(request, f"El proyecto <strong>{project.name}</strong> no puede ser finalizado porque hay sprints pendientes")
+        elif result == 2:
+            messages.warning(request, f"El proyecto <strong>{project.name}</strong> no puede ser finalizado porque hay historias de usuario pendientes")
+        elif result == 3:
+            messages.warning(request, f"El proyecto <strong>{project.name}</strong> no puede ser finalizado porque el proyecto no se inicio")
+        elif result == 4:
+            messages.warning(request, f"El proyecto <strong>{project.name}</strong> no puede ser finalizado porque no se desarrollo ningun Sprint")
+        return redirect(reverse("projects:index"))

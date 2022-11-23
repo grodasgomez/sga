@@ -31,6 +31,34 @@ class ProjectUseCase:
         return project
 
     @staticmethod
+    def finish_project(project_id):
+        """
+        Finalizar un Proyecto
+        """
+        project = Project.objects.get(id=project_id)
+        #Verificamos que el proyecto no tenga sprints activos
+        if Sprint.objects.filter(Q(project=project), Q(status=SprintStatus.CREATED) | Q(status=SprintStatus.IN_PROGRESS)).exists():
+            return 1
+        elif UserStory.objects.filter(project=project, status=UserStoryStatus.IN_PROGRESS).exists():
+            return 2
+        elif project.status == ProjectStatus.CREATED:
+            return 3
+        elif not Sprint.objects.filter(project=project).exists():
+            return 4
+        else:
+            project.status = ProjectStatus.FINISHED
+            project.end_date = date.today()
+            user_stories = UserStory.objects.filter(project=project)
+            for us in user_stories:
+                us.sprint = None
+                us.column = 0
+                us.sprint_member = None
+                us.save()
+
+            project.save()
+            return 0
+
+    @staticmethod
     def cancel_project(project_id):
         """
         Cancelar un Proyecto
@@ -43,7 +71,6 @@ class ProjectUseCase:
             us.sprint = None
             us.column = 0
             us.sprint_member = None
-            us.estimation_time = -1
             us.status = UserStoryStatus.CANCELLED
             us.save()
         sprints = Sprint.objects.filter(project=project)
@@ -167,6 +194,17 @@ class ProjectUseCase:
         Verifica si un miembro de proyecto tiene permisos para iniciar el proyecto
         """
         permissions = ['Iniciar Proyecto']
+        roles = ['Scrum Master']
+        has_perm = ProjectUseCase.member_has_permissions(user_id, project_id, permissions)
+        is_scrum_master = ProjectUseCase.member_has_roles(user_id, project_id, roles)
+
+        return is_scrum_master or has_perm
+    
+    def can_finish_project(user_id, project_id):
+        """
+        Verifica si un miembro de proyecto tiene permisos para finalizar el proyecto
+        """
+        permissions = ['Finalizar Proyecto']
         roles = ['Scrum Master']
         has_perm = ProjectUseCase.member_has_permissions(user_id, project_id, permissions)
         is_scrum_master = ProjectUseCase.member_has_roles(user_id, project_id, roles)
