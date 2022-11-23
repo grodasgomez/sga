@@ -6,14 +6,10 @@
 		var estimated_hours = JSON.parse("{{estimated_hours|safe }}");
 		var worked_hours = JSON.parse("{{worked_hours|safe }}");
 		var sprint_days = JSON.parse("{{sprint_days|safe }}".replace(/'/g, '"'));
-		console.log("sprint_days",sprint_days);
 
 		const coords_estimated = sprint_days.map((x, i) => ({ x:new Date(x), y: estimated_hours[i] }));
 		const coords_worked = sprint_days.map((x, i) => ({ x:new Date(x), y: worked_hours[i] }));
 
-
-		console.log("coords_estimated",coords_estimated);
-		console.log("coords_worked",coords_worked);
 		var chart = new CanvasJS.Chart("chartContainer", {
 			animationEnabled: true,
 			title: {
