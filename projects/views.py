@@ -1049,6 +1049,7 @@ class ProjectFinishView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusM
         result = ProjectUseCase.finish_project(project_id)
 
         if result == 0:
+            NotificationUseCase.notify_finish_project(request.user,project)
             messages.success(request, f"Proyecto <strong>{project.name}</strong> finalizado correctamente")
         elif result == 1:
             messages.warning(request, f"El proyecto <strong>{project.name}</strong> no puede ser finalizado porque hay sprints pendientes")

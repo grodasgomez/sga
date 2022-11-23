@@ -109,9 +109,11 @@ class SprintView(CustomLoginMixin, SprintAccessMixin, DetailView):
         try:
             if sprint.status == "PLANNED":
                 SprintUseCase.start_sprint(sprint)
+                NotificationUseCase.notify_start_sprint(request.user, project_id, sprint)
                 messages.success(request, f"Sprint iniciado correctamente")
             elif sprint.status == "IN_PROGRESS":
                 SprintUseCase.finish_sprint(sprint, request.user, self.kwargs.get('project_id'))
+                NotificationUseCase.notify_finish_sprint(request.user, project_id, sprint)
                 messages.success(request, f"Sprint finalizado correctamente, prioridad de las historias de usuario actualizada")
         except CustomError as e:
             messages.warning(request, e)

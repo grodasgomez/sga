@@ -1,6 +1,7 @@
 from .models import Notification
 from django.urls import reverse
 from projects.usecase import ProjectUseCase
+from sprints.usecase import SprintUseCase
 
 
 class NotificationUseCase:
@@ -124,3 +125,52 @@ class NotificationUseCase:
         for project_member in project_members:
             Notification.objects.create(
                 user=project_member.user, content=content, title=title)
+
+    @staticmethod
+    def notify_finish_project(user, project):
+        """
+        Notifica a un usuario que un proyecto fue finalizado
+        """
+        project_users = ProjectUseCase.get_members(project.id)
+        url = reverse('projects:project-detail',
+                      kwargs={'project_id': project.id})
+        project_str = f"<a href='{url}'>{project.name}</a>"
+        content = f"El proyecto {project_str} fue finalizado por {user.email}"
+        title = f"Finalizo el proyecto {project.name}"
+
+        for project_user in project_users:
+            Notification.objects.create(
+                user=project_user, content=content, title=title)
+    
+    @staticmethod
+    def notify_finish_sprint(user, project_id, sprint):
+        """
+        Notifica a un usuario que un sprint fue finalizado
+        """
+        sprint_members = SprintUseCase.get_sprint_members(sprint.id)
+        url = reverse('projects:sprints:detail',
+                      kwargs={'project_id': project_id , 'sprint_id': sprint.id})
+        sprint_str = f"<a href='{url}'> Sprint {sprint.number}</a>"
+        content = f"El {sprint_str} fue finalizado por {user.email}"
+        title = f"Finalizo el sprint {sprint.number}"
+
+        for sprint_member in sprint_members:
+            Notification.objects.create(
+                user=sprint_member.user, content=content, title=title)
+    
+    @staticmethod
+    def notify_start_sprint(user, project_id, sprint):
+        """
+        Notifica a un usuario que un proyecto fue iniciado
+        """
+        sprint_members = SprintUseCase.get_sprint_members(sprint.id)
+        url = reverse('projects:sprints:detail',
+                      kwargs={'project_id': project_id , 'sprint_id': sprint.id})
+        sprint_str = f"<a href='{url}'> Sprint {sprint.number}</a>"
+        content = f"El {sprint_str} fue iniciado por {user.email}"
+        title = f"Inicio el sprint {sprint.number}"
+
+        for sprint_member in sprint_members:
+            Notification.objects.create(
+                user=sprint_member.user, content=content, title=title)
+
