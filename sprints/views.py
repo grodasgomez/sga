@@ -412,14 +412,19 @@ class BurndownChartView(CustomLoginMixin, SprintAccessMixin, View):
     def get(self, request, project_id, sprint_id):
         sprint = SprintUseCase.get_sprint_by_id(sprint_id)
         if sprint.status == SprintStatus.CREATED:
-            messages.warning(request, "No se puede visualizar el gráfico")
+            messages.warning(request, "El Sprint todavia no fue iniciado")
             return redirect(reverse("projects:sprints:detail", kwargs={"project_id": project_id, "sprint_id": sprint_id}))
 
         sprint = Sprint.objects.get(id=sprint_id)
         user_stories = UserStory.objects.filter(sprint_id=sprint.id)
         tasks = UserStoryTask.objects.filter(sprint_id=sprint.id)
 
-        real_duration_days = (sprint.estimated_end_date-sprint.start_date).days+1
+        real_duration_days = 0
+        if(sprint.estimated_end_date < datetime.now().date()):
+            real_duration_days = (datetime.now().date() - sprint.start_date).days+1
+        else:
+            real_duration_days = (sprint.estimated_end_date-sprint.start_date).days+1
+        estimated_duration_date = (sprint.estimated_end_date - sprint.start_date).days+1
         sprint_days = [sprint.start_date+timedelta(days=x) for x in range(real_duration_days)]
         sprint_days_str = [x.strftime("%m/%d/%Y") for x in sprint_days] # para pasarle a JS
 
@@ -435,7 +440,7 @@ class BurndownChartView(CustomLoginMixin, SprintAccessMixin, View):
                 else:
                     estimated_hours.append(estimated_hours[x-1])
             else:
-                estimated_hours.append(int(estimation_total_sprint-(estimation_total_sprint/real_duration_days)*(x+1)))
+                estimated_hours.append(int(estimation_total_sprint-(estimation_total_sprint/estimated_duration_date)*(x+1)))
         print("estimation_total_sprint",estimation_total_sprint)
         days_worked = 0
         #si está en progreso grafica hasta el dia actual
