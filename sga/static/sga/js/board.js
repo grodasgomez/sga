@@ -40,35 +40,42 @@ const kanban = new jKanban({
       updateUsColumn(usId, targetUsTypeColumn);
       return;
     }else if (targetUsTypeColumn > us.column+1) {
-      restoreUs(us);
+      restoreUs(us, "No puedes avanzar esta US a una columna que no sea la siguiente");
+      return;
+    }
+    // Verificamos si el usuario que quiere mover la us es el mismo que esta asignado a la us
+    const isAssigned = us.user?.id === currentMember.id;
+    if (!isAssigned) {
+      restoreUs(us, "No puedes avanzar esta US porque no estas asignado a ella");
       return;
     }
 
-    // Verificamos si la us tiene una tarea dentro de la columna del cual se quiere mover
-    const hasTask = enabledUsTasks.length > 0 || us.column == 0;
+    // Validamos que si la US no tiene tareas activas asociadas a la columna actual y está
+    // intentando moverse a una columna posterior, no se pueda mover
+    const withoutTask = enabledUsTasks.length < 1 && us.column !== 0;
+    const isAdvancing = us.column < targetUsTypeColumn;
 
-    // Verificamos si el usuario que quiere mover la us es el mismo que esta asignado a la us
-    const isAssigned = us.user?.id === currentMember.id;
-
-    // Verificamos si se esta moviendo a una columna anterior a la actual
-    const isBacking = us.column > targetUsTypeColumn;
-
-    if (isAssigned && (hasTask || isBacking)) {
-      us.column = targetUsTypeColumn;
-      enabledUsTasks.forEach((task) => task.disabled = true);
-      updateUsColumn(usId, targetUsTypeColumn);
-    } else restoreUs(us);
-  },
+    if (withoutTask && isAdvancing) {
+      const message = "No puedes avanzar esta US porque no tiene tareas asignadas a la columna actual";
+      restoreUs(us, message);
+      return;
+    }
+    // Actualizamos la columna de la US e invalidamos las tareas de la columna anterior
+    us.column = targetUsTypeColumn;
+    enabledUsTasks.forEach((task) => task.disabled = true);
+    updateUsColumn(usId, targetUsTypeColumn);
+  }
 });
 
-function restoreUs(us) {
+function restoreUs(us, message) {
   Swal.fire({
-    title: "No puedes mover esta US",
+    title: "Oops...",
     icon: "error",
     showClass: {
       backdrop: "swal2-noanimation", // disable backdrop animation
       icon: "", // disable icon animation
     },
+    text: message,
     confirmButtonText: "Ok",
   });
   const kanbanUsId = `us-${us.id}`;
