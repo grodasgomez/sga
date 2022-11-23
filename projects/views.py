@@ -23,6 +23,7 @@ from users.models import CustomUser
 from user_stories.models import UserStory, UserStoryStatus
 from user_stories.mixin import UserStoryStatusMixin
 from sprints.usecase import SprintUseCase
+from sprints.models import Sprint, SprintStatus
 from notifications.usecase import NotificationUseCase
 
 # Create your views here.
@@ -1009,5 +1010,36 @@ class ProductBacklogDeleteCommentView(CustomLoginMixin, ProjectAccessMixin, User
         return redirect(reverse('projects:project-backlog-detail', kwargs={'project_id': project_id, 'us_id':us_id}))
 
 class VelocityChartView(CustomLoginMixin, ProjectAccessMixin, View):
+    """
+    Clase encargada de mostrar el Velocity Chart de un proyecto
+    """
     def get(self, request, project_id):
-        return render(request, 'projects/velocity.html')
+        project_sprints = ProjectUseCase.get_project_sprints(project_id)
+
+        if not project_sprints:#todo esta bien la verificacion?
+            messages.warning(request, "El Proyecto no tiene Sprints")
+            return redirect(reverse("projects:project-detail", kwargs={"project_id": project_id}))
+
+        estimated_hours_sprint = []
+        worked_hours_sprint = []
+        for sprint in project_sprints:
+            if sprint.status != SprintStatus.CREATED:
+                user_stories = UserStory.objects.filter(sprint_id=sprint.id)
+                tasks = UserStoryTask.objects.filter(sprint_id=sprint.id)
+                estimated_hours_sprint.append(sum([us.estimation_time for us in user_stories]))
+                worked_hours_sprint.append(sum([task.hours_worked for task in tasks]))
+
+        if len(estimated_hours_sprint) == 0 or len(worked_hours_sprint) == 0:
+            messages.warning(request, "Aun no hay informacion de los Sprints para mostrar en el grafico")
+            return redirect(reverse("projects:project-detail", kwargs={"project_id": project_id}))
+
+        sprint_labels = []
+        for x in range(1, len(estimated_hours_sprint)+1): sprint_labels.append(f"Sprint {x}")
+        context= {
+            "sprint_labels" : sprint_labels,
+            "estimated_hours_sprint" : estimated_hours_sprint,
+            "worked_hours_sprint" : worked_hours_sprint,
+            "project_id" : project_id,
+            "backpage": reverse("projects:project-detail", kwargs={"project_id": project_id})
+        }
+        return render(request, 'projects/velocity.html', context)

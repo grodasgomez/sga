@@ -3,6 +3,13 @@
 <h1> Velocity </h1>
 <script>
 	window.onload = function () {
+		var estimated_hours_sprint = JSON.parse("{{estimated_hours_sprint|safe }}");
+		var worked_hours_sprint = JSON.parse("{{worked_hours_sprint|safe }}");
+		const sprint_labels = JSON.parse(document.getElementById("sprint_labels").textContent);
+
+		const coords_estimated = sprint_labels.map((x, i) => ({ label:x, y: estimated_hours_sprint[i] }));
+		const coords_worked = sprint_labels.map((x, i) => ({ label:x, y: worked_hours_sprint[i] }));
+
 		var chart = new CanvasJS.Chart("chartContainer", {
 			animationEnabled: true,
 			title: {
@@ -19,14 +26,6 @@
 				tickColor: "#4F81BC",
 				includeZero: true
 			},
-			axisY2: {
-				title: "Realizado",
-				titleFontColor: "#C0504E",
-				lineColor: "#C0504E",
-				labelFontColor: "#C0504E",
-				tickColor: "#C0504E",
-				includeZero: true
-			},
 			toolTip: {
 				shared: false
 			},
@@ -37,26 +36,13 @@
 				type: "column",
 				name: "Estimado",
 				showInLegend: true,
-				dataPoints: [
-					{ label: "Sprint 1", y: 19034.5 },
-					{ label: "Sprint 2", y: 20015 },
-					{ label: "Sprint 3", y: 25342 },
-					{ label: "Sprint 4", y: 20088 },
-					{ label: "Sprint 5", y: 28234 }
-				]
+				dataPoints: coords_estimated
 			},
 			{
 				type: "column",
 				name: "Realizado",
-				axisYType: "secondary",
 				showInLegend: true,
-				dataPoints: [
-					{ label: "Sprint 1", y: 210.5 },
-					{ label: "Sprint 2", y: 135 },
-					{ label: "Sprint 3", y: 425 },
-					{ label: "Sprint 4", y: 130 },
-					{ label: "Sprint 5", y: 528 }
-				]
+				dataPoints: coords_worked
 			}]
 		});
 		chart.render();
@@ -64,6 +50,7 @@
 </script>
 
 <body>
+	{{sprint_labels|json_script:"sprint_labels"}}
 	<div id="chartContainer" style="height: 370px; width: 100%;"></div>
 	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 </body>

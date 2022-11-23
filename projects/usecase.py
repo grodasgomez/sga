@@ -338,6 +338,13 @@ class ProjectUseCase:
         """
         return ProjectMember.objects.filter(project_id=project_id, roles__name='Scrum Master')
 
+    @staticmethod
+    def get_project_sprints(project_id: int):
+        """
+        Obtiene los scrum masters de un proyecto
+        """
+        return Sprint.objects.filter(project_id=project_id)
+
 class RoleUseCase:
     @staticmethod
     def create_role(id, name, description, permissions):
