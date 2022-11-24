@@ -54,19 +54,17 @@ class ProjectListView(VerifiedMixin, View):
 
 class ProjectView(CustomLoginMixin, ProjectAccessMixin, View):
     """
-    Clase encargada de mostrar los detalles de una view,
+    Clase encargada de mostrar los detalles de un proyecto,
     es una vista que todos los miembros del proyecto pueden ver
     """
     def get(self, request, project_id):
         user = request.user
         project: Project = Project.objects.get(id=project_id)
         members: QuerySet = project.project_members.all()
-        #TODO: modify_sprint_method
         can_start_project = ProjectUseCase.can_start_project(user.id, project_id)
         can_finish_project = ProjectUseCase.can_finish_project(user.id, project_id)
         context= {
             "object" : project,
-            "members" : members, #TODO: NO SE USA QUE HACE ESTO
             "can_start_project" : can_start_project,
             "can_finish_project" : can_finish_project,
             "backpage": reverse("projects:index")

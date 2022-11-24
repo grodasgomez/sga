@@ -59,6 +59,19 @@ class NotificationUseCase:
         Notification.objects.create(user=user, content=content, title=title)
 
     @staticmethod
+    def notify_deassign_us(user, user_story):
+        """
+        Notifica a un usuario que se le ha asignado un user story
+        """
+        project = user_story.project
+        url = reverse('projects:project-backlog-detail',
+                      kwargs={'project_id': project.id, 'us_id': user_story.id})
+        us_str = f"<a href='{url}'>{user_story.code}</a>"
+        content = f'Se te ha desasignado la US {us_str}'
+        title = f"US desasignado {user_story.code}"
+        Notification.objects.create(user=user, content=content, title=title)
+
+    @staticmethod
     def notify_add_member_to_sprint(sprint_member):
         """
         Notifica a un usuario que ha sido agregado a un sprint
@@ -141,7 +154,7 @@ class NotificationUseCase:
         for project_user in project_users:
             Notification.objects.create(
                 user=project_user, content=content, title=title)
-    
+
     @staticmethod
     def notify_finish_sprint(user, project_id, sprint):
         """
@@ -157,7 +170,7 @@ class NotificationUseCase:
         for sprint_member in sprint_members:
             Notification.objects.create(
                 user=sprint_member.user, content=content, title=title)
-    
+
     @staticmethod
     def notify_start_sprint(user, project_id, sprint):
         """

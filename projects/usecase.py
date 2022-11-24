@@ -187,7 +187,6 @@ class ProjectUseCase:
             user_id=user_id,project_id=project_id, roles__name__in=roles
         ).exists()
 
-    #TODO: modify_sprint_method
     @staticmethod
     def can_start_project(user_id, project_id):
         """
@@ -199,7 +198,8 @@ class ProjectUseCase:
         is_scrum_master = ProjectUseCase.member_has_roles(user_id, project_id, roles)
 
         return is_scrum_master or has_perm
-    
+
+    @staticmethod
     def can_finish_project(user_id, project_id):
         """
         Verifica si un miembro de proyecto tiene permisos para finalizar el proyecto
