@@ -322,11 +322,7 @@ class FormEditUserStory(forms.Form):
     def __init__(self, project_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.project_id = project_id
-        self.fields['us_type'] = forms.ModelChoiceField(
-            queryset=ProjectUseCase.filter_user_story_type_by_project(project_id), label='Tipo de Historia de Usuario',
-            empty_label='Seleccione un tipo',
-            widget=widgets.SelectInput()
-        )
+        self.fields['us_type'] = forms.CharField(max_length=100, label='Tipo de Historia de Usuario',widget=widgets.TextInput(attrs={'readonly': 'readonly'}))  # TIPO US
         self.fields['title'] = forms.CharField(max_length=100, label='Titulo',widget=widgets.TextInput(attrs={'readonly': 'readonly'}))  # TITULO del US
         self.fields['description'] = forms.CharField(max_length=100, label='Descripcion',widget=widgets.TextInput())  # descripcion del US
         self.fields['business_value'] = forms.IntegerField( min_value=1, max_value=100 ,label='Valor de Negocio',widget=widgets.NumberInput())  # Valor de Negocio del US

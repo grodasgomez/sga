@@ -298,8 +298,6 @@ class ProjectUseCase:
             data['sprint_priority'] = round(0.6 * business_value + 0.4 * technical_priority)
         if estimation_time:
             data['estimation_time'] = estimation_time
-        if us_type:
-            data['us_type'] = us_type
         # si hubo un cambio en la columna
         if column is not None:
             data['column'] = column

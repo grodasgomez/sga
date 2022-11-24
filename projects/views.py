@@ -731,7 +731,7 @@ class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, UserStory
     def get(self, request, project_id, us_id):
         user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
         data=user_story.__dict__
-        data['us_type']=user_story.us_type
+        data['us_type']=user_story.us_type.name
         form = FormEditUserStory(project_id,initial=data)
         context= {
             "form" : form,
@@ -749,7 +749,7 @@ class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, UserStory
         if form.is_valid():
             cleaned_data = form.cleaned_data
             old_user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
-            #TODO: este retorna la us cambiada
+            
             ProjectUseCase.edit_user_story(us_id, **cleaned_data)
 
             new_user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
