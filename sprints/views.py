@@ -19,7 +19,6 @@ import copy
 from datetime import date, timedelta
 from notifications.usecase import NotificationUseCase
 
-
 class SprintListView(CustomLoginMixin, ProjectAccessMixin, ListView):
     """
     Vista que lista los sprints de un proyecto
@@ -37,7 +36,7 @@ class SprintListView(CustomLoginMixin, ProjectAccessMixin, ListView):
         context['backpage'] = reverse('projects:project-detail', kwargs={'project_id': context['project_id']})
 
         return context
-
+#todo: block sin backlog
 class SprintCreateView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, FormView):
     """
     Vista para crear un nuevo sprint
@@ -125,6 +124,8 @@ class SprintMemberCreateView(CustomLoginMixin, SprintPermissionMixin, SprintStat
     """
     permissions = ['ABM Miembro Sprint']
     roles = ['Scrum Master']
+    special_status = "IN_PROGRESS"
+    special_message = "No se puede agregar miembros a un sprint en progreso"
 
     template_name = 'sprint-members/create.html'
     form_class = SprintMemberCreateForm
@@ -219,6 +220,8 @@ class SprintMemberEditView(CustomLoginMixin, SprintPermissionMixin, SprintStatus
     """
     permissions = ['ABM Miembro Sprint']
     roles = ['Scrum Master']
+    special_status = "IN_PROGRESS"
+    special_message = "No se puede editar miembros de un sprint en progreso"
 
     template_name = 'sprint-members/edit.html'
     form_class = SprintMemberEditForm
@@ -337,6 +340,8 @@ class SprintBacklogAssignView(CustomLoginMixin, SprintPermissionMixin, SprintSta
     """
     permissions = ['ABM US Sprint']
     roles = ['Scrum Master']
+    special_status = "IN_PROGRESS"
+    special_message = "No se puede agregar una US a un sprint en progreso"
 
     def get(self, request, project_id, sprint_id):
         user_stories = SprintUseCase.assignable_us_to_sprint(project_id, sprint_id).order_by('-sprint_priority')
