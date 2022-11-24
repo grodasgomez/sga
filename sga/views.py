@@ -7,6 +7,9 @@ from django.contrib.auth.signals import user_logged_out
 from django.contrib.auth.signals import user_logged_in
 from django.contrib import messages
 
+from projects.models import Project
+from sprints.usecase import SprintUseCase
+
 @receiver(user_logged_in)
 def user_logged_in_(request, **kwargs):
     """
@@ -26,7 +29,20 @@ def user_logged_out(request, **kwargs):
 @never_cache
 @login_required()
 def index(request):
-    return render(request, 'sga/index.html')
+    if request.user.is_authenticated:
+        projects = Project.objects.all()
+        project_html = []
+        for project in projects:
+            if project.project_members.filter(id=request.user.id).exists() and (project.status == "CREATED" or project.status == "IN_PROGRESS"):
+                sprint = SprintUseCase.get_current_sprint(project.id)
+                project.name = project.name[:19] + "..." if len(project.name) > 22 else project.name
+                if sprint:
+                    project.sprint_id = sprint.id
+                else:
+                    project.sprint_id = None
+                project_html.append(project)
+        context = {"projects": project_html}
+    return render(request, 'sga/index.html', context)
 
 @never_cache
 def login(request):
@@ -34,7 +50,6 @@ def login(request):
         return redirect("/")
     return render(request, 'account/login.html')
 
-#TODO: realizar html 404, no hay que redireccionar
 def custom_404(request, exception):
     messages.warning(request, "Página no encontrada")
     return redirect("/")

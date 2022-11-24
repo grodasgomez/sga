@@ -2,13 +2,37 @@
 {% block content %}
 {% include 'utils/messages.html'%}
 {% if not user.is_verified %}
-<div class="alert alert-info" role="alert">
-  <h4 class="alert-heading">¡Ya falta poco {{user.first_name}}!</h4>
-  <p>Ya estas registrado en SGA 🎉</p>
-  <hr>
-  <p class="mb-0">Sólo falta que un administrador te active la cuenta para vivir la experiencia ágil </p>
-</div>
+  <div class="alert alert-info" role="alert">
+    <h4 class="alert-heading">¡Ya falta poco {{user.first_name}}!</h4>
+    <p>Ya estas registrado en SGA 🎉</p>
+    <hr>
+    <p class="mb-0">Sólo falta que un administrador te active la cuenta para vivir la experiencia ágil </p>
+  </div>
 {%else%}
   <h1>Hola {{user.first_name}}</h1>
+  {% if projects %}
+    <br>
+    <b>Tus proyectos</b>
+    <br>
+    <table>
+    <th><br></th>
+    <tr>
+    {% for project in projects %}
+      <td>
+        <div class="cardproject">
+            <a href="{% url 'projects:project-detail' project_id=project.id %}" style="text-decoration: none">{{ project.name }}</a>
+            <p></p>
+            {% if project.sprint_id %}
+              <a href="{% url 'projects:board:index' project_id=project.id %}" style="text-decoration: none">Tablero</a>
+            {% endif %}
+        </div>
+      </td>
+      <td>&nbsp</td>
+      {% endfor %}
+    </tr>
+    </table>
+  {% else %}
+    Aun no tienes proyectos
+  {% endif %}
 {%endif%}
 {% endblock %}
