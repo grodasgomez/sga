@@ -771,7 +771,7 @@ class UserStoryEditApiView(CustomLoginMixin, ProjectAccessMixin, View):
         UserStoriesUseCase.create_user_story_history(old_us, new_us, request.user, project_id)
 
         # Notificamos al usuario asignado a la us si es que hay uno y no fue el que cambió la columna
-        assigned_user = new_us.sprint_member.user
+        assigned_user = new_us.sprint_member.user if new_us.sprint_member else None
         logged_user = request.user
         if (assigned_user and logged_user.id != assigned_user.id):
             NotificationUseCase.notify_change_us_column(new_us, logged_user.email)
