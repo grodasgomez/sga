@@ -4,7 +4,7 @@ from datetime import date
 from projects.models import Project, ProjectMember, ProjectStatus, ProjectHoliday
 from projects.models import Role, UserStoryType
 from users.models import CustomUser
-from user_stories.models import UserStory, UserStoryAttachment, UserStoryStatus
+from user_stories.models import UserStory, UserStoryAttachment, UserStoryStatus, UserStoryHistory
 from sprints.models import Sprint, SprintStatus
 
 class ProjectUseCase:
@@ -382,6 +382,25 @@ class ProjectUseCase:
         Obtiene los scrum masters de un proyecto
         """
         return Sprint.objects.filter(project_id=project_id)
+
+    @staticmethod
+    def has_association_with_user_story(us_type_id):
+        """
+        Verifica si un tipo de us esta asociado a alguna us
+        """
+        hasUs = UserStory.objects.filter(us_type_id=us_type_id).exists()
+        hasUsHistory = UserStoryHistory.objects.filter(dataJson__icontains=f'"us_type": {us_type_id}').exists()
+
+        return hasUs or hasUsHistory
+
+    @staticmethod
+    def delete_user_story_type(us_type_id):
+        """
+        Elimina un tipo de us
+        """
+        us_type = UserStoryType.objects.get(id=us_type_id)
+        us_type.delete()
+        return us_type
 
 class RoleUseCase:
     @staticmethod

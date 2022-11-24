@@ -308,6 +308,24 @@ class UserStoryTypeListView(CustomLoginMixin, ProjectAccessMixin, ListView):
         context['backpage'] = reverse('projects:project-detail', kwargs={'project_id': context['project_id']})
         return context
 
+class UserStoryTypeDeleteView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
+    """
+    Vista para eliminar un tipo de historia de usuario de un proyecto.
+    Un tipo de historia de usuario se puede eliminar si no está asociado a ninguna historia de usuario
+    ni tampoco a ningún historial de una historia de usuario.
+    """
+    permissions = ['ABM Tipo US']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id, id):
+        if ProjectUseCase.has_association_with_user_story(id):
+            messages.warning(request, f"El tipo de historia de usuario no se puede eliminar porque está asociado a una historia de usuario")
+        else:
+            us_type = ProjectUseCase.delete_user_story_type(id)
+            messages.success(request, f"Tipo de historia de usuario <strong>{us_type.name}</strong> eliminado correctamente")
+
+        return redirect(reverse("projects:user-story-type-list", kwargs={"project_id": project_id}))
+
 class ProjectRoleEditView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, View):
     """
     Clase encargada de manejar la edicion de roles

@@ -25,6 +25,9 @@
           <a href="{% url 'projects:user-story-type-edit' project_id=project_id id=object.id %}" class="btn" title="Editar tipo de Historia de Usuario">
             <span class="btn-label"><i class="fa fa-pencil"></i></span>
           </a>
+          <a href="{% url 'projects:user-story-type-delete' project_id=project_id id=object.id %}" class="btn" title="Eliminar tipo de Historia de Usuario">
+            <span class="btn-label"><i class="fa fa-trash"></i></span>
+          </a>
         </td>
       </tr>
       {% endfor %}

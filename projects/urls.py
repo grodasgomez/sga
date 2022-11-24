@@ -29,6 +29,7 @@ urlpatterns = [
     path('<int:project_id>/user-story-type/', views.UserStoryTypeListView.as_view(), name='user-story-type-list'),
     path('<int:project_id>/user-story-type/create/', views.UserStoryTypeCreateView.as_view(), name='user-story-type-create'),
     path('<int:project_id>/user-story-type/<int:id>/edit/', views.UserStoryTypeEditView.as_view(), name='user-story-type-edit'),
+    path('<int:project_id>/user-story-type/<int:id>/delete/', views.UserStoryTypeDeleteView.as_view(), name='user-story-type-delete'),
     path('<int:project_id>/user-story-type/import/', views.UserStoryTypeImportView1.as_view(), name='user-story-type-import1'),
     path('<int:project_id>/user-story-type/import/<int:from_project_id>/', views.UserStoryTypeImportView2.as_view(), name='user-story-type-import2'),
 

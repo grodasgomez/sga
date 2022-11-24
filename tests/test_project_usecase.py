@@ -476,4 +476,40 @@ class ProjectUseCaseTest(TestCase):
 
         self.assertNotEqual(old_end_date, sprint.end_date, "La fecha de fin del sprint sigue siendo la misma despues de borrar un feriado que era un dia habil")
 
-        
+    def test_delete_user_story_type(self):
+        """
+        Funcion que prueba la eliminacion de un tipo de user story
+        """
+        data_project = {
+            'name': 'Proyecto 2',
+            'description': 'Descripcion del proyecto 2',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+
+        project = ProjectUseCase.create_project(**data_project)
+        us_type=ProjectUseCase.create_user_story_type("Tipo de user story de prueba",['Por hacer', 'En progreso', 'Hecho'],project.id)
+        us_type=ProjectUseCase.delete_user_story_type(us_type.id)
+
+        self.assertNotIn(us_type, UserStoryType.objects.all(), "El tipo de user story no fue eliminado del proyecto")
+
+
+    def test_has_association_with_user_story(self):
+        """
+        Funcion que prueba la asociacion de un tipo de user story con un user story
+        """
+        data_project = {
+            'name': 'Proyecto 2',
+            'description': 'Descripcion del proyecto 2',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+
+        project = ProjectUseCase.create_project(**data_project)
+        us_type=ProjectUseCase.create_user_story_type("Tipo de user story de prueba",['Por hacer', 'En progreso', 'Hecho'],project.id)
+        us = ProjectUseCase.create_user_story(code="US-1", title='User Story 1', description='User Story 1',
+                                                business_value=1, technical_priority=1, estimation_time=1,
+                                                us_type=us_type, project_id=project.id)
+
+        has_association = ProjectUseCase.has_association_with_user_story(us_type.id)
+        self.assertTrue(has_association, "El tipo de user story no tiene asociacion con un user story")
