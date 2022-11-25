@@ -198,3 +198,27 @@ class SprintUseCaseTest(TestCase):
         sprint = SprintUseCase.start_sprint(sprint)
         self.assertEqual(sprint.status, SprintStatus.IN_PROGRESS.value, 'El sprint no tiene el estado IN_PROGRESS')
         self.assertEqual(sprint.duration, 14, 'El sprint no tiene la duracion correcta')
+
+    def test_switch_sprint_member(self):
+        sprint = SprintUseCase.create_sprint(self.project.id, duration=14)
+        developer = CustomUser.objects.create(
+            first_name='Developer',
+            last_name='Python',
+            email='developer@gmail.com',
+            password='dsad',
+            is_active=True,
+            role_system='user')
+        developer2 = CustomUser.objects.create(
+            first_name='Developer2',
+            last_name='Python',
+            email = 'developer2@gmail.com',
+            password='dsad',
+            is_active=True,
+            role_system='user')
+        data = {
+            'workload': 10,
+        }
+        sprint_member = SprintUseCase.add_sprint_member(user = developer, sprint_id=sprint.id, **data)
+        SprintUseCase.switch_sprint_member(user=developer2,sprint_member=sprint_member, workload=69, request_user=developer, project_id=self.project.id)
+        self.assertEqual(sprint_member.user, developer2, 'No se edito el miembro del sprint')
+        

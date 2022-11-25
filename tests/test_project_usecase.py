@@ -525,3 +525,22 @@ class ProjectUseCaseTest(TestCase):
 
         has_association = ProjectUseCase.has_association_with_user_story(us_type.id)
         self.assertTrue(has_association, "El tipo de user story no tiene asociacion con un user story")
+
+    def test_get_project_sprints(self):
+        """
+        Funcion que prueba la obtencion de los sprints de un proyecto
+        """
+        data_project = {
+            'name': 'Proyecto 2',
+            'description': 'Descripcion del proyecto 2',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+
+        project = ProjectUseCase.create_project(**data_project)
+        sprint = SprintUseCase.create_sprint(project.id, duration=5)
+        sprint.status = 'IN_PROGRESS'
+        sprint = SprintUseCase.create_sprint(project.id, duration=5)
+
+        sprints = ProjectUseCase.get_project_sprints(project.id)
+        self.assertEqual(len(sprints), 2, "No se obtuvieron los sprints del proyecto")
