@@ -221,7 +221,7 @@ class SprintUseCase:
         """
         if (sprint):
             sprint.end_date = SprintUseCase.calculate_sprint_end_date(sprint.start_date, sprint.duration, sprint.project_id)
-            sprint.estimated_end_date = SprintUseCase.calculate_sprint_end_date(sprint.start_date, sprint.duration, sprint.project_id)
+            sprint.estimated_end_date = sprint.end_date
             sprint.save()
         return sprint
 

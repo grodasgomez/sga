@@ -8,6 +8,7 @@ from projects.models import Permission, Project, ProjectMember, Role, UserStoryT
 from projects.usecase import ProjectUseCase, RoleUseCase
 from sprints.usecase import SprintUseCase
 from users.models import CustomUser
+from datetime import datetime
 
 class ProjectUseCaseTest(TestCase):
     def setUp(self):
@@ -426,12 +427,18 @@ class ProjectUseCaseTest(TestCase):
 
         SprintUseCase.assign_us_sprint(sprint.id, us.id)
         SprintUseCase.start_sprint(sprint)
+
+        sprint.start_date=datetime(2022,11,4)
+        sprint.end_date=SprintUseCase.calculate_sprint_end_date(sprint.start_date.date(), sprint.duration, sprint.project_id)
+
+        sprint.save()
+
         sprint = SprintUseCase.get_sprint_by_id(sprint.id)
         old_end_date=sprint.end_date
-
+        
         holiday = ProjectUseCase.create_holiday(project_id=project.id,date=data['date']) #creacion de feriado
         sprint=SprintUseCase.recalculate_sprint_end_date(SprintUseCase.get_current_sprint(project.id))
-
+        
         self.assertNotEqual(old_end_date, sprint.end_date, "La fecha de fin del sprint sigue siendo la misma despues de agregar un feriado en un dia habil")
     
     def test_update_end_date_of_sprint_when_delete_a_holiday(self):
@@ -468,6 +475,11 @@ class ProjectUseCaseTest(TestCase):
         SprintUseCase.assign_us_sprint(sprint.id, us.id)
         holiday = ProjectUseCase.create_holiday(project_id=project.id,date=data['date']) #creacion de feriado
         SprintUseCase.start_sprint(sprint)
+        sprint.start_date=datetime(2022,11,4)
+        sprint.end_date=SprintUseCase.calculate_sprint_end_date(sprint.start_date.date(), sprint.duration, sprint.project_id)
+
+        sprint.save()
+
         sprint = SprintUseCase.get_sprint_by_id(sprint.id)
         old_end_date=sprint.end_date
 

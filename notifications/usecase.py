@@ -186,4 +186,16 @@ class NotificationUseCase:
         for sprint_member in sprint_members:
             Notification.objects.create(
                 user=sprint_member.user, content=content, title=title)
+    
+    @staticmethod
+    def notify_add_scrum_master_to_project(user, project):
+        """
+        Notifica a un usuario que ha sido agregado como scrum master a un proyecto
+        """
+        url = reverse('projects:project-detail',
+                      kwargs={'project_id': project.id})
+        project_str = f"<a href='{url}'>{project.name}</a>"
+        content = f'Ahora eres Scrum Master del proyecto {project_str}'
+        title = f"Agregado al proyecto {project.name} como Scrum Master"
+        Notification.objects.create(user=user, content=content, title=title)
 

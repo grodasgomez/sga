@@ -131,7 +131,10 @@ class ProjectCreateView(AdminMixin, View):
         form = self.form_class(request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
-            ProjectUseCase.create_project(**cleaned_data)
+            project=ProjectUseCase.create_project(**cleaned_data)
+
+            NotificationUseCase.notify_add_scrum_master_to_project(cleaned_data['scrum_master'], project)
+
             messages.success(request, 'Proyecto creado correctamente')
             return HttpResponseRedirect('/projects')
         return render(request, 'projects/create.html', {'form': form})
