@@ -48,13 +48,17 @@ class SprintCreateView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMi
     template_name = 'sprints/create.html'
 
     def get(self, request, project_id, **kwargs):
-        # Si el proyecto no esta en planeacion, no se puede crear un sprint
+        # Si el proyecto no esta en progreso, no se puede crear un sprint
         if not ProjectUseCase.get_project_status(project_id) == ProjectStatus.IN_PROGRESS:
             messages.warning(request, 'El proyecto aun no fue iniciado')
             return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
         # Si ya existe un sprint en planeacion, no se puede crear otro
         if SprintUseCase.exists_created_sprint(project_id):
             messages.warning(request, 'Ya existe un sprint en planeación')
+            return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
+        # Si no existe US en el backlog, no se puede crear un sprint
+        if not ProjectUseCase.user_stories_in_progress_by_project_exists(project_id):
+            messages.warning(request, 'No existen historias de usuario en el Backlog para crear un sprint')
             return redirect(reverse('projects:sprints:index', kwargs={'project_id': project_id}))
         return super().get(request, project_id, **kwargs)
 

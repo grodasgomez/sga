@@ -399,6 +399,13 @@ class ProjectUseCase:
         us_type = UserStoryType.objects.get(id=us_type_id)
         us_type.delete()
         return us_type
+    
+    @staticmethod
+    def user_stories_in_progress_by_project_exists(project_id):
+        """
+        cuenta las historias de usuario activas de un proyecto
+        """
+        return UserStory.objects.filter(project_id=project_id, status=UserStoryStatus.IN_PROGRESS, sprint=None).exists()
 
 class RoleUseCase:
     @staticmethod
