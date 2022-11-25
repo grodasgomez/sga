@@ -30,7 +30,11 @@
       {% endfor %}
   </div>
   {% else %}
-    Aun no tienes proyectos
+    {% if user.is_admin %}
+      Eres un administrador del Sistema
+    {% else %}
+      No tienes proyectos asignados
+    {% endif %}
   {% endif %}
 {%endif%}
 {% endblock %}
