@@ -61,7 +61,7 @@ class NotificationUseCase:
     @staticmethod
     def notify_deassign_us(user, user_story):
         """
-        Notifica a un usuario que se le ha asignado un user story
+        Notifica a un usuario que se le ha desasignado un user story
         """
         project = user_story.project
         url = reverse('projects:project-backlog-detail',
