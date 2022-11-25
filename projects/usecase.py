@@ -48,13 +48,6 @@ class ProjectUseCase:
         else:
             project.status = ProjectStatus.FINISHED
             project.end_date = date.today()
-            user_stories = UserStory.objects.filter(project=project)
-            for us in user_stories:
-                us.sprint = None
-                us.column = 0
-                us.sprint_member = None
-                us.save()
-
             project.save()
             return 0
 
@@ -68,9 +61,6 @@ class ProjectUseCase:
         project.end_date = date.today()
         user_stories = UserStory.objects.filter(project=project)
         for us in user_stories:
-            us.sprint = None
-            us.column = 0
-            us.sprint_member = None
             us.status = UserStoryStatus.CANCELLED
             us.save()
         sprints = Sprint.objects.filter(project=project)
