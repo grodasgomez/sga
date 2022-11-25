@@ -14,23 +14,21 @@
     <br>
     <b>Tus proyectos</b>
     <br>
-    <table>
-    <th><br></th>
-    <tr>
+    <div class="boxflex">
     {% for project in projects %}
-      <td>
         <div class="cardproject">
-            <a href="{% url 'projects:project-detail' project_id=project.id %}" style="text-decoration: none">{{ project.name }}</a>
+            <strong>{{project.name}}</strong>
+            <div>
             <p></p>
+            <a href="{% url 'projects:project-detail' project_id=project.id %}" style="text-decoration: none">Detalles</a>
+            <br>
             {% if project.sprint_id %}
               <a href="{% url 'projects:board:index' project_id=project.id %}" style="text-decoration: none">Tablero</a>
             {% endif %}
+            </div>
         </div>
-      </td>
-      <td>&nbsp</td>
       {% endfor %}
-    </tr>
-    </table>
+  </div>
   {% else %}
     Aun no tienes proyectos
   {% endif %}
