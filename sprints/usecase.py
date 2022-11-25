@@ -246,7 +246,6 @@ class SprintUseCase:
 
         return aux
 
-
     @staticmethod
     def finish_sprint(sprint, user, project_id):
         """

@@ -332,7 +332,7 @@ class ProjectUseCase:
         Obtiene los dias festivos de un proyecto
         """
         return ProjectHoliday.objects.filter(project_id=project_id)
-    
+
     @staticmethod
     def get_holiday_by_id(id):
         """
@@ -346,7 +346,7 @@ class ProjectUseCase:
         Crea un feriado
         """
         return ProjectHoliday.objects.create(project_id=project_id, date=date)
-    
+
     @staticmethod
     def delete_holiday(id):
         """
@@ -399,13 +399,29 @@ class ProjectUseCase:
         us_type = UserStoryType.objects.get(id=us_type_id)
         us_type.delete()
         return us_type
-    
+
     @staticmethod
     def user_stories_in_progress_by_project_exists(project_id):
         """
         cuenta las historias de usuario activas de un proyecto
         """
         return UserStory.objects.filter(project_id=project_id, status=UserStoryStatus.IN_PROGRESS, sprint=None).exists()
+
+    @staticmethod
+    def get_projects_and_sprint_active(user):
+        projects = Project.objects.all()
+        project_html = []
+        for project in projects:
+            #debe ser miembro del proyecto y el proyecto debe estar activo
+            if project.project_members.filter(id=user.id).exists() and (project.status == "CREATED" or project.status == "IN_PROGRESS"):
+                sprint = Sprint.objects.filter(project_id=project.id, status=SprintStatus.IN_PROGRESS).first()
+                project.name = project.name[:19] + "..." if len(project.name) > 22 else project.name
+                if sprint:
+                    project.sprint_id = sprint.id
+                else:
+                    project.sprint_id = None
+                project_html.append(project)
+        return project_html
 
 class RoleUseCase:
     @staticmethod
