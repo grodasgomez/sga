@@ -437,7 +437,8 @@ class SprintBoardView(CustomLoginMixin, ProjectAccessMixin, View):
             'current_member': {
                 'id': request.user.id,
                 'roles': [role.name for role in current_member.roles.all()]
-            }
+            },
+            "backpage": reverse("projects:sprints:detail", kwargs={"project_id": project_id, "sprint_id": sprint.id})
         }
         return render(request, 'sprints/board.html', context)
 
