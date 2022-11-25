@@ -6,6 +6,7 @@ from sga import widgets
 from users.models import CustomUser
 from projects.usecase import RoleUseCase
 from projects.models import Permission
+from sprints.models import Sprint
 from user_stories.models import UserStory, UserStoryComment
 from datetime import datetime
 
@@ -319,15 +320,27 @@ class FormEditUserStory(forms.Form):
     """
     Formulario para editar una historia de usuario en un proyecto
     """
-    def __init__(self, project_id, *args, **kwargs):
+    def __init__(self, project_id, us_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.project_id = project_id
+        self.user_story_id = us_id
         self.fields['us_type'] = forms.CharField(max_length=100, label='Tipo de Historia de Usuario',widget=widgets.TextInput(attrs={'readonly': 'readonly'}))  # TIPO US
         self.fields['title'] = forms.CharField(max_length=100, label='Titulo',widget=widgets.TextInput(attrs={'readonly': 'readonly'}))  # TITULO del US
         self.fields['description'] = forms.CharField(max_length=100, label='Descripcion',widget=widgets.TextInput())  # descripcion del US
         self.fields['business_value'] = forms.IntegerField( min_value=1, max_value=100 ,label='Valor de Negocio',widget=widgets.NumberInput())  # Valor de Negocio del US
         self.fields['technical_priority'] = forms.IntegerField(min_value=1, max_value=100 ,label='Prioridad Tecnica',widget=widgets.NumberInput())  # Prioridad Tecnica del US
         self.fields['estimation_time'] = forms.IntegerField(min_value=1, max_value=100 , label='Tiempo estimado',widget=widgets.NumberInput())  # Tiempo estimado del US
+
+    def clean(self):
+        cleaned_data = super().clean()
+        estimation_time = cleaned_data.get('estimation_time')
+        old_us = UserStory.objects.get(id=self.user_story_id)
+        sprint = Sprint.objects.filter(id=old_us.sprint_id).first()
+        sprint_was_changed = True if sprint and sprint.status != 'PLANNED' else False
+        if estimation_time != old_us.estimation_time and sprint_was_changed:
+            raise forms.ValidationError(build_field_error(
+                'estimation_time', 'No puede modificar el tiempo puesto que el Sprint ya fue iniciado'))
+        return cleaned_data
 
 class FormCreateComment(forms.Form):
     """

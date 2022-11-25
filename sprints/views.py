@@ -129,7 +129,6 @@ class SprintFinishView(CustomLoginMixin, SprintPermissionMixin, SprintStatusMixi
 
     def get(self, request, project_id, sprint_id):
         sprint = Sprint.objects.get(id=sprint_id)
-        #todo: usecase
         us = UserStory.objects.filter(sprint_id=sprint_id)
         us_type = UserStoryType.objects.filter(project_id=project_id)
         us_show = []

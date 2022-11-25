@@ -93,7 +93,6 @@ class ProjectMembersView(CustomLoginMixin, ProjectAccessMixin, View):
             "project_id" : project_id,
             "backpage": reverse("projects:project-detail", kwargs={"project_id": project_id})
         }
-        #TODO: realizar un usecase get_project_members_with_roles()
         for member in members:
             scrum_master = False
             roles = RoleUseCase.get_roles_from_member(member, data)
@@ -498,7 +497,6 @@ class ProductBacklogCreateView(CustomLoginMixin, ProjectPermissionMixin, Project
         has_perm = ProjectUseCase.member_has_permissions(user.id, project_id, self.permissions)
         has_role_SM = ProjectUseCase.member_has_roles(user.id, project_id, ['Scrum Master'])
         has_role_PO = ProjectUseCase.member_has_roles(user.id, project_id, ['Product Owner'])
-        #TODO: solo se necesita preguntar si es PO, cualquier otro rol tiene formulario completo
         form = FormCreateUserStory(project_id)
         if has_perm or has_role_SM:
             form = FormCreateUserStory(project_id)
@@ -730,7 +728,7 @@ class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, UserStory
         user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
         data=user_story.__dict__
         data['us_type']=user_story.us_type.name
-        form = FormEditUserStory(project_id,initial=data)
+        form = FormEditUserStory(project_id,us_id,initial=data)
         context= {
             "form" : form,
             "backpage": reverse("projects:project-backlog", kwargs={"project_id": project_id})
@@ -739,7 +737,7 @@ class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, UserStory
 
     def post(self, request, project_id, us_id):
 
-        form = FormEditUserStory(project_id,request.POST, request.FILES)
+        form = FormEditUserStory(project_id,us_id,request.POST, request.FILES)
         context= {
             "form" : form,
             "backpage": reverse("projects:project-backlog", kwargs={"project_id": project_id})
@@ -1041,7 +1039,7 @@ class VelocityChartView(CustomLoginMixin, ProjectAccessMixin, View):
     def get(self, request, project_id):
         project_sprints = ProjectUseCase.get_project_sprints(project_id)
 
-        if not project_sprints:#todo esta bien la verificacion?
+        if not project_sprints:
             messages.warning(request, "El Proyecto no tiene Sprints")
             return redirect(reverse("projects:project-detail", kwargs={"project_id": project_id}))
 

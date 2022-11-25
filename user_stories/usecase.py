@@ -143,7 +143,7 @@ class UserStoriesUseCase:
             sprint_member=SprintMember.objects.get(user=user,sprint=sprint),
             description=description,
             hours_worked=hours,
-            column=user_story.column #TODO esta bien?
+            column=user_story.column
         )
 
     @staticmethod

@@ -158,7 +158,7 @@ class SprintUseCase:
         us.save()
         return us
 
-    @staticmethod #todo, verificacion, esta bien esto?
+    @staticmethod
     def assign_us_sprint_member(sprint_member, user_story_id):
         """
         Asigna una historia de usuario a un miembro de un sprint
