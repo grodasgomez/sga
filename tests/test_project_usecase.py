@@ -373,7 +373,7 @@ class ProjectUseCaseTest(TestCase):
 
         self.assertIn(holiday, ProjectUseCase.get_holidays_by_project(project.id), "El feriado no fue agregado al proyecto")
 
-    
+
     def test_delete_holiday(self):
         """
         Funcion que prueba la eliminacion de un feriado
@@ -393,7 +393,7 @@ class ProjectUseCaseTest(TestCase):
         holiday = ProjectUseCase.delete_holiday(holiday.id) #eliminacion de feriado
 
         self.assertNotIn(holiday, ProjectUseCase.get_holidays_by_project(project.id), "El feriado no fue eliminado del proyecto")
-    
+
 
     def test_update_end_date_of_sprint_when_create_a_holiday(self):
         """
@@ -436,12 +436,12 @@ class ProjectUseCaseTest(TestCase):
 
         sprint = SprintUseCase.get_sprint_by_id(sprint.id)
         old_end_date=sprint.end_date
-        
+
         holiday = ProjectUseCase.create_holiday(project_id=project.id,date=data['date']) #creacion de feriado
         sprint=SprintUseCase.recalculate_sprint_end_date(SprintUseCase.get_current_sprint(project.id))
-        
+
         self.assertNotEqual(old_end_date, sprint.end_date, "La fecha de fin del sprint sigue siendo la misma despues de agregar un feriado en un dia habil")
-    
+
     def test_update_end_date_of_sprint_when_delete_a_holiday(self):
         """
         Funcion que prueba la actualizacion de la fecha estimada de un sprint cuando se borra un feriado
@@ -545,7 +545,7 @@ class ProjectUseCaseTest(TestCase):
 
         sprints = ProjectUseCase.get_project_sprints(project.id)
         self.assertEqual(len(sprints), 2, "No se obtuvieron los sprints del proyecto")
-    
+
     def test_finish_project(self):
         """
         Funcion que prueba la finalizacion de un proyecto
@@ -572,4 +572,20 @@ class ProjectUseCaseTest(TestCase):
 
         self.assertEqual(ProjectUseCase.get_project_status(project.id), ProjectStatus.FINISHED, "El proyecto no fue finalizado")
 
+    def test_get_home_cards(self):
+        """
+        Funcion que prueba la obtencion de los proyectos de la pagina home
+        """
+        data1 = {
+            'name': 'Proyecto 1',
+            'description': 'Descripcion del proyecto 1',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+        project = ProjectUseCase.create_project(**data1)
+        sprint = SprintUseCase.create_sprint(project.id, duration=14)
+        sprint.status = SprintStatus.IN_PROGRESS.value
+        sprint.save()
 
+        project_list = ProjectUseCase.get_projects_and_sprint_active(self.scrum_master)
+        self.assertEqual(len(project_list), 1, "No se obtuvieron los proyectos correctos")
