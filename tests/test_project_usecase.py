@@ -4,11 +4,12 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sga.settings")
 setup()
-from projects.models import Permission, Project, ProjectMember, Role, UserStoryType
+from projects.models import Permission, Project, ProjectMember, Role, UserStoryType, ProjectStatus
 from projects.usecase import ProjectUseCase, RoleUseCase
 from sprints.usecase import SprintUseCase
 from users.models import CustomUser
 from datetime import datetime
+from sprints.models import SprintStatus
 
 class ProjectUseCaseTest(TestCase):
     def setUp(self):
@@ -544,3 +545,31 @@ class ProjectUseCaseTest(TestCase):
 
         sprints = ProjectUseCase.get_project_sprints(project.id)
         self.assertEqual(len(sprints), 2, "No se obtuvieron los sprints del proyecto")
+    
+    def test_finish_project(self):
+        """
+        Funcion que prueba la finalizacion de un proyecto
+        """
+        data1 = {
+            'name': 'Proyecto 1',
+            'description': 'Descripcion del proyecto 1',
+            'prefix': 'P1',
+            'scrum_master': self.scrum_master,
+        }
+        project = ProjectUseCase.create_project(**data1)
+        ProjectUseCase.start_project(project.id)
+        sprint = SprintUseCase.create_sprint(project.id, duration=14)
+        sprint.status = SprintStatus.IN_PROGRESS.value
+        sprint.save()
+
+        user = CustomUser()
+        user.role_system = "user"
+        user.email = "user1@gmail.com"
+
+        SprintUseCase.finish_sprint(sprint, user, project.id)
+
+        resul=ProjectUseCase.finish_project(project.id)
+
+        self.assertEqual(ProjectUseCase.get_project_status(project.id), ProjectStatus.FINISHED, "El proyecto no fue finalizado")
+
+
