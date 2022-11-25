@@ -359,7 +359,10 @@ class SprintBacklogAssignMemberView(CustomLoginMixin, SprintPermissionMixin, Spr
 
             us_data=UserStory.objects.get(id=user_story_id)
             UserStoriesUseCase.create_user_story_history(old_us, us_data, request.user, project_id)
-            messages.success(request, f"Miembro <strong>{cleaned_data['sprint_member']}</strong> asignado correctamente al US <strong>{us_data.title}</strong>")
+            if cleaned_data['sprint_member']:
+                messages.success(request, f"Miembro <strong>{cleaned_data['sprint_member']}</strong> asignado correctamente al US <strong>{us_data.title}</strong>")
+            else:
+                messages.success(request, f"Miembro desasignado de <strong>{us_data.title}</strong>")
             return redirect(reverse('projects:sprints:backlog', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
         return render(request, 'sprints/backlog_assign_member.html', {'form': form})
 
