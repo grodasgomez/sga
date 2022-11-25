@@ -1,0 +1,42 @@
+{% extends 'sga/layout/base_generic.html'%}
+{% block content %}
+<b></b>
+	<h1>Finalizar Sprint</h1>
+	{% if us %}
+		<h2>Las siguientes historias seran finalizadas</h2>
+		<table class="table-custom">
+			<thead>
+			<tr>
+				<th scope="col">Codigo</th>
+				<th scope="col">Titulo</th>
+				<th scope="col">Descripcion</th>
+				<th scope="col">Valor de negocio</th>
+				<th scope="col">Prioridad Tecnica</th>
+				<th scope="col">Tiempo Estimado (Hs)</th>
+				<th scope="col">Prioridad para sprint</th>
+				<th scope="col">Tipo</th>
+			</tr>
+			</thead>
+			<tbody>
+			{% for u in us %}
+			<tr height="60px">
+				<td>{{ u.code }}</td>
+				<td>{{ u.title }}</td>
+				<td>{{ u.description }}</td>
+				<td>{{ u.business_value }}</td>
+				<td>{{ u.technical_priority }}</td>
+				<td>{{ u.estimation_time }}</td>
+				<td>{{ u.sprint_priority }}</td>
+				<td>{{ u.us_type.name }}</td>
+			</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	{% else %}
+		<h2>No existen historias a ser finalizadas</h2>
+	{% endif %}
+	<form method="post" class="form row g-3">
+	{% csrf_token %}
+		<input type="submit" value="Finalizar">
+	</form>
+{% endblock %}

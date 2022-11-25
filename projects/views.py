@@ -73,15 +73,10 @@ class ProjectView(CustomLoginMixin, ProjectAccessMixin, View):
 
     def post(self, request, project_id):
         project: Project = Project.objects.get(id=project_id)
-        print ("Project")
-        print  (project.status)
         if project.status == ProjectStatus.CREATED:
-            print ("Project 2")
             ProjectUseCase.start_project(project_id)
-            print ("Project started")
             messages.success(request, 'Proyecto iniciado correctamente')
             return redirect(reverse("projects:project-detail", kwargs={"project_id": project_id}))
-            #return redirect(request.META['HTTP_REFERER'])
         elif project.status == ProjectStatus.IN_PROGRESS:
             return redirect(reverse("projects:finish", kwargs={"project_id": project_id}))
 
@@ -752,7 +747,7 @@ class ProductBacklogEditView(CustomLoginMixin, ProjectPermissionMixin, UserStory
         if form.is_valid():
             cleaned_data = form.cleaned_data
             old_user_story = ProjectUseCase.get_user_story_by_id(id=us_id)
-            
+
             ProjectUseCase.edit_user_story(us_id, **cleaned_data)
 
             new_user_story = ProjectUseCase.get_user_story_by_id(id=us_id)

@@ -111,11 +111,34 @@ class SprintView(CustomLoginMixin, SprintAccessMixin, DetailView):
                 NotificationUseCase.notify_start_sprint(request.user, project_id, sprint)
                 messages.success(request, f"Sprint iniciado correctamente")
             elif sprint.status == "IN_PROGRESS":
-                SprintUseCase.finish_sprint(sprint, request.user, self.kwargs.get('project_id'))
-                NotificationUseCase.notify_finish_sprint(request.user, project_id, sprint)
-                messages.success(request, f"Sprint finalizado correctamente, prioridad de las historias de usuario actualizada")
+                return redirect(reverse("projects:sprints:finish", kwargs={"project_id": project_id, "sprint_id": sprint_id}))
         except CustomError as e:
             messages.warning(request, e)
+        return redirect(reverse('projects:sprints:detail', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
+
+class SprintFinishView(CustomLoginMixin, SprintPermissionMixin, SprintStatusMixin, View):
+    """
+    """
+    permissions = ['["ABM Sprint"]']
+    roles = ['Scrum Master']
+
+    def get(self, request, project_id, sprint_id):
+        sprint = Sprint.objects.get(id=sprint_id)
+        #todo: usecase
+        us = UserStory.objects.filter(sprint_id=sprint_id)
+        us_type = UserStoryType.objects.filter(project_id=project_id)
+        us_show = []
+        for u in us:
+            if len(u.us_type.columns) - 1 == u.column:
+                us_show.append(u)
+        context = { "us": us_show }
+        return render(request, 'sprints/finish.html', context)
+
+    def post(self, request, project_id, sprint_id):
+        sprint = Sprint.objects.get(id=sprint_id)
+        SprintUseCase.finish_sprint(sprint, request.user, self.kwargs.get('project_id'))
+        NotificationUseCase.notify_finish_sprint(request.user, project_id, sprint)
+        messages.success(request, f"Sprint finalizado correctamente, prioridad de las historias de usuario actualizada")
         return redirect(reverse('projects:sprints:detail', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
 
 class SprintMemberCreateView(CustomLoginMixin, SprintPermissionMixin, SprintStatusMixin, FormView):
