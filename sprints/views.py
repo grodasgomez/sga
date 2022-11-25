@@ -36,7 +36,7 @@ class SprintListView(CustomLoginMixin, ProjectAccessMixin, ListView):
         context['backpage'] = reverse('projects:project-detail', kwargs={'project_id': context['project_id']})
 
         return context
-#todo: block sin backlog
+
 class SprintCreateView(CustomLoginMixin, ProjectPermissionMixin, ProjectStatusMixin, FormView):
     """
     Vista para crear un nuevo sprint
@@ -122,9 +122,10 @@ class SprintView(CustomLoginMixin, SprintAccessMixin, DetailView):
 
 class SprintFinishView(CustomLoginMixin, SprintPermissionMixin, SprintStatusMixin, View):
     """
+    Vista para finalizar un sprint
     """
-    permissions = ['["ABM Sprint"]']
-    roles = ['Scrum Master']
+    permissions = ["ABM Sprint"]
+    roles = ["Scrum Master"]
 
     def get(self, request, project_id, sprint_id):
         sprint = Sprint.objects.get(id=sprint_id)
@@ -142,7 +143,7 @@ class SprintFinishView(CustomLoginMixin, SprintPermissionMixin, SprintStatusMixi
         sprint = Sprint.objects.get(id=sprint_id)
         SprintUseCase.finish_sprint(sprint, request.user, self.kwargs.get('project_id'))
         NotificationUseCase.notify_finish_sprint(request.user, project_id, sprint)
-        messages.success(request, f"Sprint finalizado correctamente, prioridad de las historias de usuario actualizada")
+        messages.success(request, f"Sprint finalizado correctamente, prioridades y estados de las historias de usuario actualizadas")
         return redirect(reverse('projects:sprints:detail', kwargs={'project_id': project_id, 'sprint_id': sprint_id}))
 
 class SprintMemberCreateView(CustomLoginMixin, SprintPermissionMixin, SprintStatusMixin, FormView):
